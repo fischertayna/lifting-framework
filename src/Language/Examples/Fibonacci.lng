@@ -1,0 +1,9 @@
+main () {
+  fib (6)
+}
+
+fib (n) {
+  if (n * (n - 1))
+    then fib(n -1) + fib(n-2)
+    else 1
+}
