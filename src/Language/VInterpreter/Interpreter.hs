@@ -95,16 +95,6 @@ partition (Var lvint) =
 (+++) :: VarInt -> VarInt -> VarInt
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
 
--- EIf cond expt expe -> restrictThen `union` restrictElse
---   where
---     condV@[(pred, pc)] = valList $ evalV context cond
---     truePartition = filter (\(pred, pc) -> pred /= 0) condV
---     falsePartition = filter (\(pred, pc) -> pred == 0) condV
---     truePartitionDisj = foldr (\(pred, pc) disj -> disj \/ pc) falsePC truePartition
---     falsePartitionDisj = foldr (\(pred, pc) disj -> disj \/ pc) falsePC falsePartition
---     restrictThen = restrict truePartitionDisj (evalV context expt)
---     restrictElse = restrict falsePartitionDisj (evalV context expe)
-
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing
 lookup ((i, v) : cs) s
