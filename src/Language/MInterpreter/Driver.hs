@@ -5,6 +5,7 @@ import Language.MInterpreter.Interpreter
 
 import Language.Frontend.ErrM
 import Memoization.Core.State ((<.>), State (runState))
+import Memoization.Core.Memory (KeyValueArray)
 
 main :: IO ()
 main = do
@@ -12,12 +13,15 @@ main = do
   putStrLn ""
 
 input :: Integer
-input = 6
+input = 24
 
-initialState :: [Integer]
+initialState :: KeyValueArray [Integer] Integer
 initialState = []
+
+memoizedFunctionName :: String
+memoizedFunctionName = "fib"
 
 calc :: String -> String
 calc s =
   let Ok p = pProgram  (myLexer s)
-  in show $ runState (evalP p <.> return input) initialState
+  in show $ runState (evalP p memoizedFunctionName <.> return input) initialState
