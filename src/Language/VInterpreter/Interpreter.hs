@@ -9,7 +9,6 @@ import Language.Frontend.AbsLanguage
   )
 import Prelude hiding (lookup)
 import Debug.Trace
-import Text.XHtml (base)
 
 type Context k v = [(k, v)]
 type RContext = (VContext, FContext)
