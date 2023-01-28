@@ -1,5 +1,5 @@
-main () {
-  fib (6)
+main (n) {
+  fib (n)
 }
 
 fib (n) {

@@ -17,10 +17,10 @@ type VContext = Context Ident Integer
 
 type FContext = Context Ident Function
 
-evalP :: Program -> Integer
-evalP (Prog fs) = eval context (Call (Ident "main") [])
+evalP :: Program -> Integer -> Integer
+evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
   where
-    initialFContext = updatecF ([], []) fs
+    initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
 eval :: RContext -> Exp -> Integer
