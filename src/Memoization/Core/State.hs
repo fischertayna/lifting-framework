@@ -11,7 +11,6 @@ instance Functor (State s') where
     let (a, s') = runState am s
      in (f a, s')
 
--- Note: I'm not 100% sure this is the right implementation for <*>
 instance Applicative (State s') where
   pure :: a -> State s' a
   pure x = State (x,)
@@ -19,7 +18,7 @@ instance Applicative (State s') where
   fm <*> am = State $ \s ->
     let (f, s') = runState fm s
         (a, s'') = runState am s'
-     in (f a, s)
+     in (f a, s'')
 
 instance Monad (State s') where
   (>>=) :: State s' a -> (a -> State s' b) -> State s' b
