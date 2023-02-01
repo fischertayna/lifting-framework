@@ -8,17 +8,20 @@ import Language.Frontend.AbsLanguage
     Program (..),
   )
 import Prelude hiding (lookup)
-import Debug.Trace
 
 type Context k v = [(k, v)]
+
 type RContext = (VContext, FContext)
+
 type VContext = Context Ident VarInt
+
 type FContext = Context Ident Function
+
 type PresenceCondition = Bool
 
 type Val a = (a, PresenceCondition)
 
-newtype Var t = Var [Val t] deriving Show
+newtype Var t = Var [Val t] deriving (Show)
 
 type VarInt = Var Integer
 
@@ -35,10 +38,10 @@ applyOperator context exp0 exp1 op =
     ]
 
 sat :: PresenceCondition -> Bool
-sat b = b
+sat b = b == truePC
 
 unsat :: PresenceCondition -> Bool
-unsat = not
+unsat b = b == falsePC
 
 evalPV :: Program -> VarInt -> VarInt
 evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
@@ -61,7 +64,7 @@ falsePC = False
 union :: VarInt -> VarInt -> VarInt
 union (Var ls1) (Var ls2) = Var $ ls1 ++ ls2
 
-evalV :: (VContext, FContext) -> Exp -> Var Integer
+evalV :: RContext -> Exp -> Var Integer
 evalV context@(vcontext, fcontext) x = case x of
   EInt n -> Var [(n, True)]
   EAdd exp0 exp1 -> applyOperator context exp0 exp1 (+)
@@ -74,13 +77,16 @@ evalV context@(vcontext, fcontext) x = case x of
       (Fun _ decls fExp) = fromJust $ lookup fcontext fId
       paramBindings = zip decls (map (evalV context) pExps)
   EIf e eT eE ->
-    let (pct, pcf) = partition (evalV context e)
-     in let veT = evalV context eT
-         in let veE = evalV context eE
-             in if pct == truePC then veT
-                else if pct == falsePC then veE
-                else (veT ||| pct) +++ (veE ||| pcf)
-
+    if pct == truePC
+      then evalV context eT
+      else
+        if pct == falsePC
+          then evalV context eE
+          else (restrictedEvalET ||| pct) +++ (restrictedEvalEE ||| pcf)
+    where
+      (pct, pcf) = partition (evalV context e)
+      restrictedEvalET = evalV (restrictContext context pct) eT
+      restrictedEvalEE = evalV (restrictContext context pcf) eE
 
 partition :: VarInt -> (PresenceCondition, PresenceCondition)
 partition (Var lvint) =
@@ -89,8 +95,13 @@ partition (Var lvint) =
     (False, False)
     lvint
 
+restrictContext :: RContext -> PresenceCondition -> RContext
+restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
+  where
+    restrictedVContext = [(vId, restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = vInt ||| pc]
+
 (|||) :: VarInt -> PresenceCondition -> VarInt
-(Var listPCv) ||| pcR = Var (map (\(v, pc) -> (v, pc && pcR)) listPCv)
+(Var listPCv) ||| pcR = Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc && pcR, sat pc'])
 
 (+++) :: VarInt -> VarInt -> VarInt
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
