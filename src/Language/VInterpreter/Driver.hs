@@ -1,8 +1,9 @@
 import Language.Frontend.AbsLanguage
 import Language.Frontend.ErrM
-import Language.Frontend.LexLanguage
-import Language.Frontend.ParLanguage
-import Language.VInterpreter.Interpreter
+import Language.Frontend.LexLanguage ()
+import Language.Frontend.ParLanguage (myLexer, pProgram)
+import Language.VInterpreter.Interpreter (evalPV)
+import Variability.VarTypes (PresenceCondition, Var (Var), VarInt)
 
 main :: IO ()
 main = do
@@ -16,7 +17,7 @@ pc2 :: PresenceCondition
 pc2 = False
 
 inputParam :: VarInt
-inputParam = Var [(6, pc1), (3,pc2)]
+inputParam = Var [(6, pc1), (3, pc2)]
 
 calc :: String -> String
 calc s =
