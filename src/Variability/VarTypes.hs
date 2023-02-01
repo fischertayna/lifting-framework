@@ -6,9 +6,7 @@ type Val a = (a, PresenceCondition)
 
 newtype Var t = Var [Val t] deriving (Show)
 
-type VarInt = Var Integer
-
-valList :: VarInt -> [Val Integer]
+valList :: Var a -> [Val a]
 valList (Var ls) = ls
 
 sat :: PresenceCondition -> Bool
@@ -29,18 +27,21 @@ truePC = True
 falsePC :: PresenceCondition
 falsePC = False
 
-union :: VarInt -> VarInt -> VarInt
+union :: Var a -> Var a -> Var a
 union (Var ls1) (Var ls2) = Var $ ls1 ++ ls2
 
-partition :: VarInt -> (PresenceCondition, PresenceCondition)
-partition (Var lvint) =
-  foldr
-    (\(v, pc) (pct, pcf) -> (pct || ((v /= 0) && pc), pcf || ((v == 0) && pc)))
-    (False, False)
-    lvint
+unions :: [Var t] -> Var t
+unions = foldr union (Var [])
 
-(|||) :: VarInt -> PresenceCondition -> VarInt
+(|||) :: Var a -> PresenceCondition -> Var a
 (Var listPCv) ||| pcR = Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc && pcR, sat pc'])
 
-(+++) :: VarInt -> VarInt -> VarInt
+(+++) :: Var a -> Var a -> Var a
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
+
+apply_ :: Val (a -> b) -> Var a -> Var b
+apply_ (fn, fnpc) x'@(Var x) =
+  Var [(fn v, pc') | (v, !pc) <- x, let pc' = fnpc /\ pc, sat pc']
+
+apply :: Var (a -> b) -> Var a -> Var b
+apply f@(Var fn) x = unions [apply_ f x | f <- fn]

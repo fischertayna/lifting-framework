@@ -10,9 +10,7 @@ import Language.Frontend.AbsLanguage
 import Variability.VarTypes
   ( PresenceCondition,
     Var (..),
-    VarInt,
     falsePC,
-    partition,
     sat,
     truePC,
     valList,
@@ -21,11 +19,13 @@ import Variability.VarTypes
   )
 import Prelude hiding (lookup)
 
+type VarInteger = Var Integer
+
 type Context k v = [(k, v)]
 
 type RContext = (VContext, FContext)
 
-type VContext = Context Ident VarInt
+type VContext = Context Ident VarInteger
 
 type FContext = Context Ident Function
 
@@ -53,13 +53,13 @@ evalV context@(vcontext, fcontext) x = case x of
       restrictedEvalET = evalV (restrictContext context pct) eT
       restrictedEvalEE = evalV (restrictContext context pcf) eE
 
-evalPV :: Program -> VarInt -> VarInt
+evalPV :: Program -> VarInteger -> VarInteger
 evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
   where
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
-applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarInt
+applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarInteger
 applyOperator context exp0 exp1 op =
   Var
     [ (i1 `op` i2, pc1 && pc2)
@@ -72,6 +72,13 @@ restrictContext :: RContext -> PresenceCondition -> RContext
 restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
   where
     restrictedVContext = [(vId, restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = vInt ||| pc]
+
+partition :: VarInteger -> (PresenceCondition, PresenceCondition)
+partition (Var lvint) =
+  foldr
+    (\(v, pc) (pct, pcf) -> (pct || ((v /= 0) && pc), pcf || ((v == 0) && pc)))
+    (False, False)
+    lvint
 
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing
