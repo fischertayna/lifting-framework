@@ -1,6 +1,5 @@
 module Language.MInterpreter.SLDriver where
 
-
 import Language.Frontend.AbsLanguage
 import Language.Frontend.ErrM
 import Language.Frontend.LexLanguage
@@ -8,7 +7,7 @@ import Language.Frontend.ParLanguage
 import Language.MInterpreter.Interpreter
 import Memoization.Core.Memory (KeyValueArray)
 import Memoization.Core.State (State (runState), (<.>))
-import Variability.VarTypes (Var (Var), apply, ttPC)
+import Variability.VarTypes (Prop, Var (Var), apply, mkBDDVar, notBDD, ttPC, (/\))
 
 main :: IO ()
 main = do
@@ -28,11 +27,32 @@ shallowLift fM v = do
   f <- fM
   applyMapMAndZip f v
 
+propA :: Prop
+propA = mkBDDVar "A"
+
+propB :: Prop
+propB = mkBDDVar "B"
+
+atbt :: Prop
+atbt = propA /\ propB
+
+atbf :: Prop
+atbf = propA /\ notBDD propB
+
+afbt :: Prop
+afbt = notBDD propA /\ propB
+
+afbf :: Prop
+afbf = notBDD propA /\ notBDD propB
+
 input :: Var Integer
--- As we are NOT checking the presence condition invariants (yet), setting all the
--- presence conditions to 'True' will help us to see 
--- some sort of Variational computation in action (even if somewhat limited).
-input = Var [(10,ttPC), (8, ttPC), (7,ttPC), (40,ttPC)]
+input = Var [(5, atbt), (6, atbf), (7, afbt), (8, afbf)]
+
+multByTwoIfPropA :: Var (Integer -> Integer)
+multByTwoIfPropA = Var [((* 2), propA), (id, notBDD propA) ]
+
+input' :: Var Integer
+input' = apply multByTwoIfPropA input
 
 initialState :: KeyValueArray [Integer] Integer
 initialState = []
@@ -42,5 +62,5 @@ memoizedFunctionName = "fib"
 
 calc :: String -> String
 calc s =
-  let Ok p = pProgram (myLexer s); programComputation = shallowLift (evalP p memoizedFunctionName) input
+  let Ok p = pProgram (myLexer s); programComputation = shallowLift (evalP p memoizedFunctionName) input'
    in show $ runState programComputation initialState

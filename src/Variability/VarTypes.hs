@@ -1,22 +1,21 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE InstanceSigs #-}
-
 module Variability.VarTypes where
 
-import Control.Exception (assert)
-import Cudd.Cudd (DDManager, DDNode, bAnd, bNot, bOr, cuddInit, ithVar, nodeReadIndex, readLogicZero, readOne)
+import Cudd.Cudd (DDManager, DDNode, bAnd, bNot, bOr, cuddInit, readLogicZero, readOne, ithVar, nodeReadIndex)
 import qualified Data.HashTable.IO as H
-import Data.Hashable (Hashable (hashWithSalt))
-import qualified Data.List as L
 import GHC.IO (unsafePerformIO)
+import Data.Hashable ( Hashable(hashWithSalt) )
+import qualified Data.List as L
 import GHC.StableName (makeStableName)
+import Control.Exception (assert)
 
 type HashTable k v = H.BasicHashTable k v
 
 instance Hashable DDNode where
-  {-# INLINE hashWithSalt #-}
-  hashWithSalt :: Int -> DDNode -> Int
-  hashWithSalt s d = hashWithSalt s (nodeReadIndex d)
+    {-# INLINE hashWithSalt #-}
+    hashWithSalt :: Int -> DDNode -> Int
+    hashWithSalt s d = hashWithSalt s (nodeReadIndex d)
 
 newtype Prop = Prop
   { b :: DDNode
@@ -28,18 +27,18 @@ instance Eq Prop where
   (Prop b0) == (Prop b1) = b0 == b1
 
 instance Ord Prop where
-  (<=) :: Prop -> Prop -> Bool
-  (Prop b0) <= (Prop b1) = nodeReadIndex b0 <= nodeReadIndex b1
+    (<=) :: Prop -> Prop -> Bool
+    (Prop b0) <= (Prop b1) = nodeReadIndex b0 <= nodeReadIndex b1
 
 instance Hashable Prop where
-  {-# INLINE hashWithSalt #-}
-  hashWithSalt :: Int -> Prop -> Int
-  hashWithSalt s (Prop b) = hashWithSalt s b
+    {-# INLINE hashWithSalt #-}
+    hashWithSalt :: Int -> Prop -> Int
+    hashWithSalt s (Prop b) = hashWithSalt s b
 
 instance Show Prop where
-  {-# INLINE show #-}
-  show :: Prop -> String
-  show (Prop b) = show b
+    {-# INLINE show #-}
+    show :: Prop -> String
+    show (Prop b) = show b
 
 manager :: Cudd.Cudd.DDManager
 manager = cuddInit
@@ -109,8 +108,8 @@ lookupVar v = unsafePerformIO $ do
 
 htSize :: (Eq k, Hashable k) => HashTable k v -> IO Int
 htSize h = do
-  xs <- H.toList h
-  return $ length xs
+    xs <- H.toList h
+    return $ length xs
 
 disj :: [Prop] -> Prop
 disj = foldr orBDD ff
@@ -139,54 +138,52 @@ newtype Var t = Var [Val t]
 
 findVal :: t -> [Val t] -> (t -> t -> Bool) -> [Val t]
 findVal _ [] _ = []
-findVal v ((x, pc) : xs) cmp = if cmp v x then (x, pc) : rest else rest
-  where
-    rest = findVal v xs cmp
+findVal v ((x,pc):xs) cmp = if cmp v x then (x,pc) : rest else rest
+    where rest = findVal v xs cmp
 
 {-# INLINE phelem #-}
 phelem :: t -> [t] -> (t -> t -> Bool) -> Bool
 phelem v xs cmp = any (cmp v) xs
 
+
 groupVals_ :: [Val t] -> [t] -> (t -> t -> Bool) -> [Val t]
 groupVals_ [] _ _ = []
-groupVals_ ((x, xpc) : xs) ds cmp =
-  if phelem x ds cmp
-    then rest
-    else
-      let ms = findVal x xs cmp
-          pc = disj (xpc : map snd ms)
-       in (x, pc) : rest
-  where
-    rest = groupVals_ xs (x : ds) cmp
+groupVals_ ((x,xpc):xs) ds cmp =
+    if phelem x ds cmp then rest else
+        let ms = findVal x xs cmp
+            pc = disj (xpc:map snd ms)
+        in  (x,pc) : rest
+    where rest = groupVals_ xs (x:ds) cmp
 
 groupVals :: [Val t] -> (t -> t -> Bool) -> [Val t]
 groupVals xs = groupVals_ xs []
 
 {-# INLINE (===) #-}
 (===) :: a -> a -> Bool
-(!x) === (!y) = unsafePerformIO $ do
-  nx <- makeStableName $! x
-  ny <- makeStableName $! y
-  return (nx == ny)
+(!x) === (!y) = unsafePerformIO $ do 
+    nx <- makeStableName $! x 
+    ny <- makeStableName $! y 
+    return (nx == ny)
+
 
 compact :: Var t -> Var t
 compact (Var v) = Var (groupVals v (===))
 
 instance Show a => Show (Var a) where
-  show :: Show a => Var a -> String
-  show v' =
-    let (Var v) = compact v'
-     in "{" ++ L.intercalate ", " (map show v) ++ "}"
+    show :: Show a => Var a -> String
+    show v' =
+        let (Var v) = compact v'
+        in "{" ++ L.intercalate ", " (map show v) ++ "}"
 
 instance Functor Var where
-  fmap :: (a -> b) -> Var a -> Var b
-  fmap f = apply (f ^| ttPC)
+    fmap :: (a -> b) -> Var a -> Var b
+    fmap f = apply (f ^| ttPC)
 
 instance Applicative Var where
-  pure :: a -> Var a
-  pure = (^| ttPC)
-  (<*>) :: Var (a -> b) -> Var a -> Var b
-  (<*>) = apply
+    pure :: a -> Var a
+    pure  = (^| ttPC)
+    (<*>) :: Var (a -> b) -> Var a -> Var b
+    (<*>) = apply
 
 disjInv :: Var t -> Bool
 disjInv v'@(Var v) = all (\((_, pc1), (_, pc2)) -> unsat (pc1 /\ pc2)) (pairs v)
