@@ -10,12 +10,12 @@ import Language.Frontend.AbsLanguage
 import Variability.VarTypes
   ( PresenceCondition,
     Var (..),
-    falsePC,
+    ffPC,
     sat,
-    truePC,
+    ttPC,
     valList,
     (+++),
-    (|||),
+    (|||), (/\), (\/),
   )
 import Prelude hiding (lookup)
 
@@ -31,7 +31,7 @@ type FContext = Context Ident Function
 
 evalV :: RContext -> Exp -> Var Integer
 evalV context@(vcontext, fcontext) x = case x of
-  EInt n -> Var [(n, True)]
+  EInt n -> Var [(n, ttPC)]
   EAdd exp0 exp1 -> applyOperator context exp0 exp1 (+)
   ESub exp0 exp1 -> applyOperator context exp0 exp1 (-)
   EMul exp0 exp1 -> applyOperator context exp0 exp1 (*)
@@ -42,10 +42,10 @@ evalV context@(vcontext, fcontext) x = case x of
       (Fun _ decls fExp) = fromJust $ lookup fcontext fId
       paramBindings = zip decls (map (evalV context) pExps)
   EIf e eT eE ->
-    if pct == truePC
+    if pct == ttPC
       then evalV context eT
       else
-        if pct == falsePC
+        if pct == ffPC
           then evalV context eE
           else (restrictedEvalET ||| pct) +++ (restrictedEvalEE ||| pcf)
     where
@@ -62,10 +62,10 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
 applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarInteger
 applyOperator context exp0 exp1 op =
   Var
-    [ (i1 `op` i2, pc1 && pc2)
+    [ (i1 `op` i2, pc1 /\ pc2)
       | (i1, pc1) <- valList (evalV context exp0),
         (i2, pc2) <- valList (evalV context exp1),
-        sat (pc1 && pc2)
+        sat (pc1 /\ pc2)
     ]
 
 restrictContext :: RContext -> PresenceCondition -> RContext
@@ -76,8 +76,8 @@ restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
 partition :: VarInteger -> (PresenceCondition, PresenceCondition)
 partition (Var lvint) =
   foldr
-    (\(v, pc) (pct, pcf) -> (pct || ((v /= 0) && pc), pcf || ((v == 0) && pc)))
-    (False, False)
+    (\(v, pc) (pct, pcf) -> (pct \/ (if v /= 0 then ffPC else ttPC /\ pc), pcf \/ (if v == 0 then ttPC else ffPC /\ pc)))
+    (ffPC, ffPC)
     lvint
 
 lookup :: Eq k => Context k v -> k -> Maybe v

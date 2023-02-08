@@ -1,9 +1,11 @@
+module Language.VInterpreter.Driver where
+
 import Language.Frontend.AbsLanguage
 import Language.Frontend.ErrM
 import Language.Frontend.LexLanguage ()
 import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VInterpreter.Interpreter (VarInteger, evalPV)
-import Variability.VarTypes (PresenceCondition, Var (Var))
+import Variability.VarTypes (PresenceCondition, Var (Var), ttPC, ffPC)
 
 main :: IO ()
 main = do
@@ -11,10 +13,10 @@ main = do
   putStrLn ""
 
 pc1 :: PresenceCondition
-pc1 = True
+pc1 = ttPC
 
 pc2 :: PresenceCondition
-pc2 = False
+pc2 = ffPC
 
 inputParam :: VarInteger
 inputParam = Var [(6, pc1), (3, pc2)]

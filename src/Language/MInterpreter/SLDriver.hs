@@ -1,3 +1,6 @@
+module Language.MInterpreter.SLDriver where
+
+
 import Language.Frontend.AbsLanguage
 import Language.Frontend.ErrM
 import Language.Frontend.LexLanguage
@@ -5,7 +8,7 @@ import Language.Frontend.ParLanguage
 import Language.MInterpreter.Interpreter
 import Memoization.Core.Memory (KeyValueArray)
 import Memoization.Core.State (State (runState), (<.>))
-import Variability.VarTypes (Var (Var), apply, truePC)
+import Variability.VarTypes (Var (Var), apply, ttPC)
 
 main :: IO ()
 main = do
@@ -14,7 +17,7 @@ main = do
 
 applyMapMAndZip :: (a -> State m b) -> Var a -> State m (Var b)
 applyMapMAndZip f a =
-  let fV = Var [(f, truePC)]
+  let fV = Var [(f, ttPC)]
    in let Var vals = apply fV a
        in let pcs = map snd vals
            in do
@@ -29,7 +32,7 @@ input :: Var Integer
 -- As we are NOT checking the presence condition invariants (yet), setting all the
 -- presence conditions to 'True' will help us to see 
 -- some sort of Variational computation in action (even if somewhat limited).
-input = Var [(10,True), (8, True), (7,True), (40,True)]
+input = Var [(10,ttPC), (8, ttPC), (7,ttPC), (40,ttPC)]
 
 initialState :: KeyValueArray [Integer] Integer
 initialState = []

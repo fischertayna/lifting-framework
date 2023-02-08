@@ -1,3 +1,5 @@
+module Language.Interpreter.Driver where
+
 import Language.Frontend.LexLanguage
 import Language.Frontend.ParLanguage
 import Language.Frontend.AbsLanguage
