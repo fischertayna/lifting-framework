@@ -13,7 +13,7 @@ main = do
   putStrLn ""
 
 input :: Integer
-input = 10 
+input = 10
 
 calc :: String -> String
 calc s =

@@ -1,6 +1,9 @@
 module Main where
 
-import Language.MInterpreter.SLDriver
+import qualified Language.MInterpreter.SLDriver as SL
+import qualified Language.MInterpreter.Driver as Memo
+import qualified Language.VInterpreter.Driver as Var
+import qualified Language.Interpreter.Driver as Base
 
 main :: IO ()
-main = Language.MInterpreter.SLDriver.main
+main = SL.main

@@ -31,7 +31,7 @@ afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
 input :: Var Integer
-input = Var [(8, atbt), (5, afbf), (0, atbf), (1, afbt)]
+input = Var [(8, atbt), (5, afbt), (0, atbf), (1, afbf)]
 
 calc :: String -> String
 calc s =

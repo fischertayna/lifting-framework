@@ -48,7 +48,7 @@ afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
 input :: Var Integer
-input = Var [(5, atbt), (8, afbf), (1, atbf), (0, afbt)]
+input = Var [(8, atbt), (5, afbf), (1, atbf), (0, afbt)]
 
 initialState :: KeyValueArray [Integer] Integer
 initialState = []
