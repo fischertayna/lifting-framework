@@ -76,7 +76,7 @@ restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
 partition :: VarInteger -> (PresenceCondition, PresenceCondition)
 partition (Var lvint) =
   foldr
-    (\(v, pc) (pct, pcf) -> (pct \/ (if v /= 0 then ffPC else ttPC /\ pc), pcf \/ (if v == 0 then ttPC else ffPC /\ pc)))
+    (\(v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
 

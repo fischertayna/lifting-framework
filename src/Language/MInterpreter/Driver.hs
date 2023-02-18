@@ -16,7 +16,7 @@ main = do
   putStrLn ""
 
 input :: Integer
-input = 6
+input = 10
 
 initialState :: KeyValueArray [Integer] Integer
 initialState = []

@@ -8,6 +8,7 @@
 module Memoization.Core.Memory where
 
 import Memoization.Core.State (State (State, runState))
+import Debug.Trace
 
 class KeyMemory k v m where
   mlookup :: k -> State m (Maybe v)

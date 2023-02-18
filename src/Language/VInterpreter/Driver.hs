@@ -5,23 +5,35 @@ import Language.Frontend.ErrM
 import Language.Frontend.LexLanguage ()
 import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VInterpreter.Interpreter (VarInteger, evalPV)
-import Variability.VarTypes (PresenceCondition, Var (Var), ttPC, ffPC)
+import Variability.VarTypes (PresenceCondition, Var (Var), ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
 
 main :: IO ()
 main = do
   interact calc
   putStrLn ""
 
-pc1 :: PresenceCondition
-pc1 = ttPC
+propA :: Prop
+propA = mkBDDVar "A"
 
-pc2 :: PresenceCondition
-pc2 = ffPC
+propB :: Prop
+propB = mkBDDVar "B"
 
-inputParam :: VarInteger
-inputParam = Var [(6, pc1), (3, pc2)]
+atbt :: Prop
+atbt = propA /\ propB
+
+atbf :: Prop
+atbf = propA /\ notBDD propB
+
+afbt :: Prop
+afbt = notBDD propA /\ propB
+
+afbf :: Prop
+afbf = notBDD propA /\ notBDD propB
+
+input :: Var Integer
+input = Var [(8, atbt), (5, afbf), (0, atbf), (1, afbt)]
 
 calc :: String -> String
 calc s =
   let Ok p = pProgram (myLexer s)
-   in show $ evalPV p inputParam
+   in show $ evalPV p input
