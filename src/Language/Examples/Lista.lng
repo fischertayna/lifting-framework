@@ -1,0 +1,9 @@
+main (n) {
+    soma ([1, 2, 3, 4])
+}
+
+soma (lst) {
+    if ((isNil (lst))) 
+        then 0
+        else head (lst) + soma (tail (lst))
+}

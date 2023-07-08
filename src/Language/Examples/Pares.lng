@@ -1,0 +1,7 @@
+main (n) {
+   soma ((19, 20))
+}
+
+soma (pair) {
+    fst (pair) + snd (pair)
+}

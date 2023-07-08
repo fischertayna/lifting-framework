@@ -30,7 +30,7 @@ The reserved words used in Language are the following:
 The symbols used in Language are the following:
   | ( | ) | { | }
   | , | + | - | *
-  | / |  |  |
+  | / | [ | ] |
 
 ===Comments===
 Single-line comments begin with //.Multiple-line comments are  enclosed with /* and */.
@@ -62,6 +62,8 @@ All other symbols are terminals.
   |  |  **|**  | //Exp4//
   | //Exp4// | -> | //Integer//
   |  |  **|**  | //Ident//
+  |  |  **|**  | ``(`` //Exp// ``,`` //Exp// ``)``
+  |  |  **|**  | ``[`` //[Exp]// ``]``
   |  |  **|**  | ``(`` //Exp// ``)``
   | //Exp// | -> | //Exp1//
 

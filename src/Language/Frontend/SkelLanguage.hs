@@ -37,3 +37,5 @@ transExp x = case x of
   Language.Frontend.AbsLanguage.Call ident exps -> failure x
   Language.Frontend.AbsLanguage.EInt integer -> failure x
   Language.Frontend.AbsLanguage.EVar ident -> failure x
+  Language.Frontend.AbsLanguage.EPair exp1 exp2 -> failure x
+  Language.Frontend.AbsLanguage.EList exps -> failure x

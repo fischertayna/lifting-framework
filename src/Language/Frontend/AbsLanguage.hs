@@ -25,6 +25,8 @@ data Exp
     | Call Ident [Exp]
     | EInt Integer
     | EVar Ident
+    | EPair Exp Exp
+    | EList [Exp]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 newtype Ident = Ident String

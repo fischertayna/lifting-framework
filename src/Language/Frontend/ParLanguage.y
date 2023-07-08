@@ -48,11 +48,13 @@ import Language.Frontend.LexLanguage
   ','      { PT _ (TS _ 5)  }
   '-'      { PT _ (TS _ 6)  }
   '/'      { PT _ (TS _ 7)  }
-  'else'   { PT _ (TS _ 8)  }
-  'if'     { PT _ (TS _ 9)  }
-  'then'   { PT _ (TS _ 10) }
-  '{'      { PT _ (TS _ 11) }
-  '}'      { PT _ (TS _ 12) }
+  '['      { PT _ (TS _ 8)  }
+  ']'      { PT _ (TS _ 9)  }
+  'else'   { PT _ (TS _ 10) }
+  'if'     { PT _ (TS _ 11) }
+  'then'   { PT _ (TS _ 12) }
+  '{'      { PT _ (TS _ 13) }
+  '}'      { PT _ (TS _ 14) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
 
@@ -109,6 +111,8 @@ Exp4 :: { Language.Frontend.AbsLanguage.Exp }
 Exp4
   : Integer { Language.Frontend.AbsLanguage.EInt $1 }
   | Ident { Language.Frontend.AbsLanguage.EVar $1 }
+  | '(' Exp ',' Exp ')' { Language.Frontend.AbsLanguage.EPair $2 $4 }
+  | '[' ListExp ']' { Language.Frontend.AbsLanguage.EList $2 }
   | '(' Exp ')' { $2 }
 
 Exp :: { Language.Frontend.AbsLanguage.Exp }

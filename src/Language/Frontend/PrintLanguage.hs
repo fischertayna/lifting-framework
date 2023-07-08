@@ -172,3 +172,5 @@ instance Print Language.Frontend.AbsLanguage.Exp where
     Language.Frontend.AbsLanguage.Call id_ exps -> prPrec i 3 (concatD [prt 0 id_, doc (showString "("), prt 0 exps, doc (showString ")")])
     Language.Frontend.AbsLanguage.EInt n -> prPrec i 4 (concatD [prt 0 n])
     Language.Frontend.AbsLanguage.EVar id_ -> prPrec i 4 (concatD [prt 0 id_])
+    Language.Frontend.AbsLanguage.EPair exp1 exp2 -> prPrec i 4 (concatD [doc (showString "("), prt 0 exp1, doc (showString ","), prt 0 exp2, doc (showString ")")])
+    Language.Frontend.AbsLanguage.EList exps -> prPrec i 4 (concatD [doc (showString "["), prt 0 exps, doc (showString "]")])

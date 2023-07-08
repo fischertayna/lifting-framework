@@ -16,6 +16,8 @@ EDiv. Exp2  ::= Exp2 "/" Exp3 ;
 Call. Exp3  ::= Ident "(" [Exp] ")" ;
 EInt. Exp4  ::= Integer ;
 EVar. Exp4  ::= Ident ;
+EPair. Exp4 ::= "(" Exp "," Exp ")" ;
+EList. Exp4 ::= "[" [Exp] "]" ;
 
 coercions Exp 4 ;
 
