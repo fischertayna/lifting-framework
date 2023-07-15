@@ -24,6 +24,12 @@ data Valor
     | ValorFun
         { f :: Function
         }
+    | ValorBool
+        { b :: Bool
+        }
+    | ValorStr
+        { s :: String
+        }
     | ValorList
         { l :: [Valor]
         }
@@ -40,17 +46,24 @@ evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
 
 eval :: RContext -> Exp -> Valor
 eval context@(vcontext, fcontext) x = case x of
-  EAdd exp0 exp1 -> ValorInt(i (eval context exp0) + i (eval context exp1))
-  ESub exp0 exp1 -> ValorInt(i (eval context exp0) - i (eval context exp1))
-  EMul exp0 exp1 -> ValorInt(i (eval context exp0) * i (eval context exp1))
-  EDiv exp0 exp1 -> ValorInt(i (eval context exp0) `div` i (eval context exp1))
-  EInt n -> ValorInt n
+  ECon exp0 exp1  -> ValorStr (s (eval context exp0) ++ s (eval context exp1))
+  EAdd exp0 exp1  -> ValorInt (i (eval context exp0) + i (eval context exp1))
+  ESub exp0 exp1  -> ValorInt (i (eval context exp0) - i (eval context exp1))
+  EMul exp0 exp1  -> ValorInt (i (eval context exp0) * i (eval context exp1))
+  EDiv exp0 exp1  -> ValorInt (i (eval context exp0) `div` i (eval context exp1))
+  EOr exp0 exp1   -> ValorBool (b (eval context exp0) || b (eval context exp1))
+  EAnd exp0 exp1  -> ValorBool (b (eval context exp0)  && b (eval context exp1))
+  ENot exp1        -> ValorBool ( not (b (eval context exp1)))
+  EStr s          -> ValorStr s
+  ETrue           -> ValorBool True
+  EFalse          -> ValorBool False
+  EInt n          -> ValorInt n
   EVar vId -> fromJust $ lookup vcontext vId
   EIf cond expi expe -> case eval context cond of
     ValorInt 0 -> eval context expe
     _ -> eval context expi
   EList list -> ValorList (map (eval context) list)
-  EPair p1 p2 -> ValorPair ((eval context p1), (eval context p2))
+  EPair p1 p2 -> ValorPair (eval context p1, eval context p2)
   Call id pExps -> case id of
     Ident "head" -> head list
     Ident "tail" ->  ValorList (tail list)

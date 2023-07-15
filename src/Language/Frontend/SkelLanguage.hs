@@ -30,6 +30,10 @@ transFunction x = case x of
 transExp :: Language.Frontend.AbsLanguage.Exp -> Result
 transExp x = case x of
   Language.Frontend.AbsLanguage.EIf exp1 exp2 exp3 -> failure x
+  Language.Frontend.AbsLanguage.EOr exp1 exp2 -> failure x
+  Language.Frontend.AbsLanguage.EAnd exp1 exp2 -> failure x
+  Language.Frontend.AbsLanguage.ENot exp -> failure x
+  Language.Frontend.AbsLanguage.ECon exp1 exp2 -> failure x
   Language.Frontend.AbsLanguage.EAdd exp1 exp2 -> failure x
   Language.Frontend.AbsLanguage.ESub exp1 exp2 -> failure x
   Language.Frontend.AbsLanguage.EMul exp1 exp2 -> failure x
@@ -37,5 +41,8 @@ transExp x = case x of
   Language.Frontend.AbsLanguage.Call ident exps -> failure x
   Language.Frontend.AbsLanguage.EInt integer -> failure x
   Language.Frontend.AbsLanguage.EVar ident -> failure x
+  Language.Frontend.AbsLanguage.EStr string -> failure x
   Language.Frontend.AbsLanguage.EPair exp1 exp2 -> failure x
   Language.Frontend.AbsLanguage.EList exps -> failure x
+  Language.Frontend.AbsLanguage.ETrue -> failure x
+  Language.Frontend.AbsLanguage.EFalse -> failure x

@@ -18,6 +18,10 @@ data Function = Fun Ident [Ident] Exp
 
 data Exp
     = EIf Exp Exp Exp
+    | EOr Exp Exp
+    | EAnd Exp Exp
+    | ENot Exp
+    | ECon Exp Exp
     | EAdd Exp Exp
     | ESub Exp Exp
     | EMul Exp Exp
@@ -25,8 +29,11 @@ data Exp
     | Call Ident [Exp]
     | EInt Integer
     | EVar Ident
+    | EStr String
     | EPair Exp Exp
     | EList [Exp]
+    | ETrue
+    | EFalse
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 newtype Ident = Ident String

@@ -1,0 +1,7 @@
+main (n) {
+   concat ("first", "second")
+}
+
+concat (exp1, exp2) {
+    exp1 ++ exp2
+}

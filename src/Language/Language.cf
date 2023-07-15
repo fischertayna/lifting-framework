@@ -8,16 +8,23 @@ terminator Function "" ;
 separator  Ident "," ;
 separator  Exp "," ;
 
-EIf.  Exp1 ::= "if" "(" Exp1 ")" "then" Exp1 "else" Exp1;
-EAdd. Exp1  ::= Exp1  "+" Exp2 ;
-ESub. Exp1  ::= Exp1  "-" Exp2 ;
-EMul. Exp2  ::= Exp2 "*" Exp3 ;
-EDiv. Exp2  ::= Exp2 "/" Exp3 ;
-Call. Exp3  ::= Ident "(" [Exp] ")" ;
-EInt. Exp4  ::= Integer ;
-EVar. Exp4  ::= Ident ;
-EPair. Exp4 ::= "(" Exp "," Exp ")" ;
-EList. Exp4 ::= "[" [Exp] "]" ;
+EIf.  Exp ::= "if" "(" Exp ")" "then" Exp "else" Exp;
+EOr.  Exp1 ::= Exp1 "||" Exp2 ;
+EAnd. Exp2 ::= Exp2 "&&" Exp3 ;
+ENot. Exp3 ::= "!" Exp3 ;
+ECon. Exp4  ::= Exp4  "++" Exp5 ;
+EAdd. Exp4  ::= Exp4  "+" Exp5 ;
+ESub. Exp4  ::= Exp4  "-" Exp5 ;
+EMul. Exp5  ::= Exp5 "*" Exp6 ;
+EDiv. Exp5  ::= Exp5 "/" Exp6 ;
+Call. Exp6  ::= Ident "(" [Exp] ")" ;
+EInt. Exp7  ::= Integer ;
+EVar. Exp7  ::= Ident ;
+EStr. Exp7  ::= String ;
+EPair. Exp7 ::= "(" Exp "," Exp ")" ;
+EList. Exp7 ::= "[" [Exp] "]" ;
+ETrue. Exp7 ::= "True" ;
+EFalse. Exp7 ::= "False" ;
 
-coercions Exp 4 ;
+coercions Exp 7 ;
 

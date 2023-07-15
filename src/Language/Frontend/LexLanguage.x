@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \( | \) | \{ | \} | \, | \+ | \- | \* | \/ | \[ | \]
+@rsyms = \( | \) | \{ | \} | \, | \| \| | \& \& | \! | \+ \+ | \+ | \- | \* | \/ | \[ | \]
 
 :-
 
@@ -48,6 +48,10 @@ $white+ ;
 -- Keywords and Ident
 $l $i*
     { tok (eitherResIdent TV) }
+
+-- String
+\" ([$u # [\" \\ \n]] | (\\ (\" | \\ | \' | n | t | r | f)))* \"
+    { tok (TL . unescapeInitTail) }
 
 -- Integer
 $d+
@@ -154,13 +158,13 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "[" 8
-    (b "+" 4
-       (b ")" 2 (b "(" 1 N N) (b "*" 3 N N))
-       (b "-" 6 (b "," 5 N N) (b "/" 7 N N)))
-    (b "then" 12
-       (b "else" 10 (b "]" 9 N N) (b "if" 11 N N))
-       (b "}" 14 (b "{" 13 N N) N))
+  b "False" 11
+    (b "+" 6
+       (b "(" 3 (b "&&" 2 (b "!" 1 N N) N) (b "*" 5 (b ")" 4 N N) N))
+       (b "-" 9 (b "," 8 (b "++" 7 N N) N) (b "/" 10 N N)))
+    (b "if" 16
+       (b "]" 14 (b "[" 13 (b "True" 12 N N) N) (b "else" 15 N N))
+       (b "||" 19 (b "{" 18 (b "then" 17 N N) N) (b "}" 20 N N)))
   where
   b s n = B bs (TS bs n)
     where

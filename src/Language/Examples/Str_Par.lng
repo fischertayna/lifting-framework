@@ -1,0 +1,7 @@
+main (n) {
+   primeiro ((True, False))
+}
+
+primeiro (pair) {
+    fst (pair)
+}

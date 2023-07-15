@@ -13,11 +13,14 @@ module Language.Frontend.ParLanguage
   , pListFunction
   , pListIdent
   , pListExp
+  , pExp
   , pExp1
   , pExp2
   , pExp3
   , pExp4
-  , pExp
+  , pExp5
+  , pExp6
+  , pExp7
   ) where
 
 import Prelude
@@ -32,31 +35,41 @@ import Language.Frontend.LexLanguage
 %name pListFunction ListFunction
 %name pListIdent ListIdent
 %name pListExp ListExp
+%name pExp Exp
 %name pExp1 Exp1
 %name pExp2 Exp2
 %name pExp3 Exp3
 %name pExp4 Exp4
-%name pExp Exp
+%name pExp5 Exp5
+%name pExp6 Exp6
+%name pExp7 Exp7
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
 %token
-  '('      { PT _ (TS _ 1)  }
-  ')'      { PT _ (TS _ 2)  }
-  '*'      { PT _ (TS _ 3)  }
-  '+'      { PT _ (TS _ 4)  }
-  ','      { PT _ (TS _ 5)  }
-  '-'      { PT _ (TS _ 6)  }
-  '/'      { PT _ (TS _ 7)  }
-  '['      { PT _ (TS _ 8)  }
-  ']'      { PT _ (TS _ 9)  }
-  'else'   { PT _ (TS _ 10) }
-  'if'     { PT _ (TS _ 11) }
-  'then'   { PT _ (TS _ 12) }
-  '{'      { PT _ (TS _ 13) }
-  '}'      { PT _ (TS _ 14) }
+  '!'      { PT _ (TS _ 1)  }
+  '&&'     { PT _ (TS _ 2)  }
+  '('      { PT _ (TS _ 3)  }
+  ')'      { PT _ (TS _ 4)  }
+  '*'      { PT _ (TS _ 5)  }
+  '+'      { PT _ (TS _ 6)  }
+  '++'     { PT _ (TS _ 7)  }
+  ','      { PT _ (TS _ 8)  }
+  '-'      { PT _ (TS _ 9)  }
+  '/'      { PT _ (TS _ 10) }
+  'False'  { PT _ (TS _ 11) }
+  'True'   { PT _ (TS _ 12) }
+  '['      { PT _ (TS _ 13) }
+  ']'      { PT _ (TS _ 14) }
+  'else'   { PT _ (TS _ 15) }
+  'if'     { PT _ (TS _ 16) }
+  'then'   { PT _ (TS _ 17) }
+  '{'      { PT _ (TS _ 18) }
+  '||'     { PT _ (TS _ 19) }
+  '}'      { PT _ (TS _ 20) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
+  L_quoted { PT _ (TL $$)   }
 
 %%
 
@@ -65,6 +78,9 @@ Ident  : L_Ident { Language.Frontend.AbsLanguage.Ident $1 }
 
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
+
+String  :: { String }
+String   : L_quoted { $1 }
 
 Program :: { Language.Frontend.AbsLanguage.Program }
 Program : ListFunction { Language.Frontend.AbsLanguage.Prog $1 }
@@ -89,34 +105,53 @@ ListExp
   | Exp { (:[]) $1 }
   | Exp ',' ListExp { (:) $1 $3 }
 
+Exp :: { Language.Frontend.AbsLanguage.Exp }
+Exp
+  : 'if' '(' Exp ')' 'then' Exp 'else' Exp { Language.Frontend.AbsLanguage.EIf $3 $6 $8 }
+  | Exp1 { $1 }
+
 Exp1 :: { Language.Frontend.AbsLanguage.Exp }
 Exp1
-  : 'if' '(' Exp1 ')' 'then' Exp1 'else' Exp1 { Language.Frontend.AbsLanguage.EIf $3 $6 $8 }
-  | Exp1 '+' Exp2 { Language.Frontend.AbsLanguage.EAdd $1 $3 }
-  | Exp1 '-' Exp2 { Language.Frontend.AbsLanguage.ESub $1 $3 }
+  : Exp1 '||' Exp2 { Language.Frontend.AbsLanguage.EOr $1 $3 }
   | Exp2 { $1 }
 
 Exp2 :: { Language.Frontend.AbsLanguage.Exp }
 Exp2
-  : Exp2 '*' Exp3 { Language.Frontend.AbsLanguage.EMul $1 $3 }
-  | Exp2 '/' Exp3 { Language.Frontend.AbsLanguage.EDiv $1 $3 }
+  : Exp2 '&&' Exp3 { Language.Frontend.AbsLanguage.EAnd $1 $3 }
   | Exp3 { $1 }
 
 Exp3 :: { Language.Frontend.AbsLanguage.Exp }
 Exp3
-  : Ident '(' ListExp ')' { Language.Frontend.AbsLanguage.Call $1 $3 }
-  | Exp4 { $1 }
+  : '!' Exp3 { Language.Frontend.AbsLanguage.ENot $2 } | Exp4 { $1 }
 
 Exp4 :: { Language.Frontend.AbsLanguage.Exp }
 Exp4
+  : Exp4 '++' Exp5 { Language.Frontend.AbsLanguage.ECon $1 $3 }
+  | Exp4 '+' Exp5 { Language.Frontend.AbsLanguage.EAdd $1 $3 }
+  | Exp4 '-' Exp5 { Language.Frontend.AbsLanguage.ESub $1 $3 }
+  | Exp5 { $1 }
+
+Exp5 :: { Language.Frontend.AbsLanguage.Exp }
+Exp5
+  : Exp5 '*' Exp6 { Language.Frontend.AbsLanguage.EMul $1 $3 }
+  | Exp5 '/' Exp6 { Language.Frontend.AbsLanguage.EDiv $1 $3 }
+  | Exp6 { $1 }
+
+Exp6 :: { Language.Frontend.AbsLanguage.Exp }
+Exp6
+  : Ident '(' ListExp ')' { Language.Frontend.AbsLanguage.Call $1 $3 }
+  | Exp7 { $1 }
+
+Exp7 :: { Language.Frontend.AbsLanguage.Exp }
+Exp7
   : Integer { Language.Frontend.AbsLanguage.EInt $1 }
   | Ident { Language.Frontend.AbsLanguage.EVar $1 }
+  | String { Language.Frontend.AbsLanguage.EStr $1 }
   | '(' Exp ',' Exp ')' { Language.Frontend.AbsLanguage.EPair $2 $4 }
   | '[' ListExp ']' { Language.Frontend.AbsLanguage.EList $2 }
+  | 'True' { Language.Frontend.AbsLanguage.ETrue }
+  | 'False' { Language.Frontend.AbsLanguage.EFalse }
   | '(' Exp ')' { $2 }
-
-Exp :: { Language.Frontend.AbsLanguage.Exp }
-Exp : Exp1 { $1 }
 
 {
 
