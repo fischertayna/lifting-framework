@@ -19,8 +19,14 @@ import Variability.VarTypes
   )
 import Prelude hiding (lookup)
 
-newtype VarValor
+data VarValor
     = VarInteger { i :: VarInt
+        }
+    | VarList
+        { l :: [VarValor]
+        }
+    | VarPair
+        { p :: (VarValor, VarValor)
         }
     deriving (Show)
 
@@ -42,6 +48,8 @@ evalV context@(vcontext, fcontext) x = case x of
   EMul exp0 exp1 -> applyOperator context exp0 exp1 (*)
   EDiv exp0 exp1 -> applyOperator context exp0 exp1 div
   EVar vId -> fromJust $ lookup vcontext vId
+  EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
+  EList list -> VarList (map (evalV context) list)
   Call fId pExps -> evalV (paramBindings, fcontext) fExp
     where
       (Fun _ decls fExp) = fromJust $ lookup fcontext fId

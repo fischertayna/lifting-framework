@@ -1,0 +1,7 @@
+main (n) {
+    generate (n)
+}
+
+generate (n) {
+    [n, n, n]
+}
