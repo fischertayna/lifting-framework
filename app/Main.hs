@@ -6,4 +6,4 @@ import qualified Language.VInterpreter.Driver as Var
 import qualified Language.Interpreter.Driver as Base
 
 main :: IO ()
-main = Base.main
+main = Var.main

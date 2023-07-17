@@ -19,19 +19,24 @@ import Variability.VarTypes
   )
 import Prelude hiding (lookup)
 
-type VarInteger = Var Integer
+newtype Valor
+    = ValorInt { i :: Integer
+        }
+    deriving (Show)
+
+type VarValor = Var Valor
 
 type Context k v = [(k, v)]
 
 type RContext = (VContext, FContext)
 
-type VContext = Context Ident VarInteger
+type VContext = Context Ident VarValor
 
 type FContext = Context Ident Function
 
-evalV :: RContext -> Exp -> Var Integer
+evalV :: RContext -> Exp -> Var Valor
 evalV context@(vcontext, fcontext) x = case x of
-  EInt n -> Var [(n, ttPC)]
+  EInt n -> Var [(ValorInt n, ttPC)]
   EAdd exp0 exp1 -> applyOperator context exp0 exp1 (+)
   ESub exp0 exp1 -> applyOperator context exp0 exp1 (-)
   EMul exp0 exp1 -> applyOperator context exp0 exp1 (*)
@@ -53,16 +58,16 @@ evalV context@(vcontext, fcontext) x = case x of
       restrictedEvalET = evalV (restrictContext context pct) eT
       restrictedEvalEE = evalV (restrictContext context pcf) eE
 
-evalPV :: Program -> VarInteger -> VarInteger
+evalPV :: Program -> VarValor -> VarValor
 evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
   where
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
-applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarInteger
+applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
 applyOperator context exp0 exp1 op =
   Var
-    [ (i1 `op` i2, pc1 /\ pc2)
+    [ (ValorInt (i i1) `op` ValorInt (i i2), pc1 /\ pc2)
       | (i1, pc1) <- valList (evalV context exp0),
         (i2, pc2) <- valList (evalV context exp1),
         sat (pc1 /\ pc2)
@@ -73,10 +78,10 @@ restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
   where
     restrictedVContext = [(vId, restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = vInt ||| pc]
 
-partition :: VarInteger -> (PresenceCondition, PresenceCondition)
+partition :: VarValor -> (PresenceCondition, PresenceCondition)
 partition (Var lvint) =
   foldr
-    (\(v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (\(v, pc) (pct, pcf) -> if ValorInt v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
 
