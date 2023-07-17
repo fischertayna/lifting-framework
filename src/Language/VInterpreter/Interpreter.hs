@@ -67,7 +67,7 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
 applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
 applyOperator context exp0 exp1 op =
   Var
-    [ (ValorInt (i i1) `op` ValorInt (i i2), pc1 /\ pc2)
+    [ (ValorInt (i i1 `op` i i2), pc1 /\ pc2)
       | (i1, pc1) <- valList (evalV context exp0),
         (i2, pc2) <- valList (evalV context exp1),
         sat (pc1 /\ pc2)
@@ -81,7 +81,7 @@ restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
 partition :: VarValor -> (PresenceCondition, PresenceCondition)
 partition (Var lvint) =
   foldr
-    (\(v, pc) (pct, pcf) -> if ValorInt v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (\(ValorInt v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
 
