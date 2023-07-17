@@ -80,7 +80,7 @@ eval context@(vcontext, fcontext) x = case x of
 
 boolToInt :: Bool -> Integer
 boolToInt b
-  | b == False = 0
+  | not b = 0
   | otherwise = 1
 
 lookup :: Eq k => Context k v -> k -> Maybe v

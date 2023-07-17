@@ -50,9 +50,18 @@ evalV context@(vcontext, fcontext) x = case x of
   EVar vId -> fromJust $ lookup vcontext vId
   EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
   EList list -> VarList (map (evalV context) list)
-  Call fId pExps -> evalV (paramBindings, fcontext) fExp
+  Call id pExps -> case id of
+    Ident "head" -> head list
+    Ident "tail" ->  VarList (tail list)
+    Ident "isNil" -> VarInteger (Var [(boolToInt (null list), ttPC)])
+    Ident "fst" -> f
+    Ident "snd" -> s
+    Ident func -> evalV (paramBindings, fcontext) fExp
     where
-      (Fun _ decls fExp) = fromJust $ lookup fcontext fId
+      arg = evalV context (head pExps)
+      list = l arg
+      (f,s) = p arg
+      (Fun _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (evalV context) pExps)
   EIf e eT eE ->
     if pct == ttPC
@@ -65,6 +74,11 @@ evalV context@(vcontext, fcontext) x = case x of
       (pct, pcf) = partition (evalV context e)
       restrictedEvalET = evalV (restrictContext context pct) eT
       restrictedEvalEE = evalV (restrictContext context pcf) eE
+
+boolToInt :: Bool -> Integer
+boolToInt b
+  | not b = 0
+  | otherwise = 1
 
 evalPV :: Program -> VarValor -> VarValor
 evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
@@ -116,4 +130,4 @@ updatecF (vcontext, fcontext) (f@(Fun fId _ _) : fs) = updatecF (vcontext, newFC
 (VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
 
 (||||) :: VarValor -> PresenceCondition -> VarValor
-(VarInteger (Var listPCv)) |||| pcR = VarInteger(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
