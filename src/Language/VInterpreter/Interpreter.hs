@@ -19,12 +19,12 @@ import Variability.VarTypes
   )
 import Prelude hiding (lookup)
 
-newtype Valor
-    = ValorInt { i :: Integer
+newtype VarValor
+    = VarInteger { i :: VarInt
         }
     deriving (Show)
 
-type VarValor = Var Valor
+type VarInt = Var Integer
 
 type Context k v = [(k, v)]
 
@@ -34,9 +34,9 @@ type VContext = Context Ident VarValor
 
 type FContext = Context Ident Function
 
-evalV :: RContext -> Exp -> Var Valor
+evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
-  EInt n -> Var [(ValorInt n, ttPC)]
+  EInt n -> VarInteger (Var [(n, ttPC)])
   EAdd exp0 exp1 -> applyOperator context exp0 exp1 (+)
   ESub exp0 exp1 -> applyOperator context exp0 exp1 (-)
   EMul exp0 exp1 -> applyOperator context exp0 exp1 (*)
@@ -52,7 +52,7 @@ evalV context@(vcontext, fcontext) x = case x of
       else
         if pct == ffPC
           then evalV context eE
-          else (restrictedEvalET ||| pct) +++ (restrictedEvalEE ||| pcf)
+          else (restrictedEvalET |||| pct) ++++ (restrictedEvalEE |||| pcf)
     where
       (pct, pcf) = partition (evalV context e)
       restrictedEvalET = evalV (restrictContext context pct) eT
@@ -66,22 +66,22 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
 
 applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
 applyOperator context exp0 exp1 op =
-  Var
-    [ (ValorInt (i i1 `op` i i2), pc1 /\ pc2)
-      | (i1, pc1) <- valList (evalV context exp0),
-        (i2, pc2) <- valList (evalV context exp1),
+  VarInteger (Var
+    [ (i1 `op` i2, pc1 /\ pc2)
+      | (i1, pc1) <- valList (i (evalV context exp0)),
+        (i2, pc2) <- valList (i (evalV context exp1)),
         sat (pc1 /\ pc2)
-    ]
+    ])
 
 restrictContext :: RContext -> PresenceCondition -> RContext
 restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
   where
-    restrictedVContext = [(vId, restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = vInt ||| pc]
+    restrictedVContext = [(vId, VarInteger  restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = i vInt ||| pc]
 
 partition :: VarValor -> (PresenceCondition, PresenceCondition)
-partition (Var lvint) =
+partition (VarInteger (Var lvint)) =
   foldr
-    (\(ValorInt v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (\(v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
 
@@ -102,3 +102,10 @@ updatecF c [] = c
 updatecF (vcontext, fcontext) (f@(Fun fId _ _) : fs) = updatecF (vcontext, newFContext) fs
   where
     newFContext = update fcontext fId f
+
+
+(++++) :: VarValor -> VarValor -> VarValor
+(VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
+
+(||||) :: VarValor -> PresenceCondition -> VarValor
+(VarInteger (Var listPCv)) |||| pcR = VarInteger(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
