@@ -20,7 +20,13 @@ import Variability.VarTypes
 import Prelude hiding (lookup)
 
 data VarValor
-    = VarInteger { i :: VarInt
+    = VarInteger { i :: Var Integer
+        }
+    | VarBool
+        { b :: Var Bool
+        }
+    | VarString
+        { s :: Var String
         }
     | VarList
         { l :: [VarValor]
@@ -29,8 +35,6 @@ data VarValor
         { p :: (VarValor, VarValor)
         }
     deriving (Show)
-
-type VarInt = Var Integer
 
 type Context k v = [(k, v)]
 
@@ -43,10 +47,14 @@ type FContext = Context Ident Function
 evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
   EInt n -> VarInteger (Var [(n, ttPC)])
-  EAdd exp0 exp1 -> applyOperator context exp0 exp1 (+)
-  ESub exp0 exp1 -> applyOperator context exp0 exp1 (-)
-  EMul exp0 exp1 -> applyOperator context exp0 exp1 (*)
-  EDiv exp0 exp1 -> applyOperator context exp0 exp1 div
+  ECon exp0 exp1  -> applyStringOperator context exp0 exp1 (++)
+  EAdd exp0 exp1 -> applyIntegerOperator context exp0 exp1 (+)
+  ESub exp0 exp1 -> applyIntegerOperator context exp0 exp1 (-)
+  EMul exp0 exp1 -> applyIntegerOperator context exp0 exp1 (*)
+  EDiv exp0 exp1 -> applyIntegerOperator context exp0 exp1 div
+  -- EOr exp0 exp1   -> applyBoolOperator context exp0 exp1 div ||
+  -- EAnd exp0 exp1  -> applyBoolOperator context exp0 exp1 div (&&)
+  -- ENot exp1    -> ValorBool ( not (b (eval context exp1)))
   EVar vId -> fromJust $ lookup vcontext vId
   EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
   EList list -> VarList (map (evalV context) list)
@@ -86,12 +94,30 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
-applyOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
-applyOperator context exp0 exp1 op =
+applyIntegerOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
+applyIntegerOperator context exp0 exp1 op =
   VarInteger (Var
     [ (i1 `op` i2, pc1 /\ pc2)
       | (i1, pc1) <- valList (i (evalV context exp0)),
         (i2, pc2) <- valList (i (evalV context exp1)),
+        sat (pc1 /\ pc2)
+    ])
+
+applyStringOperator :: RContext -> Exp -> Exp -> (String -> String -> String) -> VarValor
+applyStringOperator context exp0 exp1 op =
+  VarString (Var
+    [ (i1 `op` i2, pc1 /\ pc2)
+      | (i1, pc1) <- valList (s (evalV context exp0)),
+        (i2, pc2) <- valList (s (evalV context exp1)),
+        sat (pc1 /\ pc2)
+    ])
+
+applyBoolOperator :: RContext -> Exp -> Exp -> (Bool -> Bool -> Bool) -> VarValor
+applyBoolOperator context exp0 exp1 op =
+  VarBool (Var
+    [ (i1 `op` i2, pc1 /\ pc2)
+      | (i1, pc1) <- valList (b (evalV context exp0)),
+        (i2, pc2) <- valList (b (evalV context exp1)),
         sat (pc1 /\ pc2)
     ])
 
