@@ -47,15 +47,18 @@ type FContext = Context Ident Function
 evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
   EInt n -> VarInteger (Var [(n, ttPC)])
-  ECon exp0 exp1  -> applyStringOperator context exp0 exp1 (++)
-  EAdd exp0 exp1 -> applyIntegerOperator context exp0 exp1 (+)
-  ESub exp0 exp1 -> applyIntegerOperator context exp0 exp1 (-)
-  EMul exp0 exp1 -> applyIntegerOperator context exp0 exp1 (*)
-  EDiv exp0 exp1 -> applyIntegerOperator context exp0 exp1 div
-  -- EOr exp0 exp1   -> applyBoolOperator context exp0 exp1 div ||
-  -- EAnd exp0 exp1  -> applyBoolOperator context exp0 exp1 div (&&)
-  -- ENot exp1    -> ValorBool ( not (b (eval context exp1)))
+  ECon exp0 exp1  -> applyBinaryOperator VarString s context exp0 exp1 (++)
+  EAdd exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (+)
+  ESub exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (-)
+  EMul exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (*)
+  EDiv exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 div
+  EOr exp0 exp1  -> applyBinaryOperator VarBool b context exp0 exp1 (||)
+  EAnd exp0 exp1 -> applyBinaryOperator VarBool b context exp0 exp1 (&&)
+  ENot exp1  -> applyUnaryOperator VarBool b context exp1 not
   EVar vId -> fromJust $ lookup vcontext vId
+  EStr s -> VarString (Var [(s, ttPC)])
+  ETrue -> VarBool (Var [(True, ttPC)])
+  EFalse -> VarBool (Var [(False, ttPC)])
   EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
   EList list -> VarList (map (evalV context) list)
   Call id pExps -> case id of
@@ -94,31 +97,20 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
-applyIntegerOperator :: RContext -> Exp -> Exp -> (Integer -> Integer -> Integer) -> VarValor
-applyIntegerOperator context exp0 exp1 op =
-  VarInteger (Var
-    [ (i1 `op` i2, pc1 /\ pc2)
-      | (i1, pc1) <- valList (i (evalV context exp0)),
-        (i2, pc2) <- valList (i (evalV context exp1)),
+applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
+applyBinaryOperator cons f context exp0 exp1 op =
+  cons (Var
+    [ (v1 `op` v2, pc1 /\ pc2)
+      | (v1, pc1) <- valList (f (evalV context exp0)),
+        (v2, pc2) <- valList (f (evalV context exp1)),
         sat (pc1 /\ pc2)
     ])
 
-applyStringOperator :: RContext -> Exp -> Exp -> (String -> String -> String) -> VarValor
-applyStringOperator context exp0 exp1 op =
-  VarString (Var
-    [ (i1 `op` i2, pc1 /\ pc2)
-      | (i1, pc1) <- valList (s (evalV context exp0)),
-        (i2, pc2) <- valList (s (evalV context exp1)),
-        sat (pc1 /\ pc2)
-    ])
-
-applyBoolOperator :: RContext -> Exp -> Exp -> (Bool -> Bool -> Bool) -> VarValor
-applyBoolOperator context exp0 exp1 op =
-  VarBool (Var
-    [ (i1 `op` i2, pc1 /\ pc2)
-      | (i1, pc1) <- valList (b (evalV context exp0)),
-        (i2, pc2) <- valList (b (evalV context exp1)),
-        sat (pc1 /\ pc2)
+applyUnaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> (a -> a) -> VarValor
+applyUnaryOperator cons f context exp op =
+  cons (Var
+    [ (op v, pc1)
+      | (v, pc1) <- valList (f (evalV context exp))
     ])
 
 restrictContext :: RContext -> PresenceCondition -> RContext
@@ -154,6 +146,10 @@ updatecF (vcontext, fcontext) (f@(Fun fId _ _) : fs) = updatecF (vcontext, newFC
 
 (++++) :: VarValor -> VarValor -> VarValor
 (VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
+(VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
+(VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
 
 (||||) :: VarValor -> PresenceCondition -> VarValor
 (VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarString (Var listPCv)) |||| pcR = VarString (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarBool (Var listPCv)) |||| pcR = VarBool(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))

@@ -30,10 +30,16 @@ afbt = notBDD propA /\ propB
 afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
-input :: VarValor
-input = VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])
+inputInt :: VarValor
+inputInt = VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])
+
+inputBool :: VarValor
+inputBool = VarBool (Var [(True, atbt), ( False, afbt),  (False, atbf), (False, afbf)])
+
+inputString :: VarValor
+inputString = VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
 
 calc :: String -> String
 calc s =
   let Ok p = pProgram (myLexer s)
-   in show $ evalPV p input
+   in show $ evalPV p inputInt

@@ -1,5 +1,5 @@
 main (n) {
-   concat ("first", "second")
+   concat (n, "concated")
 }
 
 concat (exp1, exp2) {
