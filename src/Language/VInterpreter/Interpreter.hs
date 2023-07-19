@@ -116,7 +116,7 @@ applyUnaryOperator cons f context exp op =
 restrictContext :: RContext -> PresenceCondition -> RContext
 restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
   where
-    restrictedVContext = [(vId, VarInteger  restrictedVInt) | (vId, vInt) <- vcontext, let restrictedVInt = i vInt ||| pc]
+    restrictedVContext = [(vId, restrictedVInt) | (vId, v) <- vcontext, let restrictedVInt = v |||| pc]
 
 partition :: VarValor -> (PresenceCondition, PresenceCondition)
 partition (VarInteger (Var lvint)) =
@@ -124,6 +124,12 @@ partition (VarInteger (Var lvint)) =
     (\(v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
+partition (VarBool (Var lvint)) =
+  foldr
+    (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (ffPC, ffPC)
+    lvint
+    
 
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing
