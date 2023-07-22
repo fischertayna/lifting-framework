@@ -1,7 +1,9 @@
+main :: int -> [int]
 main (n) {
     generate (n)
 }
 
+generate :: int -> [int] 
 generate (n) {
     [n, n, n]
 }

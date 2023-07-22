@@ -13,7 +13,10 @@ import qualified Data.String
 data Program = Prog [Function]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data Function = Fun Ident [Ident] Exp
+data Decl = Dec Ident [Type]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data Function = Fun Decl Ident [Ident] Exp
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Exp
@@ -34,6 +37,15 @@ data Exp
     | EList [Exp]
     | ETrue
     | EFalse
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data Type
+    = Tbool
+    | Tint
+    | TStr
+    | TFun Function
+    | TPair Type Type
+    | TList Type
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 newtype Ident = Ident String

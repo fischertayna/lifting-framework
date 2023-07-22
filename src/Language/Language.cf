@@ -1,10 +1,12 @@
 Prog. Program  ::= [Function] ;
-Fun.  Function ::= Ident "(" [Ident] ")" "{" Exp "}" ;
+Dec. Decl ::= Ident "::" [Type] ;
+Fun.  Function ::= Decl Ident "(" [Ident] ")" "{" Exp "}" ;
 
 comment "//" ;
 comment "/*" "*/" ;
 
 terminator Function "" ;
+separator  Type "->" ;
 separator  Ident "," ;
 separator  Exp "," ;
 
@@ -25,6 +27,13 @@ EPair. Exp7 ::= "(" Exp "," Exp ")" ;
 EList. Exp7 ::= "[" [Exp] "]" ;
 ETrue. Exp7 ::= "True" ;
 EFalse. Exp7 ::= "False" ;
+
+Tbool. Type ::= "bool" ;
+Tint.  Type ::= "int" ;
+TStr.  Type ::= "String" ;
+TFun.  Type ::= Function ;
+TPair. Type ::= "(" Type "," Type ")" ;
+TList. Type ::= "[" Type "]" ;
 
 coercions Exp 7 ;
 

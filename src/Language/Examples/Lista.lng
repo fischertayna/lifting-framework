@@ -1,7 +1,9 @@
+main :: int -> int
 main (n) {
     soma ([n, n + 1, n + 2, n + 3])
 }
 
+soma :: [int] -> int
 soma (lst) {
     if ((isNil (lst))) 
         then 0

@@ -1,7 +1,9 @@
+main :: int -> bool
 main (n) {
    primeiro ((True, False))
 }
 
+primeiro :: (bool, bool) -> bool
 primeiro (pair) {
     fst (pair)
 }

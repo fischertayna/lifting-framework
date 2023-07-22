@@ -42,6 +42,8 @@ library
         Language.MInterpreter.Interpreter
         Language.VInterpreter.Driver
         Language.VInterpreter.Interpreter
+        Language.Typechecker.Driver
+        Language.Typechecker.Typechecker
 
     -- Modules included in this library but not exported.
     -- other-modules:

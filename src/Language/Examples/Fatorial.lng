@@ -1,7 +1,9 @@
+main :: int -> int
 main (n) {
   fat (n)
 }
 
+fat :: int -> int
 fat (n) {
  if (n)
     then n * fat (n-1)

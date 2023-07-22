@@ -75,7 +75,7 @@ eval context@(vcontext, fcontext) x = case x of
       arg = eval context (head pExps)
       list = l arg
       (f,s) = p arg
-      (Fun _ decls fExp) = fromJust $ lookup fcontext id
+      (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (eval context) pExps)
 
 boolToInt :: Bool -> Integer
@@ -97,6 +97,6 @@ update ((i, v) : cs) s nv
 
 updatecF :: RContext -> [Function] -> RContext
 updatecF c [] = c
-updatecF (vcontext, fcontext) (f@(Fun fId _ _) : fs) = updatecF (vcontext, newFContext) fs
+updatecF (vcontext, fcontext) (f@(Fun _ fId _ _) : fs) = updatecF (vcontext, newFContext) fs
   where
     newFContext = update fcontext fId f

@@ -23,9 +23,13 @@ transProgram :: Language.Frontend.AbsLanguage.Program -> Result
 transProgram x = case x of
   Language.Frontend.AbsLanguage.Prog functions -> failure x
 
+transDecl :: Language.Frontend.AbsLanguage.Decl -> Result
+transDecl x = case x of
+  Language.Frontend.AbsLanguage.Dec ident types -> failure x
+
 transFunction :: Language.Frontend.AbsLanguage.Function -> Result
 transFunction x = case x of
-  Language.Frontend.AbsLanguage.Fun ident idents exp -> failure x
+  Language.Frontend.AbsLanguage.Fun decl ident idents exp -> failure x
 
 transExp :: Language.Frontend.AbsLanguage.Exp -> Result
 transExp x = case x of
@@ -46,3 +50,12 @@ transExp x = case x of
   Language.Frontend.AbsLanguage.EList exps -> failure x
   Language.Frontend.AbsLanguage.ETrue -> failure x
   Language.Frontend.AbsLanguage.EFalse -> failure x
+
+transType :: Language.Frontend.AbsLanguage.Type -> Result
+transType x = case x of
+  Language.Frontend.AbsLanguage.Tbool -> failure x
+  Language.Frontend.AbsLanguage.Tint -> failure x
+  Language.Frontend.AbsLanguage.TStr -> failure x
+  Language.Frontend.AbsLanguage.TFun function -> failure x
+  Language.Frontend.AbsLanguage.TPair type_1 type_2 -> failure x
+  Language.Frontend.AbsLanguage.TList type_ -> failure x

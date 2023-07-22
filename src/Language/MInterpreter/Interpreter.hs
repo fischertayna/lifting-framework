@@ -61,7 +61,7 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
           if fId == memoizedFunctionName
             then memoizedCall context fId pExps
             else
-              ( let (Fun _ decls fExp) = fromJust $ lookup fcontext fId
+              ( let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
                  in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
                      in eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp
               )
@@ -69,7 +69,7 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
 
 memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem Integer
 memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
-  let (Fun _ decls fExp) = fromJust $ lookup fcontext fId
+  let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
    in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
        in let paramListM = mapM snd paramBindings
            in do
@@ -90,6 +90,6 @@ update ((i, v) : cs) s nv
 
 updatecF :: RContext Mem -> [Function] -> RContext Mem
 updatecF c [] = c
-updatecF (vcontext, fcontext, memoizedFunctionName) (f@(Fun fId _ _) : fs) = updatecF (vcontext, newFContext, memoizedFunctionName) fs
+updatecF (vcontext, fcontext, memoizedFunctionName) (f@(Fun _ fId _ _) : fs) = updatecF (vcontext, newFContext, memoizedFunctionName) fs
   where
     newFContext = update fcontext fId f

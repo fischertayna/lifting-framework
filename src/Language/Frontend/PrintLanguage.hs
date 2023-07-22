@@ -144,13 +144,22 @@ instance Print Language.Frontend.AbsLanguage.Program where
   prt i = \case
     Language.Frontend.AbsLanguage.Prog functions -> prPrec i 0 (concatD [prt 0 functions])
 
+instance Print Language.Frontend.AbsLanguage.Decl where
+  prt i = \case
+    Language.Frontend.AbsLanguage.Dec id_ types -> prPrec i 0 (concatD [prt 0 id_, doc (showString "::"), prt 0 types])
+
 instance Print Language.Frontend.AbsLanguage.Function where
   prt i = \case
-    Language.Frontend.AbsLanguage.Fun id_ ids exp -> prPrec i 0 (concatD [prt 0 id_, doc (showString "("), prt 0 ids, doc (showString ")"), doc (showString "{"), prt 0 exp, doc (showString "}")])
+    Language.Frontend.AbsLanguage.Fun decl id_ ids exp -> prPrec i 0 (concatD [prt 0 decl, prt 0 id_, doc (showString "("), prt 0 ids, doc (showString ")"), doc (showString "{"), prt 0 exp, doc (showString "}")])
 
 instance Print [Language.Frontend.AbsLanguage.Function] where
   prt _ [] = concatD []
   prt _ (x:xs) = concatD [prt 0 x, prt 0 xs]
+
+instance Print [Language.Frontend.AbsLanguage.Type] where
+  prt _ [] = concatD []
+  prt _ [x] = concatD [prt 0 x]
+  prt _ (x:xs) = concatD [prt 0 x, doc (showString "->"), prt 0 xs]
 
 instance Print [Language.Frontend.AbsLanguage.Ident] where
   prt _ [] = concatD []
@@ -181,3 +190,12 @@ instance Print Language.Frontend.AbsLanguage.Exp where
     Language.Frontend.AbsLanguage.EList exps -> prPrec i 7 (concatD [doc (showString "["), prt 0 exps, doc (showString "]")])
     Language.Frontend.AbsLanguage.ETrue -> prPrec i 7 (concatD [doc (showString "True")])
     Language.Frontend.AbsLanguage.EFalse -> prPrec i 7 (concatD [doc (showString "False")])
+
+instance Print Language.Frontend.AbsLanguage.Type where
+  prt i = \case
+    Language.Frontend.AbsLanguage.Tbool -> prPrec i 0 (concatD [doc (showString "bool")])
+    Language.Frontend.AbsLanguage.Tint -> prPrec i 0 (concatD [doc (showString "int")])
+    Language.Frontend.AbsLanguage.TStr -> prPrec i 0 (concatD [doc (showString "String")])
+    Language.Frontend.AbsLanguage.TFun function -> prPrec i 0 (concatD [prt 0 function])
+    Language.Frontend.AbsLanguage.TPair type_1 type_2 -> prPrec i 0 (concatD [doc (showString "("), prt 0 type_1, doc (showString ","), prt 0 type_2, doc (showString ")")])
+    Language.Frontend.AbsLanguage.TList type_ -> prPrec i 0 (concatD [doc (showString "["), prt 0 type_, doc (showString "]")])

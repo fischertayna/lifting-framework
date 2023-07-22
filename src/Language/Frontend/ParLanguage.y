@@ -9,8 +9,10 @@ module Language.Frontend.ParLanguage
   ( happyError
   , myLexer
   , pProgram
+  , pDecl
   , pFunction
   , pListFunction
+  , pListType
   , pListIdent
   , pListExp
   , pExp
@@ -21,6 +23,7 @@ module Language.Frontend.ParLanguage
   , pExp5
   , pExp6
   , pExp7
+  , pType
   ) where
 
 import Prelude
@@ -31,8 +34,10 @@ import Language.Frontend.LexLanguage
 }
 
 %name pProgram Program
+%name pDecl Decl
 %name pFunction Function
 %name pListFunction ListFunction
+%name pListType ListType
 %name pListIdent ListIdent
 %name pListExp ListExp
 %name pExp Exp
@@ -43,6 +48,7 @@ import Language.Frontend.LexLanguage
 %name pExp5 Exp5
 %name pExp6 Exp6
 %name pExp7 Exp7
+%name pType Type
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
@@ -56,17 +62,22 @@ import Language.Frontend.LexLanguage
   '++'     { PT _ (TS _ 7)  }
   ','      { PT _ (TS _ 8)  }
   '-'      { PT _ (TS _ 9)  }
-  '/'      { PT _ (TS _ 10) }
-  'False'  { PT _ (TS _ 11) }
-  'True'   { PT _ (TS _ 12) }
-  '['      { PT _ (TS _ 13) }
-  ']'      { PT _ (TS _ 14) }
-  'else'   { PT _ (TS _ 15) }
-  'if'     { PT _ (TS _ 16) }
-  'then'   { PT _ (TS _ 17) }
-  '{'      { PT _ (TS _ 18) }
-  '||'     { PT _ (TS _ 19) }
-  '}'      { PT _ (TS _ 20) }
+  '->'     { PT _ (TS _ 10) }
+  '/'      { PT _ (TS _ 11) }
+  '::'     { PT _ (TS _ 12) }
+  'False'  { PT _ (TS _ 13) }
+  'String' { PT _ (TS _ 14) }
+  'True'   { PT _ (TS _ 15) }
+  '['      { PT _ (TS _ 16) }
+  ']'      { PT _ (TS _ 17) }
+  'bool'   { PT _ (TS _ 18) }
+  'else'   { PT _ (TS _ 19) }
+  'if'     { PT _ (TS _ 20) }
+  'int'    { PT _ (TS _ 21) }
+  'then'   { PT _ (TS _ 22) }
+  '{'      { PT _ (TS _ 23) }
+  '||'     { PT _ (TS _ 24) }
+  '}'      { PT _ (TS _ 25) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
   L_quoted { PT _ (TL $$)   }
@@ -85,13 +96,23 @@ String   : L_quoted { $1 }
 Program :: { Language.Frontend.AbsLanguage.Program }
 Program : ListFunction { Language.Frontend.AbsLanguage.Prog $1 }
 
+Decl :: { Language.Frontend.AbsLanguage.Decl }
+Decl
+  : Ident '::' ListType { Language.Frontend.AbsLanguage.Dec $1 $3 }
+
 Function :: { Language.Frontend.AbsLanguage.Function }
 Function
-  : Ident '(' ListIdent ')' '{' Exp '}' { Language.Frontend.AbsLanguage.Fun $1 $3 $6 }
+  : Decl Ident '(' ListIdent ')' '{' Exp '}' { Language.Frontend.AbsLanguage.Fun $1 $2 $4 $7 }
 
 ListFunction :: { [Language.Frontend.AbsLanguage.Function] }
 ListFunction
   : {- empty -} { [] } | Function ListFunction { (:) $1 $2 }
+
+ListType :: { [Language.Frontend.AbsLanguage.Type] }
+ListType
+  : {- empty -} { [] }
+  | Type { (:[]) $1 }
+  | Type '->' ListType { (:) $1 $3 }
 
 ListIdent :: { [Language.Frontend.AbsLanguage.Ident] }
 ListIdent
@@ -152,6 +173,15 @@ Exp7
   | 'True' { Language.Frontend.AbsLanguage.ETrue }
   | 'False' { Language.Frontend.AbsLanguage.EFalse }
   | '(' Exp ')' { $2 }
+
+Type :: { Language.Frontend.AbsLanguage.Type }
+Type
+  : 'bool' { Language.Frontend.AbsLanguage.Tbool }
+  | 'int' { Language.Frontend.AbsLanguage.Tint }
+  | 'String' { Language.Frontend.AbsLanguage.TStr }
+  | Function { Language.Frontend.AbsLanguage.TFun $1 }
+  | '(' Type ',' Type ')' { Language.Frontend.AbsLanguage.TPair $2 $4 }
+  | '[' Type ']' { Language.Frontend.AbsLanguage.TList $2 }
 
 {
 

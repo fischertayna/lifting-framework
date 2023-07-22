@@ -30,14 +30,15 @@ except ``"`` unless preceded by ``\``.
 The set of reserved words is the set of terminals appearing in the grammar. Those reserved words that consist of non-letter characters are called symbols, and they are treated in a different way from those that are similar to identifiers. The lexer follows rules familiar from languages like Haskell, C, and Java, including longest match and spacing conventions.
 
 The reserved words used in Language are the following:
-  | ``False`` | ``True`` | ``else`` | ``if``
-  | ``then`` |  |  |
+  | ``False`` | ``String`` | ``True`` | ``bool``
+  | ``else`` | ``if`` | ``int`` | ``then``
 
 The symbols used in Language are the following:
-  | ( | ) | { | }
-  | , | || | && | !
-  | ++ | + | - | *
-  | / | [ | ] |
+  | :: | ( | ) | {
+  | } | -> | , | ||
+  | && | ! | ++ | +
+  | - | * | / | [
+  | ] |  |  |
 
 ===Comments===
 Single-line comments begin with //.Multiple-line comments are  enclosed with /* and */.
@@ -49,9 +50,13 @@ and **eps** (empty rule) belong to the BNF notation.
 All other symbols are terminals.
 
   | //Program// | -> | //[Function]//
-  | //Function// | -> | //Ident// ``(`` //[Ident]// ``)`` ``{`` //Exp// ``}``
+  | //Decl// | -> | //Ident// ``::`` //[Type]//
+  | //Function// | -> | //Decl// //Ident// ``(`` //[Ident]// ``)`` ``{`` //Exp// ``}``
   | //[Function]// | -> | **eps**
   |  |  **|**  | //Function// //[Function]//
+  | //[Type]// | -> | **eps**
+  |  |  **|**  | //Type//
+  |  |  **|**  | //Type// ``->`` //[Type]//
   | //[Ident]// | -> | **eps**
   |  |  **|**  | //Ident//
   |  |  **|**  | //Ident// ``,`` //[Ident]//
@@ -83,6 +88,12 @@ All other symbols are terminals.
   |  |  **|**  | ``True``
   |  |  **|**  | ``False``
   |  |  **|**  | ``(`` //Exp// ``)``
+  | //Type// | -> | ``bool``
+  |  |  **|**  | ``int``
+  |  |  **|**  | ``String``
+  |  |  **|**  | //Function//
+  |  |  **|**  | ``(`` //Type// ``,`` //Type// ``)``
+  |  |  **|**  | ``[`` //Type// ``]``
 
 
 
