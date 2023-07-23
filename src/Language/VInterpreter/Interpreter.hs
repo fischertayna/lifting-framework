@@ -1,6 +1,6 @@
 module Language.VInterpreter.Interpreter where
 
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isNothing)
 import Language.Frontend.AbsLanguage
   ( Exp (..),
     Function (..),
@@ -44,73 +44,85 @@ type VContext = Context Ident VarValor
 
 type FContext = Context Ident Function
 
-evalV :: RContext -> Exp -> VarValor
-evalV context@(vcontext, fcontext) x = case x of
+type OpContext = Context Ident Exp
+
+type Op a = (a -> a -> a)
+
+evalV :: Maybe Int -> RContext -> Exp -> VarValor
+evalV listMod context@(vcontext, fcontext) x = case x of
   EInt n -> VarInteger (Var [(n, ttPC)])
-  ECon exp0 exp1  -> applyBinaryOperator VarString s context exp0 exp1 (++)
-  EAdd exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (+)
-  ESub exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (-)
-  EMul exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (*)
-  EDiv exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 div
-  EOr exp0 exp1  -> applyBinaryOperator VarBool b context exp0 exp1 (||)
-  EAnd exp0 exp1 -> applyBinaryOperator VarBool b context exp0 exp1 (&&)
-  ENot exp1  -> applyUnaryOperator VarBool b context exp1 not
+  ECon exp0 exp1  -> applyBinaryOperator listMod VarString s context exp0 exp1 (++)
+  EAdd exp0 exp1 -> applyBinaryOperator listMod VarInteger i context exp0 exp1 (+)
+  ESub exp0 exp1 -> applyBinaryOperator listMod VarInteger i context exp0 exp1 (-)
+  EMul exp0 exp1 -> applyBinaryOperator listMod VarInteger i context exp0 exp1 (*)
+  EDiv exp0 exp1 -> applyBinaryOperator listMod VarInteger i context exp0 exp1 div
+  EOr exp0 exp1  -> applyBinaryOperator listMod VarBool b context exp0 exp1 (||)
+  EAnd exp0 exp1 -> applyBinaryOperator listMod VarBool b context exp0 exp1 (&&)
+  ENot exp1  -> applyUnaryOperator listMod VarBool b context exp1 not
   EVar vId -> fromJust $ lookup vcontext vId
   EStr s -> VarString (Var [(s, ttPC)])
   ETrue -> VarBool (Var [(True, ttPC)])
   EFalse -> VarBool (Var [(False, ttPC)])
-  EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
-  EList list -> VarList (map (evalV context) list)
+  EPair p1 p2 -> VarPair (evalV listMod context p1, evalV listMod context p2)
+  EList list -> VarList (map (evalV listMod context) list)
   Call id pExps -> case id of
     Ident "head" -> head list
     Ident "tail" ->  VarList (tail list)
     Ident "isNil" -> VarInteger (Var [(boolToInt (null list), ttPC)])
     Ident "fst" -> f
     Ident "snd" -> s
-    Ident func -> evalV (paramBindings, fcontext) fExp
+    Ident func -> case pExps of
+      [EList lst] -> if isNothing listMod || (length lst <= fromJust listMod)
+                        then executeEvalV
+                        else evalV listMod context (getJoinOperator context id  (Call id [EList (take (fromJust listMod) lst)]) (Call id [EList (drop (fromJust listMod) lst)]))
+      _ -> executeEvalV
     where
-      arg = evalV context (head pExps)
+      executeEvalV = evalV listMod (paramBindings, fcontext) fExp
+      arg = evalV listMod context (head pExps)
       list = l arg
       (f,s) = p arg
       (Fun _ decls fExp) = fromJust $ lookup fcontext id
-      paramBindings = zip decls (map (evalV context) pExps)
+      paramBindings = zip decls (map (evalV listMod context) pExps)
   EIf e eT eE ->
     if pct == ttPC
-      then evalV context eT
+      then evalV listMod context eT
       else
         if pct == ffPC
-          then evalV context eE
+          then evalV listMod context eE
           else (restrictedEvalET |||| pct) ++++ (restrictedEvalEE |||| pcf)
     where
-      (pct, pcf) = partition (evalV context e)
-      restrictedEvalET = evalV (restrictContext context pct) eT
-      restrictedEvalEE = evalV (restrictContext context pcf) eE
+      (pct, pcf) = partition (evalV listMod context e)
+      restrictedEvalET = evalV listMod (restrictContext context pct) eT
+      restrictedEvalEE = evalV listMod (restrictContext context pcf) eE
+
+getJoinOperator :: RContext -> Ident -> Exp -> Exp -> Exp
+getJoinOperator contexto id = EAdd
 
 boolToInt :: Bool -> Integer
 boolToInt b
   | not b = 0
   | otherwise = 1
 
-evalPV :: Program -> VarValor -> VarValor
-evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
+evalPV :: Program -> Maybe Int -> VarValor -> VarValor
+evalPV (Prog fs) listMod input = evalV listMod context (Call (Ident "main") [EVar (Ident "n")])
   where
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
 
-applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
-applyBinaryOperator cons f context exp0 exp1 op =
+applyBinaryOperator :: Maybe Int ->  (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
+applyBinaryOperator listMod cons f context exp0 exp1 op =
   cons (Var
     [ (v1 `op` v2, pc1 /\ pc2)
-      | (v1, pc1) <- valList (f (evalV context exp0)),
-        (v2, pc2) <- valList (f (evalV context exp1)),
+      | (v1, pc1) <- valList (f (evalV listMod context exp0)),
+        (v2, pc2) <- valList (f (evalV listMod context exp1)),
         sat (pc1 /\ pc2)
     ])
 
-applyUnaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> (a -> a) -> VarValor
-applyUnaryOperator cons f context exp op =
+applyUnaryOperator :: Maybe Int ->  (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> (a -> a) -> VarValor
+applyUnaryOperator listMod cons f context exp op =
   cons (Var
     [ (op v, pc1)
-      | (v, pc1) <- valList (f (evalV context exp))
+      | (v, pc1) <- valList (f (evalV listMod context exp))
     ])
 
 restrictContext :: RContext -> PresenceCondition -> RContext
@@ -129,7 +141,6 @@ partition (VarBool (Var lvint)) =
     (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
-    
 
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing

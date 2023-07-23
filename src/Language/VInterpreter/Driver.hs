@@ -6,6 +6,7 @@ import Language.Frontend.LexLanguage ()
 import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VInterpreter.Interpreter
 import Variability.VarTypes (PresenceCondition, Var (Var), ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
+import System.IO.Unsafe
 
 main :: IO ()
 main = do
@@ -39,7 +40,10 @@ inputBool = VarBool (Var [(True, atbt), ( False, afbt),  (False, atbf), (False, 
 inputString :: VarValor
 inputString = VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
 
+listMod :: Maybe Int
+listMod = Just 2
+
 calc :: String -> String
 calc s =
   let Ok p = pProgram (myLexer s)
-   in show $ evalPV p inputInt
+   in show $ evalPV p listMod inputInt
