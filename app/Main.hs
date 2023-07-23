@@ -7,4 +7,4 @@ import qualified Language.Interpreter.Driver as Base
 import qualified Language.Typechecker.Driver as Typecheck
 
 main :: IO ()
-main = Typecheck.main
+main = Var.main
