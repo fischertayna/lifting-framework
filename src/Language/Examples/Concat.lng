@@ -1,6 +1,6 @@
 main :: String -> String
 main (n) {
-   concat (n, "concated")
+   concat (n, "_concatenated")
 }
 
 concat :: String -> String -> String

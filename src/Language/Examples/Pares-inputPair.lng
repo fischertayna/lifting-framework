@@ -1,0 +1,9 @@
+main :: (int, int) -> int
+main (n) {
+   soma (n)
+}
+
+soma :: (int, int) -> int
+soma (pair) {
+    fst (pair) + snd (pair)
+}

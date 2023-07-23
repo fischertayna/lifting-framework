@@ -7,5 +7,5 @@ soma :: [int] -> int
 soma (lst) {
     if ((isNil (lst))) 
         then 0
-        else head (lst) - 1  + soma (tail (lst))
+        else head (lst) + soma (tail (lst))
 }
