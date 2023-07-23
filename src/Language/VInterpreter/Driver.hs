@@ -7,6 +7,7 @@ import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VInterpreter.Interpreter
 import Variability.VarTypes (PresenceCondition, Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
 import Prelude
+import Data.List (transpose)
 
 main :: IO ()
 main = do
@@ -27,8 +28,8 @@ chunksOfVar :: Int -> VarValor -> [VarValor]
 chunksOfVar i (VarInteger (Var vals)) = map (VarInteger . Var) (chunksOf i vals)
 chunksOfVar i (VarBool (Var vals)) = map (VarBool . Var) (chunksOf i vals)
 chunksOfVar i (VarString (Var vals)) = map (VarString . Var) (chunksOf i vals)
--- chunksOfVar i (VarList vals) = [VarList (chunksOfVar i v) | v <- chunksOf i vals]
--- chunksOfVar i (VarPair (v1, v2)) = [VarPair (x, y) | x <- chunksOfVar i v1, y <- chunksOfVar i v2]
+chunksOfVar i (VarList vals) = map VarList (transpose [chunksOfVar i v | v <- vals])
+chunksOfVar i (VarPair (v1, v2)) = [VarPair (x, y) | x <- chunksOfVar i v1, y <- chunksOfVar i v2]
 
 uVarValores :: [VarValor] -> VarValor
 uVarValores varValores = case head varValores of
@@ -79,8 +80,8 @@ chunkSize = 2
 calc :: String -> String
 calc s =
   let Ok p = pProgram (myLexer s)
-  --  in show $ evalPV p inputString
-   in show $ uVarValores (evalPVChunk p (chunksOfVar chunkSize inputString))
+  --  in show $ evalPV p inputList
+   in show $ uVarValores (evalPVChunk p (chunksOfVar chunkSize inputList))
 
 evalPVChunk :: Program -> [VarValor] -> [VarValor]
 evalPVChunk _ [] = [] -- Caso base: lista vazia
