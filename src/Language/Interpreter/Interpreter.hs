@@ -21,9 +21,6 @@ data Valor
     = ValorInt
         { i :: Integer
         }
-    | ValorFun
-        { f :: Function
-        }
     | ValorBool
         { b :: Bool
         }

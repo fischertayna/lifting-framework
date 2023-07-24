@@ -55,23 +55,15 @@ afbt = notBDD propA /\ propB
 afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
-inputInt :: VarValor
+inputInt, inputBool, inputString, inputList, inputPair :: VarValor
 inputInt = VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])
-
-inputBool :: VarValor
 inputBool = VarBool (Var [(True, atbt), ( False, afbt),  (False, atbf), (False, afbf)])
-
-inputString :: VarValor
 inputString = VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
-
-inputList :: VarValor
 inputList = VarList [
                       VarInteger (Var [(8, atbt), ( 5, afbt), (0, atbf), (1, afbf)]),
                       VarInteger (Var [(2, atbt), ( 1, afbt), (4, atbf), (6, afbf)]),
                       VarInteger (Var [(3, atbt), ( 2, afbt), (5, atbf), (2, afbf)])
                     ]
-
-inputPair :: VarValor
 inputPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)]), VarInteger (Var [(2, atbt), ( 1, afbt),  (4, atbf), (6, afbf)]))
 
 chunkSize :: Int
