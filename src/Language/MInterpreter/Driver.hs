@@ -15,10 +15,10 @@ main = do
   interact calc
   putStrLn ""
 
-input :: Integer
-input = 10
+input :: Valor
+input = ValorInt 10
 
-initialState :: KeyValueArray [Integer] Integer
+initialState :: KeyValueArray [Valor] Valor
 initialState = []
 
 memoizedFunctionName :: String

@@ -47,10 +47,10 @@ afbt = notBDD propA /\ propB
 afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
-input :: Var Integer
-input = Var [(8, atbt), (5, afbf), (1, atbf), (0, afbt)]
+input :: Var Valor
+input = (Var [(ValorInt 8, atbt), (ValorInt 5, afbf), (ValorInt 1, atbf), (ValorInt 0, afbt)])
 
-initialState :: KeyValueArray [Integer] Integer
+initialState :: KeyValueArray [Valor] Valor
 initialState = []
 
 memoizedFunctionName :: String

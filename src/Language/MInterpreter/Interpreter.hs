@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use lambda-case" #-}
-module Language.MInterpreter.Interpreter (evalP) where
+module Language.MInterpreter.Interpreter where
 
 import Data.Maybe (fromJust)
 import Language.Frontend.AbsLanguage
@@ -15,17 +15,35 @@ import Memoization.Core.State (State, (<.>))
 import Prelude hiding (lookup)
 import Debug.Trace
 
+data Valor
+    = ValorInt
+        { i :: Integer
+        }
+    | ValorBool
+        { b :: Bool
+        }
+    | ValorStr
+        { s :: String
+        }
+    | ValorList
+        { l :: [Valor]
+        }
+    | ValorPair
+        { p :: (Valor, Valor)
+        }
+    deriving (Show, Eq)
+
 type Context k v = [(k, v)]
 
 type RContext m = (VContext m, FContext, Ident)
 
-type VContext m = Context Ident (State m Integer)
+type VContext m = Context Ident (State m Valor)
 
 type FContext = Context Ident Function
 
-type Mem =  (KeyValueArray [Integer] Integer)
+type Mem =  (KeyValueArray [Valor] Valor)
 
-evalP :: Program -> String -> State Mem (Integer -> State Mem Integer)
+evalP :: Program -> String -> State Mem (Valor -> State Mem Valor)
 evalP (Prog fs) memoizedFunctionName =
   return
     ( \input ->
@@ -34,15 +52,18 @@ evalP (Prog fs) memoizedFunctionName =
              in eval context <.> return (Call (Ident "main") [EVar (Ident "n")])
     )
 
-liftOperator :: (Integer -> Integer -> Integer) -> State m (Integer -> State m (Integer -> State m Integer))
-liftOperator op = return (\a -> return (\b -> return (a `op` b)))
+liftOperator :: (Integer -> Integer -> Integer) -> State m (Valor -> State m (Valor -> State m Valor))
+liftOperator op = return (\(ValorInt a) -> return (\(ValorInt b) -> return (ValorInt (a `op` b))))
 
-liftedIf :: State m Integer -> State m Integer -> State m Integer -> State m Integer
+
+liftedIf :: State m Valor -> State m Valor -> State m Valor -> State m Valor
 liftedIf cond p1 p2 = do
   c <- cond
-  if c /= 0 then p1 else p2
+  case c of
+    ValorInt 0 -> p2
+    _ -> p1
 
-eval :: RContext Mem -> State Mem (Exp -> State Mem Integer)
+eval :: RContext Mem -> State Mem (Exp -> State Mem Valor)
 eval context@(vcontext, fcontext, memoizedFunctionName) =
   return
     ( \x -> case x of
@@ -50,7 +71,7 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
         (ESub exp0 exp1) -> liftOperator (-) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
         (EMul exp0 exp1) -> liftOperator (*) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
         (EDiv exp0 exp1) -> liftOperator div <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        EInt n -> return n
+        EInt n -> return (ValorInt n)
         EVar vId -> fromJust (lookup vcontext vId)
         EIf cond expi expe -> liftedIf evalCond evalExpi evalExpe
           where
@@ -67,7 +88,7 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
               )
     )
 
-memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem Integer
+memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem Valor
 memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
   let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
    in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
