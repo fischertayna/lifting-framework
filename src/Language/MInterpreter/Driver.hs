@@ -15,8 +15,15 @@ main = do
   interact calc
   putStrLn ""
 
-input :: Valor
-input = ValorInt 10
+-- input :: Valor
+-- input = ValorInt 10
+
+inputInt, inputBool, inputString, inputList, inputPair :: Valor
+inputInt = ValorInt 10
+inputBool = ValorBool True
+inputString = ValorStr "teste"
+inputList = ValorList [ValorInt 10, ValorInt 12, ValorInt 13]
+inputPair = ValorPair (ValorInt 8, ValorInt 5)
 
 initialState :: KeyValueArray [Valor] Valor
 initialState = []
@@ -27,4 +34,4 @@ memoizedFunctionName = "fib"
 calc :: String -> String
 calc s =
   let Ok p = pProgram  (myLexer s)
-  in show $ runState (evalP p memoizedFunctionName <.> return input) initialState
+  in show $ runState (evalP p memoizedFunctionName <.> return inputList) initialState

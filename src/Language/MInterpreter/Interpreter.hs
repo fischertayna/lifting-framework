@@ -52,9 +52,17 @@ evalP (Prog fs) memoizedFunctionName =
              in eval context <.> return (Call (Ident "main") [EVar (Ident "n")])
     )
 
-liftOperator :: (Integer -> Integer -> Integer) -> State m (Valor -> State m (Valor -> State m Valor))
-liftOperator op = return (\(ValorInt a) -> return (\(ValorInt b) -> return (ValorInt (a `op` b))))
+liftIntOperator :: (Integer -> Integer -> Integer) -> State m (Valor -> State m (Valor -> State m Valor))
+liftIntOperator op = return (\(ValorInt a) -> return (\(ValorInt b) -> return (ValorInt (a `op` b))))
 
+liftStringOperator :: (String -> String -> String) -> State m (Valor -> State m (Valor -> State m Valor))
+liftStringOperator op = return (\(ValorStr a) -> return (\(ValorStr b) -> return (ValorStr (a `op` b))))
+
+liftBoolBinaryOperator :: (Bool -> Bool -> Bool) -> State m (Valor -> State m (Valor -> State m Valor))
+liftBoolBinaryOperator op = return (\(ValorBool a) -> return (\(ValorBool b) -> return (ValorBool (a `op` b))))
+
+liftBoolUnaryOperator :: (Bool -> Bool) -> State m (Valor -> State m Valor)
+liftBoolUnaryOperator op = return (\(ValorBool b) -> return (ValorBool (op b)))
 
 liftedIf :: State m Valor -> State m Valor -> State m Valor -> State m Valor
 liftedIf cond p1 p2 = do
@@ -67,26 +75,71 @@ eval :: RContext Mem -> State Mem (Exp -> State Mem Valor)
 eval context@(vcontext, fcontext, memoizedFunctionName) =
   return
     ( \x -> case x of
-        (EAdd exp0 exp1) -> liftOperator (+) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (ESub exp0 exp1) -> liftOperator (-) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EMul exp0 exp1) -> liftOperator (*) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EDiv exp0 exp1) -> liftOperator div <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (ECon exp0 exp1)  -> liftStringOperator (++) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (EAdd exp0 exp1) -> liftIntOperator (+) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (ESub exp0 exp1) -> liftIntOperator (-) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (EMul exp0 exp1) -> liftIntOperator (*) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (EDiv exp0 exp1) -> liftIntOperator div <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (EOr exp0 exp1)   -> liftBoolBinaryOperator (||) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (EAnd exp0 exp1)  -> liftBoolBinaryOperator (&&) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
+        (ENot exp1)        -> liftBoolUnaryOperator not <.> (eval context <.> return exp1)
         EInt n -> return (ValorInt n)
+        EStr s          -> return (ValorStr s)
+        ETrue           -> return (ValorBool True)
+        EFalse          -> return (ValorBool False)
         EVar vId -> fromJust (lookup vcontext vId)
+        EList exps -> do
+          vals <- mapM (\e -> eval context <.> return e) exps
+          return $ ValorList vals
+        EPair p1 p2 -> do
+          v1 <- eval context <.> return p1
+          v2 <- eval context <.> return p2
+          return $ ValorPair (v1, v2)
         EIf cond expi expe -> liftedIf evalCond evalExpi evalExpe
           where
             evalCond = eval context <.> return cond
             evalExpi = eval context <.> return expi
             evalExpe = eval context <.> return expe
-        Call fId pExps ->
-          if fId == memoizedFunctionName
-            then memoizedCall context fId pExps
-            else
-              ( let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
-                 in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
-                     in eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp
-              )
+        Call fId pExps -> case fId of
+          Ident "head" -> do
+            vals <- (mapM (\e -> eval context <.> return e) pExps)
+            case vals of
+              [ValorList l] -> return (head l)
+              _ -> error "Invalid argument to head"
+          Ident "tail" -> do
+            vals <- (mapM (\e -> eval context <.> return e) pExps)
+            case vals of
+              [ValorList l] -> return $ ValorList (tail l)
+              _ -> error "Invalid argument to tail"
+          Ident "isNil" -> do
+            vals <- (mapM (\e -> eval context <.> return e) pExps)
+            case vals of
+              [ValorList l] -> return $ ValorInt (boolToInt (null l))
+              _ -> error "Invalid argument to isNil"
+          Ident "fst" -> do
+            vals <- (mapM (\e -> eval context <.> return e) pExps)
+            case vals of
+              [ValorPair (f, s)] -> return f
+              _ -> error "Invalid argument to fst"
+          Ident "snd" -> do
+            vals <- (mapM (\e -> eval context <.> return e) pExps)
+            case vals of
+              [ValorPair (f, s)] -> return s
+              _ -> error "Invalid argument to snd"
+          _ ->
+            if fId == memoizedFunctionName
+              then memoizedCall context fId pExps
+              else
+                ( let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
+                  in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
+                      in eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp
+                )
     )
+
+boolToInt :: Bool -> Integer
+boolToInt b
+  | not b = 0
+  | otherwise = 1
 
 memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem Valor
 memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
