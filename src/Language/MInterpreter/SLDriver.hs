@@ -29,26 +29,11 @@ shallowLift fM = do
   f <- fM
   applyMapMAndZip f
 
-propA :: Prop
-propA = mkBDDVar "A"
-
-propB :: Prop
-propB = mkBDDVar "B"
-
-atbt :: Prop
-atbt = propA /\ propB
-
-atbf :: Prop
-atbf = propA /\ notBDD propB
-
-afbt :: Prop
-afbt = notBDD propA /\ propB
-
-afbf :: Prop
-afbf = notBDD propA /\ notBDD propB
+pA :: Prop
+pA = mkBDDVar "A"
 
 input :: Var Valor
-input = (Var [(ValorInt 8, atbt), (ValorInt 5, afbf), (ValorInt 1, atbf), (ValorInt 0, afbt)])
+input = (Var [(ValorInt 8, pA), (ValorInt 5, notBDD pA)])
 
 initialState :: KeyValueArray [Valor] Valor
 initialState = []
@@ -56,7 +41,12 @@ initialState = []
 memoizedFunctionName :: String
 memoizedFunctionName = "fib"
 
+executeProg :: String -> String -> Var Valor -> (Var Valor, Mem)
+executeProg memoizedFunctionName prog input =
+  let Ok p = pProgram (myLexer prog); programComputationM = shallowLift (evalP p memoizedFunctionName) <.> return input
+  in runState programComputationM initialState
+
 calc :: String -> String
 calc s =
-  let Ok p = pProgram (myLexer s); programComputationM = shallowLift (evalP p memoizedFunctionName) <.> return input
-   in show $ (runState programComputationM initialState)
+  let r = executeProg memoizedFunctionName s input
+   in show $ r

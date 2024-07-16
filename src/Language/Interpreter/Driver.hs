@@ -15,7 +15,12 @@ main = do
 input :: Valor
 input = ValorInt 10
 
+executeProg :: String -> Valor -> Valor
+executeProg prog input =
+  let Ok p = pProgram (myLexer prog)
+  in (evalP p input)
+
 calc :: String -> String
 calc s =
-  let Ok p = pProgram  (myLexer s)
-  in show (evalP p input)
+  let r = executeProg s input
+  in show r

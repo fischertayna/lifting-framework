@@ -9,6 +9,7 @@ import Data.Hashable ( Hashable(hashWithSalt) )
 import qualified Data.List as L
 import GHC.StableName (makeStableName)
 import Control.Exception (assert)
+import Data.List (sort)
 
 type HashTable k v = H.BasicHashTable k v
 
@@ -135,6 +136,11 @@ negPC = notBDD
 type Val a = (a, PresenceCondition)
 
 newtype Var t = Var [Val t]
+
+instance (Eq t, Ord t) => Eq (Var t) where
+    (Var vals1) == (Var vals2) = and $ zipWith eqVal (sort vals1) (sort vals2)
+      where
+        eqVal (v1, pc1) (v2, pc2) = v1 == v2 && pc1 == pc2
 
 findVal :: t -> [Val t] -> (t -> t -> Bool) -> [Val t]
 findVal _ [] _ = []

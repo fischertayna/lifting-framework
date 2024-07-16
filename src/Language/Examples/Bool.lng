@@ -1,6 +1,6 @@
 main :: bool -> bool
 main (n) {
-   not (n)
+   and (or (not (n), n), n)
 }
 
 or :: bool -> bool -> bool

@@ -34,7 +34,7 @@ data VarValor
     | VarPair
         { p :: (VarValor, VarValor)
         }
-    deriving (Show)
+    deriving (Show, Eq)
 
 type Context k v = [(k, v)]
 

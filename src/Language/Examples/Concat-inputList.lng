@@ -1,0 +1,12 @@
+main :: [String] -> String
+main (n) {
+    concat (n)
+}
+
+concat :: [String] -> String
+concat (lst) {
+    if ((isNil (lst))) 
+        then ""
+        else head (lst) ++ concat (tail (lst))
+}
+

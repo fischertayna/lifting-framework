@@ -33,7 +33,7 @@ data Valor
     | ValorPair
         { p :: (Valor, Valor)
         }
-    deriving (Show)
+    deriving (Show, Eq)
 
 evalP :: Program -> Valor -> Valor
 evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
