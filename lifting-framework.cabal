@@ -42,8 +42,11 @@ library
         Language.MInterpreter.Interpreter
         Language.VInterpreter.Driver
         Language.VInterpreter.Interpreter
+        Language.VInterpreter.Composition
         Language.Typechecker.Driver
         Language.Typechecker.Typechecker
+        Language.DeepMemo.Interpreter
+        Language.DeepMemo.Driver
 
     -- Modules included in this library but not exported.
     -- other-modules:

@@ -248,3 +248,30 @@ valList (Var ls) = ls
 
 (+++) :: Var a -> Var a -> Var a
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
+
+(++++) :: VarValor -> VarValor -> VarValor
+(VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
+(VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
+(VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
+
+(||||) :: VarValor -> PresenceCondition -> VarValor
+(VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarString (Var listPCv)) |||| pcR = VarString (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarBool (Var listPCv)) |||| pcR = VarBool(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+
+data VarValor
+    = VarInteger { int :: Var Integer
+        }
+    | VarBool
+        { bool :: Var Bool
+        }
+    | VarString
+        { str :: Var String
+        }
+    | VarList
+        { list :: [VarValor]
+        }
+    | VarPair
+        { pair :: (VarValor, VarValor)
+        }
+    deriving (Show, Eq)

@@ -4,6 +4,7 @@ import BaseTest
 import VarTest
 import MemoTest
 import SLMemoTest
+import DeepMemoTest
 
 main :: IO ()
 main = do
@@ -12,4 +13,5 @@ main = do
     runTestTT varTestSuite
     runTestTT memoTestSuite
     runTestTT slMemoTestSuite
+    runTestTT deepMemoTestSuite
     putStrLn "Done."

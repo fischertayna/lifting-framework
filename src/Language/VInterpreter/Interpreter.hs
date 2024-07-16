@@ -10,31 +10,16 @@ import Language.Frontend.AbsLanguage
 import Variability.VarTypes
   ( PresenceCondition,
     Var (..),
+    VarValor(..),
     ffPC,
     sat,
     ttPC,
     valList,
     (+++),
+    (++++), (||||),
     (|||), (/\), (\/),
   )
 import Prelude hiding (lookup)
-
-data VarValor
-    = VarInteger { i :: Var Integer
-        }
-    | VarBool
-        { b :: Var Bool
-        }
-    | VarString
-        { s :: Var String
-        }
-    | VarList
-        { l :: [VarValor]
-        }
-    | VarPair
-        { p :: (VarValor, VarValor)
-        }
-    deriving (Show, Eq)
 
 type Context k v = [(k, v)]
 
@@ -47,31 +32,31 @@ type FContext = Context Ident Function
 evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
   EInt n -> VarInteger (Var [(n, ttPC)])
-  ECon exp0 exp1  -> applyBinaryOperator VarString s context exp0 exp1 (++)
-  EAdd exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (+)
-  ESub exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (-)
-  EMul exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 (*)
-  EDiv exp0 exp1 -> applyBinaryOperator VarInteger i context exp0 exp1 div
-  EOr exp0 exp1  -> applyBinaryOperator VarBool b context exp0 exp1 (||)
-  EAnd exp0 exp1 -> applyBinaryOperator VarBool b context exp0 exp1 (&&)
-  ENot exp1  -> applyUnaryOperator VarBool b context exp1 not
+  ECon exp0 exp1  -> applyBinaryOperator VarString str context exp0 exp1 (++)
+  EAdd exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (+)
+  ESub exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (-)
+  EMul exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (*)
+  EDiv exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 div
+  EOr exp0 exp1  -> applyBinaryOperator VarBool bool context exp0 exp1 (||)
+  EAnd exp0 exp1 -> applyBinaryOperator VarBool bool context exp0 exp1 (&&)
+  ENot exp1  -> applyUnaryOperator VarBool bool context exp1 not
   EVar vId -> fromJust $ lookup vcontext vId
   EStr s -> VarString (Var [(s, ttPC)])
   ETrue -> VarBool (Var [(True, ttPC)])
   EFalse -> VarBool (Var [(False, ttPC)])
   EPair p1 p2 -> VarPair (evalV context p1, evalV context p2)
-  EList list -> VarList (map (evalV context) list)
+  EList ls -> VarList (map (evalV context) ls)
   Call id pExps -> case id of
-    Ident "head" -> head list
-    Ident "tail" ->  VarList (tail list)
-    Ident "isNil" -> VarInteger (Var [(boolToInt (null list), ttPC)])
+    Ident "head" -> head ls
+    Ident "tail" ->  VarList (tail ls)
+    Ident "isNil" -> VarInteger (Var [(boolToInt (null ls), ttPC)])
     Ident "fst" -> f
     Ident "snd" -> s
     Ident func -> evalV (paramBindings, fcontext) fExp
     where
       arg = evalV context (head pExps)
-      list = l arg
-      (f,s) = p arg
+      ls = list arg
+      (f,s) = pair arg
       (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (evalV context) pExps)
   EIf e eT eE ->
@@ -148,14 +133,3 @@ updatecF c [] = c
 updatecF (vcontext, fcontext) (f@(Fun _ fId _ _) : fs) = updatecF (vcontext, newFContext) fs
   where
     newFContext = update fcontext fId f
-
-
-(++++) :: VarValor -> VarValor -> VarValor
-(VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
-(VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
-(VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
-
-(||||) :: VarValor -> PresenceCondition -> VarValor
-(VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
-(VarString (Var listPCv)) |||| pcR = VarString (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
-(VarBool (Var listPCv)) |||| pcR = VarBool(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))

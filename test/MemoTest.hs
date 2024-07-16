@@ -113,7 +113,6 @@ testBool = TestCase $ do
     let expectedOutput = (expectedValor, expectedMem)
     assertEqual "Bool true" expectedOutput output
 
-
 testConcatSimples :: Test
 testConcatSimples = TestCase $ do
     output <- processFile (executeProg "concat") "src/Language/Examples/Concat.lng" inputString

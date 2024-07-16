@@ -7,7 +7,7 @@ import Language.Frontend.ErrM
 import Language.Frontend.LexLanguage ()
 import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VInterpreter.Interpreter
-import Variability.VarTypes (PresenceCondition, Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
+import Variability.VarTypes (PresenceCondition, VarValor(..), Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
 
 build :: ((a -> [a] -> [a]) -> [a] -> [a]) -> [a]
 build g = g (:) []

@@ -1,7 +1,7 @@
 module VarTest where
 
 import Language.VInterpreter.Interpreter
-import Variability.VarTypes (PresenceCondition, Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
+import Variability.VarTypes (PresenceCondition, VarValor(..), Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
 import Language.VInterpreter.Driver
 import Helper
 
