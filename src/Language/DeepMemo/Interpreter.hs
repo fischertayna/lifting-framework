@@ -26,6 +26,7 @@ import Variability.VarTypes
   )
 import Prelude hiding (lookup)
 import Debug.Trace
+import Language.MInterpreter.Interpreter (Valor(ValorList, ValorInt))
 
 type Context k v = [(k, v)]
 
@@ -93,37 +94,39 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
           e <- eval context <.> return cond
           let (pct, pcf) = partition e
           if pct == ttPC
-            then (eval context <.> return eT)
+            then eval context <.> return eT
+
             else
               if pct == ffPC
-                then (eval context <.> return eE)
+                then eval context <.> return eE
+
                 else applyRestrict context pct pcf eT eE
         Call fId pExps -> case fId of
-        --   Ident "head" -> do
-        --     vals <- (mapM (\e -> eval context <.> return e) pExps)
-        --     case vals of
-        --       [ValorList l] -> return (head l)
-        --       _ -> error "Invalid argument to head"
-        --   Ident "tail" -> do
-        --     vals <- (mapM (\e -> eval context <.> return e) pExps)
-        --     case vals of
-        --       [ValorList l] -> return $ ValorList (tail l)
-        --       _ -> error "Invalid argument to tail"
-        --   Ident "isNil" -> do
-        --     vals <- (mapM (\e -> eval context <.> return e) pExps)
-        --     case vals of
-        --       [ValorList l] -> return $ ValorInt (boolToInt (null l))
-        --       _ -> error "Invalid argument to isNil"
-        --   Ident "fst" -> do
-        --     vals <- (mapM (\e -> eval context <.> return e) pExps)
-        --     case vals of
-        --       [ValorPair (f, s)] -> return f
-        --       _ -> error "Invalid argument to fst"
-        --   Ident "snd" -> do
-        --     vals <- (mapM (\e -> eval context <.> return e) pExps)
-        --     case vals of
-        --       [ValorPair (f, s)] -> return s
-        --       _ -> error "Invalid argument to snd"
+          Ident "head" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarList l] -> return (head l)
+              _ -> error "Invalid argument to head"
+          Ident "tail" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarList l] -> return $ VarList (tail l)
+              _ -> error "Invalid argument to tail"
+          Ident "isNil" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarList l] -> return $ VarInteger (Var [(boolToInt (null l), ttPC)])
+              _ -> error "Invalid argument to isNil"
+          Ident "fst" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarPair (f, s)] -> return f
+              _ -> error "Invalid argument to fst"
+          Ident "snd" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarPair (f, s)] -> return s
+              _ -> error "Invalid argument to snd"
           _ ->
             if fId == memoizedFunctionName
               then memoizedCall context fId pExps
@@ -194,3 +197,4 @@ applyRestrict context pct pcf eT eE = do
   restrictedEvalET <-  eval (restrictContext context pct) <.> return eT
   restrictedEvalEE <-  eval (restrictContext context pcf) <.> return eE
   return $ (restrictedEvalET |||| pct) ++++ (restrictedEvalEE |||| pcf)
+

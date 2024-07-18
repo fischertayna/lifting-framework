@@ -10,6 +10,7 @@ import qualified Data.List as L
 import GHC.StableName (makeStableName)
 import Control.Exception (assert)
 import Data.List (sort)
+import Data.Maybe (fromJust)
 
 type HashTable k v = H.BasicHashTable k v
 
