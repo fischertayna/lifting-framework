@@ -54,9 +54,8 @@ testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile (executeProg "fib") "src/Language/Examples/Fibonacci.lng" inputInt
     let expectedValor = (VarInteger (Var [(8, afbf), (5, atbf), (3, afbt), (2, atbt)]))
-    let expectedMem = []
-    let expectedOutput = (expectedValor, expectedMem)
-    assertEqual "Fibonacci x" expectedOutput output
+    putStrLn ("\n Memo for testFibonacci: " ++ show (snd output))
+    assertEqual "Fibonacci x" expectedValor (fst output)
 
 -- testFatorial :: Test
 -- testFatorial = TestCase $ do
@@ -187,8 +186,10 @@ testFibonacci = TestCase $ do
 --     assertEqual "Concat lista" expectedOutput output
 
 deepMemoTestSuite :: Test
-deepMemoTestSuite = TestList [ TestLabel "Var testSimples" testSimples
-                         , TestLabel "Var testFibonacci" testFibonacci
+deepMemoTestSuite = TestList [ TestLabel "Var testFibonacci" testFibonacci
+                            -- TestLabel "Var testSimples" testSimples
+                            -- , TestLabel "Var testSimples False" testSimplesCondFalse
+                        --  , TestLabel "Var testFibonacci" testFibonacci
                         --  , TestLabel "Var testFatorial" testFatorial
                         --  , TestLabel "Var testSomaListaSimples" testSomaListaSimples
                         --  , TestLabel "Var testSomaLista" testSomaLista

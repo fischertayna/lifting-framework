@@ -92,15 +92,12 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
         EIf cond eT eE -> do
           e <- eval context <.> return cond
           let (pct, pcf) = partition e
-          restrictedEvalET <- eval (restrictContext context pct) <.> return eT
-          restrictedEvalEE <- eval (restrictContext context pcf) <.> return eE
           if pct == ttPC
             then (eval context <.> return eT)
-            -- else (eval context <.> return eE)
             else
               if pct == ffPC
                 then (eval context <.> return eE)
-                else return $ (restrictedEvalET |||| pct) ++++ (restrictedEvalEE |||| pcf)
+                else applyRestrict context pct pcf eT eE
         Call fId pExps -> case fId of
         --   Ident "head" -> do
         --     vals <- (mapM (\e -> eval context <.> return e) pExps)
@@ -191,3 +188,9 @@ partition (VarBool (Var lvint)) =
     (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
+
+applyRestrict :: RContext Mem -> PresenceCondition -> PresenceCondition -> Exp -> Exp -> State Mem VarValor
+applyRestrict context pct pcf eT eE = do
+  restrictedEvalET <-  eval (restrictContext context pct) <.> return eT
+  restrictedEvalEE <-  eval (restrictContext context pcf) <.> return eE
+  return $ (restrictedEvalET |||| pct) ++++ (restrictedEvalEE |||| pcf)
