@@ -196,6 +196,7 @@ instance Print Language.Frontend.AbsLanguage.Type where
     Language.Frontend.AbsLanguage.Tbool -> prPrec i 0 (concatD [doc (showString "bool")])
     Language.Frontend.AbsLanguage.Tint -> prPrec i 0 (concatD [doc (showString "int")])
     Language.Frontend.AbsLanguage.TStr -> prPrec i 0 (concatD [doc (showString "String")])
+    Language.Frontend.AbsLanguage.TAny -> prPrec i 0 (concatD [doc (showString "Any")])
     Language.Frontend.AbsLanguage.TFun function -> prPrec i 0 (concatD [prt 0 function])
     Language.Frontend.AbsLanguage.TPair type_1 type_2 -> prPrec i 0 (concatD [doc (showString "("), prt 0 type_1, doc (showString ","), prt 0 type_2, doc (showString ")")])
     Language.Frontend.AbsLanguage.TList type_ -> prPrec i 0 (concatD [doc (showString "["), prt 0 type_, doc (showString "]")])

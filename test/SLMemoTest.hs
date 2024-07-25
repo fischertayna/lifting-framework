@@ -56,12 +56,12 @@ testSimples = TestCase $ do
 testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile (executeProg "fib") "src/Language/Examples/Fibonacci.lng" inputInt
-    let expectedValor = (Var [(ValorInt 2, atbt), (ValorInt 3, afbt), (ValorInt 5, atbf), (ValorInt 8, afbf)])
-    let expectedMem = [([ValorInt 5], ValorInt 8),
-                       ([ValorInt 4], ValorInt 5),
-                       ([ValorInt 3], ValorInt 3),
-                       ([ValorInt 2], ValorInt 2),
-                       ([ValorInt 0], ValorInt 1),
+    let expectedValor = (Var [(ValorInt 1, atbt), (ValorInt 2, afbt), (ValorInt 3, atbf), (ValorInt 5, afbf)])
+    let expectedMem = [([ValorInt 5], ValorInt 5),
+                       ([ValorInt 4], ValorInt 3),
+                       ([ValorInt 3], ValorInt 2),
+                       ([ValorInt 2], ValorInt 1),
+                       ([ValorInt 0], ValorInt 0),
                        ([ValorInt 1], ValorInt 1)]
     let expectedOutput = (expectedValor, expectedMem)
     assertEqual "Fibonacci x" expectedOutput output

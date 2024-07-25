@@ -7,6 +7,11 @@ import Language.Frontend.ErrM
 import Helper
 
 import Test.HUnit
+import System.Timeout (timeout)
+import Control.Exception (evaluate)
+
+timeoutP :: Int -> IO a -> IO (Maybe a)
+timeoutP t fun = timeout t $ fun
 
 testSimples :: Test
 testSimples = TestCase $ do
@@ -17,8 +22,16 @@ testSimples = TestCase $ do
 testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/Fibonacci.lng" (ValorInt 10)
-    let expectedOutput = (ValorInt 89)
-    assertEqual "Fibonacci x" expectedOutput output
+    let expectedOutput = (ValorInt 55)
+    assertEqual "Fibonacci 10" expectedOutput output
+
+-- testHighFibonacci :: Test
+-- testHighFibonacci = TestCase $ do
+--     result <- timeoutP (1 * 100000) $ (processFile executeProg "src/Language/Examples/Fibonacci.lng" (ValorInt 100))
+--     let expectedOutput = (ValorInt 354224848179261915075)
+--     case result of
+--         Nothing -> assertFailure "Fibonacci 100 timed out!"
+--         Just output  -> assertEqual "Fibonacci 100" expectedOutput output
 
 testFatorial :: Test
 testFatorial = TestCase $ do
@@ -90,10 +103,39 @@ testConcatLista = TestCase $ do
     let expectedOutput = (ValorStr "test_concatenated_from_list")
     assertEqual "Concat lista" expectedOutput output
 
+testPolymorphicPairSameType :: Test
+testPolymorphicPairSameType = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" (
+                    ValorPair (ValorStr "test", ValorStr "1"))
+    let expectedOutput = (ValorPair (ValorStr "1", ValorStr "test"))
+    assertEqual "Invert pair same type" expectedOutput output
+
+
+testPolymorphicPair :: Test
+testPolymorphicPair = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" (
+                    ValorPair (ValorStr "test", ValorBool True))
+    let expectedOutput = (ValorPair (ValorBool True, ValorStr "test"))
+    assertEqual "Invert pair" expectedOutput output
+
+
+testPolymorphicList :: Test
+testPolymorphicList = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" (
+                    ValorList [
+                      ValorStr "test",
+                      ValorInt 1,
+                      ValorBool True,
+                      ValorPair (ValorStr "Pair", ValorInt 2)
+                    ])
+    let expectedOutput = (ValorInt 4)
+    assertEqual "length list" expectedOutput output
+
 
 baseTestSuite :: Test
 baseTestSuite = TestList [ TestLabel "Base testSimples" testSimples
                          , TestLabel "Base testFibonacci" testFibonacci
+                        --  , TestLabel "Base testHighFibonacci" testHighFibonacci
                          , TestLabel "Base testFatorial" testFatorial
                          , TestLabel "Base testSomaListaSimples" testSomaListaSimples
                          , TestLabel "Base testSomaLista" testSomaLista
@@ -103,4 +145,7 @@ baseTestSuite = TestList [ TestLabel "Base testSimples" testSimples
                          , TestLabel "Base testBoolFalse" testBoolFalse
                          , TestLabel "Base testConcatSimples" testConcatSimples
                          , TestLabel "Base testConcatLista" testConcatLista
+                         , TestLabel "Base testPolymorphicPairSameType" testPolymorphicPairSameType
+                         , TestLabel "Base testPolymorphicPair" testPolymorphicPair
+                         , TestLabel "Base testPolymorphicList" testPolymorphicList
                         ]

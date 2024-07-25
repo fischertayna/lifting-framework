@@ -5,7 +5,9 @@ main (n) {
 
 fib :: int -> int
 fib (a) {
-  if (a * (a - 1))
-    then fib(a-1) + fib(a-2)
-    else 1
+  if (a)
+    then if (a - 1)
+        then fib(a-1) + fib(a-2)
+        else 1
+    else 0
 }

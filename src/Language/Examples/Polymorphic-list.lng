@@ -1,0 +1,11 @@
+main :: [Any] -> int
+main (n) {
+    length (n)
+}
+
+length :: [Any] -> int
+length (lst) {
+    if ((isNil (lst)))
+        then 0
+        else 1 + length (tail (lst))
+}

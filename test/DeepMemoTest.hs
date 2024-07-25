@@ -48,8 +48,9 @@ substitutions =
     , (show ffPC, " ffPC")
     ]
 
-inputInt, inputBool, inputString, inputList, inputPair :: VarValor
+inputInt, inputHighInt, inputBool, inputString, inputList, inputPair :: VarValor
 inputInt = VarInteger (Var [(2, atbt), (3, afbt),  (4, atbf), (5, afbf)])
+inputHighInt = VarInteger (Var [(25, atbt), (50, afbt),  (75, atbf), (100, afbf)])
 inputBool = VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)])
 inputString = VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
 inputListString = VarList [
@@ -62,8 +63,18 @@ inputList = VarList [
                       VarInteger (Var [(2, atbt), ( 1, afbt), (4, atbf), (6, afbf)]),
                       VarInteger (Var [(3, atbt), ( 2, afbt), (5, atbf), (3, afbf)])
                     ]
+inputPolymorphicList = VarList [
+                      VarInteger (Var [(8, atbt), ( 5, afbt), (0, atbf), (1, afbf)]),
+                      VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]),
+                      VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
+                    ]
+inputPolymorphicListIncomplete = VarList [
+                      VarInteger (Var [(8, atbt), ( 5, afbt), (0, atbf), (1, afbf)]),
+                      VarBool (Var [(False, afbt),  (False, atbf)]),
+                      VarString (Var [( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
+                    ]
 inputPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)]), VarInteger (Var [(2, atbt), ( 1, afbt),  (4, atbf), (6, afbf)]))
-
+inputPolymorphicPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)]), VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]))
 
 testSimples :: Test
 testSimples = TestCase $ do
@@ -77,9 +88,16 @@ testSimples = TestCase $ do
 testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile (executeProg "fib") "src/Language/Examples/Fibonacci.lng" inputInt
-    let expectedValor = (VarInteger (Var [(8, afbf), (5, atbf), (3, afbt), (2, atbt)]))
+    let expectedValor = (VarInteger (Var [(5, afbf), (3, atbf), (2, afbt), (1, atbt)]))
     putStrLn ("\n Mem for testFibonacci: " ++ (substitute (show (snd output)) substitutions))
     assertEqual "Fibonacci x" expectedValor (fst output)
+
+testHighFibonacci :: Test
+testHighFibonacci = TestCase $ do
+    output <- processFile (executeProg "fib") "src/Language/Examples/Fibonacci.lng" inputHighInt
+    let expectedValor = (VarInteger (Var [(75025, atbt), (12586269025, afbt), (2111485077978050, atbf), (354224848179261915075, afbf)]))
+    -- putStrLn ("\n Mem for High Fibonacci: " ++ (substitute (show (snd output)) substitutions))
+    assertEqual "Fibonacci high x" expectedValor (fst output)
 
 testFatorial :: Test
 testFatorial = TestCase $ do
@@ -224,16 +242,50 @@ testConcatLista = TestCase $ do
     -- putStrLn ("\n Memo for Concat lista " ++ (substitute (show (snd output)) substitutions))
     assertEqual "Concat lista" expectedOutput output
 
+testPolymorphicPair :: Test
+testPolymorphicPair = TestCase $ do
+    output <- processFile (executeProg "invert") "src/Language/Examples/Polymorphic-pair.lng" inputPolymorphicPair
+    let expectedValor = (VarPair (VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]), VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])))
+    -- let expectedMem = [([VarPair {pair = (VarInteger {int = {(8, atbt), (5, afbt), (0, atbf), (1, afbf)}},VarBool {bool = {(True, atbt), (False,DDNode {unDDNode = 0x00007fdde1008341})}})}],VarPair {pair = (VarBool {bool = {(True, atbt), (False,DDNode {unDDNode = 0x00007fdde1008341})}},VarInteger {int = {(8, atbt), (5, afbt), (0, atbf), (1, afbf)}})})]
+    putStrLn ("\n Memo for invert PolymorphicPair " ++ (substitute (show (snd output)) substitutions))
+    assertEqual "invert pair" expectedValor (fst output)
+
+
+-- TODO fix error 
+-- expected: VarInteger {int = {(3,DDNode {unDDNode = 0x00007f96cb81da20})}}
+-- but got: VarInteger {int = {(3,DDNode {unDDNode = 0x00007f96cb81da20})}}
+testPolymorphicList :: Test
+testPolymorphicList = TestCase $ do
+    output <- processFile (executeProg "length") "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicList
+    let expectedValor = (VarInteger (Var [(3, atbt), (3, afbt), (3, atbf), (3, afbf)]))
+    -- let expectedMem = [([VarList {list = [VarInteger {int = {(8, atbt), (5, afbt), (0, atbf), (1, afbf)}},VarBool {bool = {(True, atbt), (False,DDNode {unDDNode = 0x00007fd0ae81b941})}},VarString {str = {("abc", atbt), ("def", afbt), ("ghi", atbf), ("jkl", afbf)}}]}],VarInteger {int = {(3, tt)}}),([VarList {list = [VarBool {bool = {(True, atbt), (False,DDNode {unDDNode = 0x00007fd0ae81b941})}},VarString {str = {("abc", atbt), ("def", afbt), ("ghi", atbf), ("jkl", afbf)}}]}],VarInteger {int = {(2, tt)}}),([VarList {list = [VarString {str = {("abc", atbt), ("def", afbt), ("ghi", atbf), ("jkl", afbf)}}]}],VarInteger {int = {(1, tt)}}),([VarList {list = []}],VarInteger {int = {(0, tt)}})]
+    putStrLn ("\n Memo for length PolymorphicList " ++ (substitute (show (snd output)) substitutions))
+    assertEqual "length PolymorphicList" (show expectedValor) (show (fst output))
+
+-- TODO fix error 
+-- expected: "VarInteger {int = {(1,DDNode {unDDNode = 0x00007fe0d600ad40}), (3,DDNode {unDDNode = 0x00007fe0d600ad61}), (2,DDNode {unDDNode = 0x00007fe0d600ace1})}}"
+--  but got: "VarInteger {int = {(3,DDNode {unDDNode = 0x00007fe0d600ac20})}}"
+testPolymorphicListIncomplete :: Test
+testPolymorphicListIncomplete = TestCase $ do
+    output <- processFile (executeProg "length") "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicListIncomplete
+    let expectedValor = (VarInteger (Var [(1, atbt), (3, afbt), (3, atbf), (2, afbf)]))
+    -- let expectedMem = []
+    putStrLn ("\n Memo for PolymorphicListIncomplete " ++ (substitute (show (snd output)) substitutions))
+    assertEqual "length PolymorphicListIncomplete" expectedValor (fst output)
+
 deepMemoTestSuite :: Test
-deepMemoTestSuite = TestList [ 
-                              TestLabel "Var testSimples" testSimples
-                            , TestLabel "Var testFibonacci" testFibonacci
-                            , TestLabel "Var testFatorial" testFatorial
-                            , TestLabel "Var testSomaListaSimples" testSomaListaSimples
-                            , TestLabel "Var testSomaLista" testSomaLista
-                            , TestLabel "Var testSomaParSimples" testSomaParSimples
-                            , TestLabel "Var testSomaPar" testSomaPar
-                            , TestLabel "Var testBool" testBool
-                            , TestLabel "Var testConcatSimples" testConcatSimples
-                            , TestLabel "Var testConcatLista" testConcatLista
+deepMemoTestSuite = TestList [ TestLabel "DeepMemo testSimples" testSimples
+                            , TestLabel "DeepMemo testFibonacci" testFibonacci
+                            , TestLabel "DeepMemo testFibonacci" testHighFibonacci
+                            , TestLabel "DeepMemo testFatorial" testFatorial
+                            , TestLabel "DeepMemo testSomaListaSimples" testSomaListaSimples
+                            , TestLabel "DeepMemo testSomaLista" testSomaLista
+                            , TestLabel "DeepMemo testSomaParSimples" testSomaParSimples
+                            , TestLabel "DeepMemo testSomaPar" testSomaPar
+                            , TestLabel "DeepMemo testBool" testBool
+                            , TestLabel "DeepMemo testConcatSimples" testConcatSimples
+                            , TestLabel "DeepMemo testConcatLista" testConcatLista
+                            , TestLabel "DeepMemo testPolymorphicPair" testPolymorphicPair
+                            , TestLabel "DeepMemo testPolymorphicList" testPolymorphicList
+                            , TestLabel "DeepMemo testPolymorphicListIncomplete" testPolymorphicListIncomplete
                             ]

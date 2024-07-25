@@ -43,6 +43,7 @@ data Type
     = Tbool
     | Tint
     | TStr
+    | TAny
     | TFun Function
     | TPair Type Type
     | TList Type

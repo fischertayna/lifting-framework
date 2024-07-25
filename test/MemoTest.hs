@@ -32,17 +32,17 @@ testSimples = TestCase $ do
 testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile (executeProg "fib") "src/Language/Examples/Fibonacci.lng" inputInt
-    let expectedValor = (ValorInt 89) 
-    let expectedMem = [([ValorInt 10], ValorInt 89),
-                       ([ValorInt 9], ValorInt 55),
-                       ([ValorInt 8], ValorInt 34),
-                       ([ValorInt 7], ValorInt 21),
-                       ([ValorInt 6], ValorInt 13),
-                       ([ValorInt 5], ValorInt 8),
-                       ([ValorInt 4], ValorInt 5),
-                       ([ValorInt 3], ValorInt 3),
-                       ([ValorInt 2], ValorInt 2),
-                       ([ValorInt 0], ValorInt 1),
+    let expectedValor = (ValorInt 55) 
+    let expectedMem = [([ValorInt 10], ValorInt 55),
+                       ([ValorInt 9], ValorInt 34),
+                       ([ValorInt 8], ValorInt 21),
+                       ([ValorInt 7], ValorInt 13),
+                       ([ValorInt 6], ValorInt 8),
+                       ([ValorInt 5], ValorInt 5),
+                       ([ValorInt 4], ValorInt 3),
+                       ([ValorInt 3], ValorInt 2),
+                       ([ValorInt 2], ValorInt 1),
+                       ([ValorInt 0], ValorInt 0),
                        ([ValorInt 1], ValorInt 1)]
     let expectedOutput = (expectedValor, expectedMem)
     assertEqual "Fibonacci x" expectedOutput output
@@ -171,6 +171,58 @@ testConcatLista = TestCase $ do
     let expectedOutput = (expectedValor, expectedMem)
     assertEqual "Concat lista" expectedOutput output
 
+testPolymorphicPairSameType :: Test
+testPolymorphicPairSameType = TestCase $ do
+    output <- processFile (executeProg "invert") "src/Language/Examples/Polymorphic-pair.lng" (
+                    ValorPair (ValorStr "test", ValorStr "1"))
+    let expectedValor = (ValorPair (ValorStr "1", ValorStr "test"))
+    let expectedMem = [([ValorPair (ValorStr "test",ValorStr "1")],
+                        ValorPair (ValorStr "1",ValorStr "test"))]
+    let expectedOutput = (expectedValor, expectedMem)
+    assertEqual "Invert pair same type" expectedOutput output
+
+
+testPolymorphicPair :: Test
+testPolymorphicPair = TestCase $ do
+    output <- processFile (executeProg "invert") "src/Language/Examples/Polymorphic-pair.lng" (
+                    ValorPair (ValorStr "test", ValorBool True))
+    let expectedValor = (ValorPair (ValorBool True, ValorStr "test"))
+    let expectedMem = [([ValorPair (ValorStr "test",ValorBool True)],
+                        ValorPair (ValorBool True,ValorStr "test"))]
+    let expectedOutput = (expectedValor, expectedMem)
+    assertEqual "Invert pair" expectedOutput output
+
+
+testPolymorphicList :: Test
+testPolymorphicList = TestCase $ do
+    output <- processFile (executeProg "length") "src/Language/Examples/Polymorphic-list.lng" (
+                    ValorList [
+                      ValorStr "test",
+                      ValorInt 1,
+                      ValorBool True,
+                      ValorPair (ValorStr "Pair", ValorInt 2)
+                    ])
+    let expectedValor = (ValorInt 4)
+    let expectedMem = [([ValorList [
+                                    ValorStr "test",
+                                    ValorInt 1,
+                                    ValorBool True,
+                                    ValorPair (ValorStr "Pair",ValorInt 2)]],
+                        ValorInt 4),
+                      ([ValorList [ValorInt 1,
+                                  ValorBool True,
+                                  ValorPair (ValorStr "Pair",ValorInt 2)]],
+                        ValorInt 3),
+                      ([ValorList [ValorBool True,ValorPair (ValorStr "Pair",ValorInt 2)]],
+                        ValorInt 2),
+                      ([ValorList [ValorPair (ValorStr "Pair",ValorInt 2)]],
+                        ValorInt 1),
+                      ([ValorList []],
+                        ValorInt 0)]
+    let expectedOutput = (expectedValor, expectedMem)
+    assertEqual "length list" expectedOutput output
+
+
 memoTestSuite :: Test
 memoTestSuite = TestList [ TestLabel "Var testSimples" testSimples
                          , TestLabel "Var testFibonacci" testFibonacci
@@ -182,4 +234,7 @@ memoTestSuite = TestList [ TestLabel "Var testSimples" testSimples
                          , TestLabel "Var testBool" testBool
                          , TestLabel "Var testConcatSimples" testConcatSimples
                          , TestLabel "Var testConcatLista" testConcatLista
+                         , TestLabel "Var testPolymorphicPairSameType" testPolymorphicPairSameType
+                         , TestLabel "Var testPolymorphicPair" testPolymorphicPair
+                         , TestLabel "Var testPolymorphicList" testPolymorphicList
                         ]

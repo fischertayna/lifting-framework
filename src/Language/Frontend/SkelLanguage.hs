@@ -56,6 +56,7 @@ transType x = case x of
   Language.Frontend.AbsLanguage.Tbool -> failure x
   Language.Frontend.AbsLanguage.Tint -> failure x
   Language.Frontend.AbsLanguage.TStr -> failure x
+  Language.Frontend.AbsLanguage.TAny -> failure x
   Language.Frontend.AbsLanguage.TFun function -> failure x
   Language.Frontend.AbsLanguage.TPair type_1 type_2 -> failure x
   Language.Frontend.AbsLanguage.TList type_ -> failure x

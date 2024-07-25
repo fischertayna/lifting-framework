@@ -52,17 +52,16 @@ evalP (Prog fs) memoizedFunctionName =
              in eval context <.> return (Call (Ident "main") [EVar (Ident "n")])
     )
 
-liftIntOperator :: (Integer -> Integer -> Integer) -> State m (Valor -> State m (Valor -> State m Valor))
-liftIntOperator op = return (\(ValorInt a) -> return (\(ValorInt b) -> return (ValorInt (a `op` b))))
+applyBinaryOperator :: (a -> Valor) -> (Valor -> a) -> RContext Mem -> Exp -> Exp -> (a -> a -> a) -> State Mem Valor
+applyBinaryOperator cons f context exp0 exp1 op = do
+  e0 <- (eval context <.> return exp0)
+  e1 <- (eval context <.> return exp1)
+  return $ cons (f e0 `op` f e1)
 
-liftStringOperator :: (String -> String -> String) -> State m (Valor -> State m (Valor -> State m Valor))
-liftStringOperator op = return (\(ValorStr a) -> return (\(ValorStr b) -> return (ValorStr (a `op` b))))
-
-liftBoolBinaryOperator :: (Bool -> Bool -> Bool) -> State m (Valor -> State m (Valor -> State m Valor))
-liftBoolBinaryOperator op = return (\(ValorBool a) -> return (\(ValorBool b) -> return (ValorBool (a `op` b))))
-
-liftBoolUnaryOperator :: (Bool -> Bool) -> State m (Valor -> State m Valor)
-liftBoolUnaryOperator op = return (\(ValorBool b) -> return (ValorBool (op b)))
+applyUnaryOperator :: (a -> Valor) -> (Valor -> a) -> RContext Mem -> Exp -> (a -> a) -> State Mem Valor
+applyUnaryOperator cons f context exp op = do
+  e <- (eval context <.> return exp)
+  return $ cons (op (f e))
 
 liftedIf :: State m Valor -> State m Valor -> State m Valor -> State m Valor
 liftedIf cond p1 p2 = do
@@ -75,14 +74,14 @@ eval :: RContext Mem -> State Mem (Exp -> State Mem Valor)
 eval context@(vcontext, fcontext, memoizedFunctionName) =
   return
     ( \x -> case x of
-        (ECon exp0 exp1)  -> liftStringOperator (++) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EAdd exp0 exp1) -> liftIntOperator (+) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (ESub exp0 exp1) -> liftIntOperator (-) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EMul exp0 exp1) -> liftIntOperator (*) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EDiv exp0 exp1) -> liftIntOperator div <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EOr exp0 exp1)   -> liftBoolBinaryOperator (||) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (EAnd exp0 exp1)  -> liftBoolBinaryOperator (&&) <.> (eval context <.> return exp0) <.> (eval context <.> return exp1)
-        (ENot exp1)        -> liftBoolUnaryOperator not <.> (eval context <.> return exp1)
+        (ECon exp0 exp1)  -> applyBinaryOperator ValorStr s context exp0 exp1 (++)
+        (EAdd exp0 exp1) -> applyBinaryOperator ValorInt i context exp0 exp1 (+)
+        (ESub exp0 exp1) -> applyBinaryOperator ValorInt i context exp0 exp1  (-)
+        (EMul exp0 exp1) -> applyBinaryOperator ValorInt i context exp0 exp1  (*)
+        (EDiv exp0 exp1) -> applyBinaryOperator ValorInt i context exp0 exp1  div
+        (EOr exp0 exp1)   -> applyBinaryOperator ValorBool b context exp0 exp1 (||)
+        (EAnd exp0 exp1)  -> applyBinaryOperator ValorBool b context exp0 exp1 (&&)
+        (ENot exp1)        -> applyUnaryOperator ValorBool b context exp1 not
         EInt n -> return (ValorInt n)
         EStr s          -> return (ValorStr s)
         ETrue           -> return (ValorBool True)

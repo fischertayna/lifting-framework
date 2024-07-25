@@ -65,19 +65,20 @@ import Language.Frontend.LexLanguage
   '->'     { PT _ (TS _ 10) }
   '/'      { PT _ (TS _ 11) }
   '::'     { PT _ (TS _ 12) }
-  'False'  { PT _ (TS _ 13) }
-  'String' { PT _ (TS _ 14) }
-  'True'   { PT _ (TS _ 15) }
-  '['      { PT _ (TS _ 16) }
-  ']'      { PT _ (TS _ 17) }
-  'bool'   { PT _ (TS _ 18) }
-  'else'   { PT _ (TS _ 19) }
-  'if'     { PT _ (TS _ 20) }
-  'int'    { PT _ (TS _ 21) }
-  'then'   { PT _ (TS _ 22) }
-  '{'      { PT _ (TS _ 23) }
-  '||'     { PT _ (TS _ 24) }
-  '}'      { PT _ (TS _ 25) }
+  'Any'    { PT _ (TS _ 13) }
+  'False'  { PT _ (TS _ 14) }
+  'String' { PT _ (TS _ 15) }
+  'True'   { PT _ (TS _ 16) }
+  '['      { PT _ (TS _ 17) }
+  ']'      { PT _ (TS _ 18) }
+  'bool'   { PT _ (TS _ 19) }
+  'else'   { PT _ (TS _ 20) }
+  'if'     { PT _ (TS _ 21) }
+  'int'    { PT _ (TS _ 22) }
+  'then'   { PT _ (TS _ 23) }
+  '{'      { PT _ (TS _ 24) }
+  '||'     { PT _ (TS _ 25) }
+  '}'      { PT _ (TS _ 26) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
   L_quoted { PT _ (TL $$)   }
@@ -179,6 +180,7 @@ Type
   : 'bool' { Language.Frontend.AbsLanguage.Tbool }
   | 'int' { Language.Frontend.AbsLanguage.Tint }
   | 'String' { Language.Frontend.AbsLanguage.TStr }
+  | 'Any' { Language.Frontend.AbsLanguage.TAny }
   | Function { Language.Frontend.AbsLanguage.TFun $1 }
   | '(' Type ',' Type ')' { Language.Frontend.AbsLanguage.TPair $2 $4 }
   | '[' Type ']' { Language.Frontend.AbsLanguage.TList $2 }

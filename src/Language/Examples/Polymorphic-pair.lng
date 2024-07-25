@@ -1,0 +1,9 @@
+main :: (Any, Any) -> (Any, Any)
+main (pair) {
+   invert (pair)
+}
+
+invert :: (Any, Any) -> (Any, Any)
+invert (pair) {
+    (snd (pair), fst (pair))
+}

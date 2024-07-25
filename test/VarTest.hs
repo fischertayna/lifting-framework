@@ -39,7 +39,18 @@ inputList = VarList [
                       VarInteger (Var [(2, atbt), ( 1, afbt), (4, atbf), (6, afbf)]),
                       VarInteger (Var [(3, atbt), ( 2, afbt), (5, atbf), (3, afbf)])
                     ]
+inputPolymorphicList = VarList [
+                      VarInteger (Var [(8, atbt), ( 5, afbt), (0, atbf), (1, afbf)]),
+                      VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]),
+                      VarString (Var [("abc", atbt), ( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
+                    ]
+inputPolymorphicListIncomplete = VarList [
+                      VarInteger (Var [(8, atbt), ( 5, afbt), (0, atbf), (1, afbf)]),
+                      VarBool (Var [(False, afbt),  (False, atbf)]),
+                      VarString (Var [( "def", afbt),  ("ghi", atbf), ("jkl", afbf)])
+                    ]
 inputPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)]), VarInteger (Var [(2, atbt), ( 1, afbt),  (4, atbf), (6, afbf)]))
+inputPolymorphicPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)]), VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]))
 
 testSimples :: Test
 testSimples = TestCase $ do
@@ -50,7 +61,7 @@ testSimples = TestCase $ do
 testFibonacci :: Test
 testFibonacci = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/Fibonacci.lng" inputInt
-    let expectedOutput = (VarInteger (Var [(8, afbf), (5, atbf), (3, afbt), (2, atbt)]))
+    let expectedOutput = (VarInteger (Var [(5, afbf), (3, atbf), (2, afbt), (1, atbt)]))
     assertEqual "Fibonacci x" expectedOutput output
 
 testFatorial :: Test
@@ -110,6 +121,28 @@ testConcatLista = TestCase $ do
             ("this_is_a_test", afbf)])
     assertEqual "Concat lista" expectedOutput output
 
+testPolymorphicPair :: Test
+testPolymorphicPair = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" inputPolymorphicPair
+    let expectedOutput = (VarPair (VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]), VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])))
+    assertEqual "Invert pair" expectedOutput output
+
+
+testPolymorphicList :: Test
+testPolymorphicList = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicList
+    let expectedOutput = (VarInteger (Var [(3, atbt), (3, afbt), (3, atbf), (3, afbf)]))
+    assertEqual "length list" (show expectedOutput) (show output)
+
+-- TODO fix error 
+-- expected: "VarInteger {int = {(1,DDNode {unDDNode = 0x00007fe0d600ad40}), (3,DDNode {unDDNode = 0x00007fe0d600ad61}), (2,DDNode {unDDNode = 0x00007fe0d600ace1})}}"
+--  but got: "VarInteger {int = {(3,DDNode {unDDNode = 0x00007fe0d600ac20})}}"
+testPolymorphicListIncomplete :: Test
+testPolymorphicListIncomplete = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicListIncomplete
+    let expectedOutput = (VarInteger (Var [(1, atbt), (3, afbt), (3, atbf), (2, afbf)]))
+    assertEqual "length list" (show expectedOutput) (show output)
+
 varTestSuite :: Test
 varTestSuite = TestList [ TestLabel "Var testSimples" testSimples
                          , TestLabel "Var testFibonacci" testFibonacci
@@ -121,4 +154,7 @@ varTestSuite = TestList [ TestLabel "Var testSimples" testSimples
                          , TestLabel "Var testBool" testBool
                          , TestLabel "Var testConcatSimples" testConcatSimples
                          , TestLabel "Var testConcatLista" testConcatLista
+                         , TestLabel "Var testPolymorphicPair" testPolymorphicPair
+                         , TestLabel "Var testPolymorphicList" testPolymorphicList
+                         , TestLabel "Var testPolymorphicListIncomplete" testPolymorphicListIncomplete
                         ]
