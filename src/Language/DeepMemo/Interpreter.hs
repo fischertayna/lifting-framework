@@ -95,11 +95,9 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
           let (pct, pcf) = partition e
           if pct == ttPC
             then eval context <.> return eT
-
             else
               if pct == ffPC
                 then eval context <.> return eE
-
                 else applyRestrict context pct pcf eT eE
         Call fId pExps -> case fId of
           Ident "head" -> do
