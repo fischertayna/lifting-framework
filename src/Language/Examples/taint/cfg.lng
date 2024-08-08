@@ -16,16 +16,26 @@ init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))
     else if (isEqual (fst (prog), "SEQ"))
-        then init (fst (fst (prog)))
+        then init (fst (snd (prog)))
         else if (isEqual (fst (prog), "IF"))
+            then snd (fst (snd (prog)))
+            else if (isEqual (fst (prog), "WHILE"))
+                then snd (fst (snd (prog)))
+                else "error"
 }
 
-init :: Stmt -> Label
-init (Assignment _ _ l) = l
-init (Skip l) = l
-init (Seq s1 _) = init s1
-init (IfThenElse (_, l) _ _) = l
-init (While (_, l) _) = l
+final :: Any -> [String]
+final (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then [fst (snd (prog))]
+    else if (isEqual (fst (prog), "SEQ"))
+        then final (snd (snd (prog)))
+        else if (isEqual (fst (prog), "IF"))
+            then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
+            else if (isEqual (fst (prog), "WHILE"))
+                then [snd (fst (snd (prog)))]
+                else "error"
+}
 
 flow :: Stmt -> Set (Label, Label)
 flow (Assignment {}) = empty

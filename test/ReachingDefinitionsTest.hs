@@ -367,55 +367,55 @@ factorialProg =  ValorPair (
                             )
                         ),
                         ValorPair(
-                            ValorPair(
-                                ValorStr "3",
-                                ValorPair (
-                                    ValorStr "WHILE", 
-                                    ValorPair ( 
+                            ValorPair (
+                                ValorStr "WHILE", 
+                                ValorPair ( 
+                                    ValorPair(
                                         ValorPair (
                                             ValorStr "VAR", 
                                             ValorStr "y"
                                         ),
-                                        ValorPair (
-                                            ValorPair(
-                                                ValorStr "4",
+                                        ValorStr "3"
+                                    ),
+                                    ValorPair (
+                                        ValorPair(
+                                            ValorStr "4",
+                                            ValorPair (
+                                                ValorStr "ASGN", 
                                                 ValorPair (
-                                                    ValorStr "ASGN", 
+                                                    ValorStr "z", 
                                                     ValorPair (
-                                                        ValorStr "z", 
+                                                        ValorStr "MULT", 
                                                         ValorPair (
-                                                            ValorStr "MULT", 
                                                             ValorPair (
-                                                                ValorPair (
-                                                                    ValorStr "VAR", 
-                                                                    ValorStr "z"
-                                                                ),
-                                                                ValorPair (
-                                                                    ValorStr "VAR",
-                                                                    ValorStr "y"
-                                                                )
+                                                                ValorStr "VAR", 
+                                                                ValorStr "z"
+                                                            ),
+                                                            ValorPair (
+                                                                ValorStr "VAR",
+                                                                ValorStr "y"
                                                             )
                                                         )
                                                     )
                                                 )
-                                            ),
-                                            ValorPair(
-                                                ValorStr "5",
+                                            )
+                                        ),
+                                        ValorPair(
+                                            ValorStr "5",
+                                            ValorPair (
+                                                ValorStr "ASGN", 
                                                 ValorPair (
-                                                    ValorStr "ASGN", 
+                                                    ValorStr "y", 
                                                     ValorPair (
-                                                        ValorStr "y", 
+                                                        ValorStr "SUB", 
                                                         ValorPair (
-                                                            ValorStr "SUB", 
                                                             ValorPair (
-                                                                ValorPair (
-                                                                    ValorStr "VAR",
-                                                                    ValorStr "y"
-                                                                ),
-                                                                ValorPair(
-                                                                    ValorStr "CONST", 
-                                                                    ValorInt 1
-                                                                )
+                                                                ValorStr "VAR",
+                                                                ValorStr "y"
+                                                            ),
+                                                            ValorPair(
+                                                                ValorStr "CONST", 
+                                                                ValorInt 1
                                                             )
                                                         )
                                                     )
@@ -491,6 +491,90 @@ testCountFactorial = TestCase $ do
     let expectedOutput = (ValorInt 5)
     assertEqual "Count Asgns Factorial" expectedOutput output
 
+testInitEx1 :: Test
+testInitEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/init.lng" ex1
+    let expectedOutput = (ValorStr "1")
+    assertEqual "init ex1" expectedOutput output
+
+testInitExWhile :: Test
+testInitExWhile = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/init.lng" (ValorPair (
+                                ValorStr "WHILE", 
+                                ValorPair ( 
+                                    ValorPair(
+                                        ValorPair (
+                                            ValorStr "VAR", 
+                                            ValorStr "y"
+                                        ),
+                                        ValorStr "3"
+                                    ),
+                                    ValorPair(
+                                        ValorStr "4",
+                                        ValorPair (
+                                            ValorStr "ASGN", 
+                                            ValorPair (
+                                                ValorStr "c", 
+                                                ValorPair(
+                                                    ValorStr "CONST",
+                                                    ValorInt 1
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ))
+    let expectedOutput = (ValorStr "3")
+    assertEqual "init while" expectedOutput output
+
+testInitExIF :: Test
+testInitExIF = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/init.lng" (ValorPair(
+                                ValorStr "IF",
+                                ValorPair ( 
+                                    ValorPair(
+                                        ValorPair (
+                                            ValorStr "NOT",
+                                            ValorPair (
+                                                ValorStr "VAR", 
+                                                ValorStr "SOMA"
+                                            )
+                                        ),
+                                        ValorStr "4"
+                                    ),
+                                    ValorPair (
+                                        ValorPair(
+                                            ValorStr "ASGN",
+                                            ValorPair (
+                                                ValorStr "5", 
+                                                ValorPair (
+                                                    ValorStr "x", 
+                                                    ValorPair (
+                                                        ValorStr "CONST",
+                                                        ValorInt 3
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        ValorPair(
+                                            ValorStr "ASGN",
+                                            ValorPair (
+                                                ValorStr "6", 
+                                                ValorPair (
+                                                    ValorStr "SOMA", 
+                                                    ValorPair(
+                                                        ValorStr "CONST", 
+                                                        ValorInt 0
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ))
+    let expectedOutput = (ValorStr "4")
+    assertEqual "init if" expectedOutput output
+
 testChaoticIteration :: Test
 testChaoticIteration = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (ValorInt 4)
@@ -505,5 +589,8 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Count Asgns ex3" testCountEx3
                         ,   TestLabel "Count Asgns ex4" testCountEx4
                         ,   TestLabel "Count Asgns factorial" testCountFactorial
-                        -- ,   TestLabel "Chaotic Iteration" testChaoticIteration
+                        ,   TestLabel "Init ex1" testInitEx1
+                        ,   TestLabel "Init while" testInitExWhile
+                        ,   TestLabel "Init if" testInitExIF
+                        -- l "Chaotic Iteration" testChaoticIteration
                         ]

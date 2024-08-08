@@ -1,0 +1,17 @@
+main :: Any -> int
+main (prog) {
+    final (prog)
+}
+
+final :: Any -> [String]
+final (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then [fst (snd (prog))]
+    else if (isEqual (fst (prog), "SEQ"))
+        then final (snd (snd (prog)))
+        else if (isEqual (fst (prog), "IF"))
+            then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
+            else if (isEqual (fst (prog), "WHILE"))
+                then [snd (fst (snd (prog)))]
+                else "error"
+}
