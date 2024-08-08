@@ -1,0 +1,11 @@
+main :: Any -> bool
+main (n) {
+   check (n)
+}
+
+check :: Any -> bool
+check (pair) {
+    if (isPair (pair))
+       then True
+       else False
+}

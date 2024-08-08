@@ -1,0 +1,13 @@
+main :: Any -> int
+main (prog) {
+    count (prog)
+}
+
+count :: Any -> int
+count (prog) {
+    if (isPair (prog))
+        then count(fst (prog)) + count(snd (prog))
+    else if (isEqual (prog, "ASGN"))
+        then 1
+        else 0
+}

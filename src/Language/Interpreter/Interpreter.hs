@@ -67,6 +67,13 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "isNil" -> ValorInt (boolToInt (null list))
     Ident "fst" -> f
     Ident "snd" -> s
+    Ident "isPair" -> case arg of
+      ValorPair _ -> ValorInt 1
+      _ -> ValorInt 0
+    Ident "isEqual" -> let
+        val1 = eval context (pExps !! 0)
+        val2 = eval context (pExps !! 1)
+      in ValorInt (boolToInt (val1 == val2))
     Ident func -> eval (paramBindings, fcontext) fExp
     where
       arg = eval context (head pExps)

@@ -1,0 +1,11 @@
+main :: (Any, Any) -> bool
+main (n) {
+   soma (n)
+}
+
+soma :: (Any, Any) -> bool
+soma (pair) {
+    if (isEqual (fst (pair), snd (pair)))
+       then True
+       else False
+}

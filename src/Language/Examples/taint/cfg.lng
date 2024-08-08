@@ -1,0 +1,42 @@
+main :: Any -> int
+main (prog) {
+    flow (prog)
+}
+
+flow :: Any -> [(String, String)]
+flow (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then []
+    else if (isEqual (fst (prog), "WHILE"))
+        then flow (snd (snd (snd (prog)))) ++ (fst (snd (prog)), init (snd (snd (snd (prog)))))
+}
+
+init :: Any -> String
+init (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then fst (snd (prog))
+    else if (isEqual (fst (prog), "SEQ"))
+        then init (fst (fst (prog)))
+        else if (isEqual (fst (prog), "IF"))
+}
+
+init :: Stmt -> Label
+init (Assignment _ _ l) = l
+init (Skip l) = l
+init (Seq s1 _) = init s1
+init (IfThenElse (_, l) _ _) = l
+init (While (_, l) _) = l
+
+flow :: Stmt -> Set (Label, Label)
+flow (Assignment {}) = empty
+flow (Skip {}) = empty
+flow (Seq s1 s2) = do
+    let s2Init = init s2
+    let s1Final = final s1
+    let setOfLabels = Data.Set.map (\s1Label -> (s1Label, s2Init)) s1Final
+    flow s1 `union` flow s2  `union` setOfLabels
+flow (IfThenElse (_, l) s1 s2) = flow s1 `union` flow s2 `union` singleton (l, init s1)  `union` singleton (l, init s2)
+flow (While (_, l) s) = do
+    let sFinal = final s
+    let setOfLabels = Data.Set.map (\sLabel -> (sLabel, l)) sFinal
+    flow s `union`  singleton (l, init s)  `union` setOfLabels
