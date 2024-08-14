@@ -103,6 +103,33 @@ testConcatLista = TestCase $ do
     let expectedOutput = (ValorStr "test_concatenated_from_list")
     assertEqual "Concat lista" expectedOutput output
 
+testConcatTwoLists :: Test
+testConcatTwoLists = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/Concat-list.lng" (
+                    ValorPair (
+                        ValorList [
+                            ValorStr "test",
+                            ValorStr "_",
+                            ValorStr "concatenated"
+                        ], 
+                        ValorList [
+                            ValorStr "_",
+                            ValorStr "from",
+                            ValorStr "_",
+                            ValorStr "list"
+                        ]
+                    ))
+    let expectedOutput = (ValorList [
+                            ValorStr "test",
+                            ValorStr "_",
+                            ValorStr "concatenated",
+                            ValorStr "_",
+                            ValorStr "from",
+                            ValorStr "_",
+                            ValorStr "list"
+                        ])
+    assertEqual "Concat lista" expectedOutput output
+
 testPolymorphicPairSameType :: Test
 testPolymorphicPairSameType = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" (
@@ -145,6 +172,7 @@ baseTestSuite = TestList [ TestLabel "Base testSimples" testSimples
                          , TestLabel "Base testBoolFalse" testBoolFalse
                          , TestLabel "Base testConcatSimples" testConcatSimples
                          , TestLabel "Base testConcatLista" testConcatLista
+                         , TestLabel "Base testConcatTwoLists" testConcatTwoLists
                          , TestLabel "Base testPolymorphicPairSameType" testPolymorphicPairSameType
                          , TestLabel "Base testPolymorphicPair" testPolymorphicPair
                          , TestLabel "Base testPolymorphicList" testPolymorphicList

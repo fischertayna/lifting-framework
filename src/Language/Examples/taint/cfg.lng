@@ -1,14 +1,50 @@
-main :: Any -> int
+main :: Any -> [Any]
 main (prog) {
     flow (prog)
 }
 
-flow :: Any -> [(String, String)]
+flow :: Any -> [Any]
 flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
-    then []
-    else if (isEqual (fst (prog), "WHILE"))
-        then flow (snd (snd (snd (prog)))) ++ (fst (snd (prog)), init (snd (snd (snd (prog)))))
+        then []
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(makeSetOfLabels(init(snd(snd (prog))), final(fst(snd (prog)))), union(flow(fst(snd (prog))), flow(snd (snd (prog)))))
+            else if (isEqual (fst (prog), "IF"))
+                then union(union(union (flow (fst (snd (snd (prog)))), flow (snd (snd (snd (prog))))), [(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))]), [(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))])
+                else if (isEqual (fst (prog), "WHILE"))
+                    then union(union(flow(snd(snd (prog))), [(snd (fst (snd (prog))), init(snd (snd (prog))))]), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog)))))
+                    else "error"
+}
+
+makeSetOfLabels :: String -> [String] -> [(String, String)]
+makeSetOfLabels (init, finals) {
+    if (isNil(finals))
+        then []
+        else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
+}
+
+
+union :: [Any] -> [Any] -> [Any]
+union (l1, l2) {
+    if (isNil(l1))
+        then l2
+        else union (tail(l1), addUnique(head(l1), l2))
+}
+
+addUnique :: Any -> [Any] -> [Any]
+addUnique (x, l) {
+    if (elem(x, l))
+        then l
+        else [x] ++ l
+}
+
+elem :: Any -> [Any] -> int
+elem (x, l) {
+    if (isNil(l))
+        then 0
+        else if (isEqual(head(l), x))
+            then 1
+            else elem(x, tail(l))
 }
 
 init :: Any -> String
@@ -36,17 +72,3 @@ final (prog) {
                 then [snd (fst (snd (prog)))]
                 else "error"
 }
-
-flow :: Stmt -> Set (Label, Label)
-flow (Assignment {}) = empty
-flow (Skip {}) = empty
-flow (Seq s1 s2) = do
-    let s2Init = init s2
-    let s1Final = final s1
-    let setOfLabels = Data.Set.map (\s1Label -> (s1Label, s2Init)) s1Final
-    flow s1 `union` flow s2  `union` setOfLabels
-flow (IfThenElse (_, l) s1 s2) = flow s1 `union` flow s2 `union` singleton (l, init s1)  `union` singleton (l, init s2)
-flow (While (_, l) s) = do
-    let sFinal = final s
-    let setOfLabels = Data.Set.map (\sLabel -> (sLabel, l)) sFinal
-    flow s `union`  singleton (l, init s)  `union` setOfLabels

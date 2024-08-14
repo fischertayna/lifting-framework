@@ -1,0 +1,9 @@
+main :: ([String], [String]) -> [String]
+main (n) {
+   concat (fst (n), snd (n))
+}
+
+concat :: [String] -> [String] -> [String]
+concat (exp1, exp2) {
+    exp1 ++ exp2
+}

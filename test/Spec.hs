@@ -11,10 +11,9 @@ import ReachingDefinitionsTestVInicial
 main :: IO ()
 main = do
     putStrLn "Running tests..."
-    -- runTestTT baseTestSuite
+    runTestTT baseTestSuite
     -- runTestTT varTestSuite
     -- runTestTT memoTestSuite
     -- runTestTT slMemoTestSuite
     runTestTT rdTestSuite
-    runTestTT rdTestSuiteVInical
     putStrLn "Done."

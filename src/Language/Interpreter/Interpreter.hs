@@ -43,7 +43,14 @@ evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
 
 eval :: RContext -> Exp -> Valor
 eval context@(vcontext, fcontext) x = case x of
-  ECon exp0 exp1  -> ValorStr (s (eval context exp0) ++ s (eval context exp1))
+  ECon exp0 exp1 -> 
+    let val0 = eval context exp0
+        val1 = eval context exp1
+    in case (val0, val1) of
+        (ValorStr s0, ValorStr s1) -> ValorStr (s0 ++ s1)
+        (ValorList l0, ValorList l1) -> ValorList (l0 ++ l1)
+        _ -> error "Type error in concatenation"
+  -- ECon exp0 exp1  -> ValorStr (s (eval context exp0) ++ s (eval context exp1))
   EAdd exp0 exp1  -> ValorInt (i (eval context exp0) + i (eval context exp1))
   ESub exp0 exp1  -> ValorInt (i (eval context exp0) - i (eval context exp1))
   EMul exp0 exp1  -> ValorInt (i (eval context exp0) * i (eval context exp1))

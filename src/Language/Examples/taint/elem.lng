@@ -1,0 +1,13 @@
+main :: (Any, [Any]) -> bool
+main (prog) {
+    elem (fst (prog), snd (prog))
+}
+
+elem :: Any -> [Any] -> int
+elem (x, l) {
+    if (isNil(l))
+        then 0
+        else if (isEqual(head(l), x))
+            then 1
+            else elem(x, tail(l))
+}

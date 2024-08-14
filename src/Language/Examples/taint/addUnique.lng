@@ -1,0 +1,20 @@
+main :: (Any, [Any]) -> [Any]
+main (prog) {
+    addUnique (fst (prog), snd (prog))
+}
+
+addUnique :: Any -> [Any] -> [Any]
+addUnique (x, l) {
+    if (elem(x, l))
+        then l
+        else [x] ++ l
+}
+
+elem :: Any -> [Any] -> int
+elem (x, l) {
+    if (isNil(l))
+        then 0
+        else if (isEqual(head(l), x))
+            then 1
+            else elem(x, tail(l))
+}

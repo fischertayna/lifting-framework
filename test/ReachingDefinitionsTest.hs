@@ -339,106 +339,117 @@ ex4 = ValorPair (
 
 -- s04 = Assignment "y" (Const 0) 6
 factorialProg =  ValorPair (
+                    ValorStr "SEQ",
                     ValorPair(
-                        ValorStr "1",
-                        ValorPair (
-                            ValorStr "ASGN", 
-                            ValorPair (
-                                ValorStr "y", 
-                                ValorPair (
-                                    ValorStr "VAR", 
-                                    ValorStr "x"
-                                )
-                            )
-                        )
-                    ),
-                    ValorPair (
                         ValorPair(
-                            ValorStr "2",
+                            ValorStr "ASGN",
                             ValorPair (
-                                ValorStr "ASGN", 
+                                ValorStr "1", 
                                 ValorPair (
-                                    ValorStr "z", 
-                                    ValorPair(
-                                        ValorStr "CONST", 
-                                        ValorInt 1
+                                    ValorStr "y", 
+                                    ValorPair (
+                                        ValorStr "VAR", 
+                                        ValorStr "x"
                                     )
                                 )
                             )
                         ),
                         ValorPair(
+                            ValorStr "SEQ",
                             ValorPair (
-                                ValorStr "WHILE", 
-                                ValorPair ( 
-                                    ValorPair(
-                                        ValorPair (
-                                            ValorStr "VAR", 
-                                            ValorStr "y"
-                                        ),
-                                        ValorStr "3"
-                                    ),
+                                ValorPair(
+                                    ValorStr "ASGN",
                                     ValorPair (
-                                        ValorPair(
-                                            ValorStr "4",
-                                            ValorPair (
-                                                ValorStr "ASGN", 
-                                                ValorPair (
-                                                    ValorStr "z", 
-                                                    ValorPair (
-                                                        ValorStr "MULT", 
-                                                        ValorPair (
-                                                            ValorPair (
-                                                                ValorStr "VAR", 
-                                                                ValorStr "z"
-                                                            ),
-                                                            ValorPair (
-                                                                ValorStr "VAR",
-                                                                ValorStr "y"
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        ),
-                                        ValorPair(
-                                            ValorStr "5",
-                                            ValorPair (
-                                                ValorStr "ASGN", 
-                                                ValorPair (
-                                                    ValorStr "y", 
-                                                    ValorPair (
-                                                        ValorStr "SUB", 
-                                                        ValorPair (
-                                                            ValorPair (
-                                                                ValorStr "VAR",
-                                                                ValorStr "y"
-                                                            ),
-                                                            ValorPair(
-                                                                ValorStr "CONST", 
-                                                                ValorInt 1
-                                                            )
-                                                        )
-                                                    )
-                                                )
+                                        ValorStr "2", 
+                                        ValorPair (
+                                            ValorStr "z", 
+                                            ValorPair(
+                                                ValorStr "CONST", 
+                                                ValorInt 1
                                             )
                                         )
                                     )
-                                )
-                            ),
-                            ValorPair(
-                                ValorStr "6",
-                                ValorPair (
-                                    ValorStr "ASGN", 
-                                    ValorPair (
-                                        ValorStr "y", 
+                                ),
+                                ValorPair(
+                                    ValorStr "SEQ",
+                                    ValorPair(
+                                        ValorPair (
+                                            ValorStr "WHILE", 
+                                            ValorPair ( 
+                                                ValorPair(
+                                                    ValorPair (
+                                                        ValorStr "VAR", 
+                                                        ValorStr "y"
+                                                    ),
+                                                    ValorStr "3"
+                                                ),
+                                                ValorPair (
+                                                    ValorStr "SEQ",
+                                                    ValorPair(
+                                                        ValorPair(
+                                                            ValorStr "ASGN",
+                                                            ValorPair (
+                                                                ValorStr "4", 
+                                                                ValorPair (
+                                                                    ValorStr "z", 
+                                                                    ValorPair (
+                                                                        ValorStr "MULT", 
+                                                                        ValorPair (
+                                                                            ValorPair (
+                                                                                ValorStr "VAR", 
+                                                                                ValorStr "z"
+                                                                            ),
+                                                                            ValorPair (
+                                                                                ValorStr "VAR",
+                                                                                ValorStr "y"
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        ValorPair(
+                                                            ValorStr "ASGN",
+                                                            ValorPair (
+                                                                ValorStr "5", 
+                                                                ValorPair (
+                                                                    ValorStr "y", 
+                                                                    ValorPair (
+                                                                        ValorStr "SUB", 
+                                                                        ValorPair (
+                                                                            ValorPair (
+                                                                                ValorStr "VAR",
+                                                                                ValorStr "y"
+                                                                            ),
+                                                                            ValorPair(
+                                                                                ValorStr "CONST", 
+                                                                                ValorInt 1
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
                                         ValorPair(
-                                            ValorStr "CONST", 
-                                            ValorInt 0
+                                            ValorStr "ASGN",
+                                            ValorPair (
+                                                ValorStr "6", 
+                                                ValorPair (
+                                                    ValorStr "y", 
+                                                    ValorPair(
+                                                        ValorStr "CONST", 
+                                                        ValorInt 0
+                                                    )
+                                                )
+                                            )
                                         )
                                     )
                                 )
                             )
-
                         )
                     )
                 )
@@ -575,6 +586,183 @@ testInitExIF = TestCase $ do
     let expectedOutput = (ValorStr "4")
     assertEqual "init if" expectedOutput output
 
+testFinalEx1 :: Test
+testFinalEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/final.lng" ex1
+    let expectedOutput = (ValorList [ValorStr "3"])
+    assertEqual "final ex1" expectedOutput output
+
+testFinalExWhile :: Test
+testFinalExWhile = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/final.lng" (ValorPair (
+                                ValorStr "WHILE", 
+                                ValorPair ( 
+                                    ValorPair(
+                                        ValorPair (
+                                            ValorStr "VAR", 
+                                            ValorStr "y"
+                                        ),
+                                        ValorStr "3"
+                                    ),
+                                    ValorPair(
+                                        ValorStr "ASGN",
+                                        ValorPair (
+                                            ValorStr "4", 
+                                            ValorPair (
+                                                ValorStr "c", 
+                                                ValorPair(
+                                                    ValorStr "CONST",
+                                                    ValorInt 1
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ))
+    let expectedOutput = (ValorList [ValorStr "3"])
+    assertEqual "final while" expectedOutput output
+
+testFinalExIF :: Test
+testFinalExIF = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/final.lng" (ValorPair(
+                                ValorStr "IF",
+                                ValorPair ( 
+                                    ValorPair(
+                                        ValorPair (
+                                            ValorStr "NOT",
+                                            ValorPair (
+                                                ValorStr "VAR", 
+                                                ValorStr "SOMA"
+                                            )
+                                        ),
+                                        ValorStr "4"
+                                    ),
+                                    ValorPair (
+                                        ValorPair(
+                                            ValorStr "ASGN",
+                                            ValorPair (
+                                                ValorStr "5", 
+                                                ValorPair (
+                                                    ValorStr "x", 
+                                                    ValorPair (
+                                                        ValorStr "CONST",
+                                                        ValorInt 3
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        ValorPair(
+                                            ValorStr "ASGN",
+                                            ValorPair (
+                                                ValorStr "6", 
+                                                ValorPair (
+                                                    ValorStr "SOMA", 
+                                                    ValorPair(
+                                                        ValorStr "CONST", 
+                                                        ValorInt 0
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ))
+    let expectedOutput = (ValorList [ValorStr "5", ValorStr "6"])
+    assertEqual "final if" expectedOutput output
+
+testElem :: Test
+testElem = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/elem.lng" (ValorPair(
+            ValorStr "b",
+            ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+        ))
+    let expectedOutput = (ValorInt 1)
+    assertEqual "elem" expectedOutput output
+
+testNotElem :: Test
+testNotElem = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/elem.lng" (ValorPair(
+            ValorStr "a",
+            ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+        ))
+    let expectedOutput = (ValorInt 0)
+    assertEqual "not elem" expectedOutput output
+
+testAddUnique :: Test
+testAddUnique = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (ValorPair(
+            ValorStr "a",
+            ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+        ))
+    let expectedOutput = (ValorList [ValorStr "a", ValorBool True, ValorStr "b", ValorInt 4])
+    assertEqual "addUnique" expectedOutput output
+
+testAddUniqueSame :: Test
+testAddUniqueSame = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (ValorPair(
+            ValorStr "b",
+            ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+        ))
+    let expectedOutput = (ValorList [ValorBool True, ValorStr "b", ValorInt 4])
+    assertEqual "addUnique same" expectedOutput output
+
+testUnion :: Test
+testUnion = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/union.lng" (ValorPair(
+            ValorList [ValorStr "a", ValorStr "b", ValorInt 1],
+            ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+        ))
+    let expectedOutput = (ValorList [ValorInt 1, ValorStr "a", ValorBool True, ValorStr "b", ValorInt 4])
+    assertEqual "union" expectedOutput output
+
+testFlowEx1 :: Test
+testFlowEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex1
+    let expectedOutput = (ValorList[ValorPair(ValorStr "1", ValorStr "2"), ValorPair(ValorStr "2", ValorStr "3")])
+    assertEqual "Flow ex1" expectedOutput output
+
+testFlowEx2 :: Test
+testFlowEx2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex2
+    let expectedOutput = (ValorList[])
+    assertEqual "Flow ex2" expectedOutput output
+
+
+testFlowEx3 :: Test
+testFlowEx3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex3
+    let expectedOutput = (ValorList[
+            ValorPair(ValorStr "1", ValorStr "2"), 
+            ValorPair(ValorStr "2", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "4"),
+            ValorPair(ValorStr "4", ValorStr "5"),
+            ValorPair(ValorStr "5", ValorStr "6"),
+            ValorPair(ValorStr "6", ValorStr "4")])
+    assertEqual "Flow ex3" expectedOutput output
+
+testFlowEx4 :: Test
+testFlowEx4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex4
+    let expectedOutput = (ValorList[
+            ValorPair(ValorStr "1", ValorStr "2"), 
+            ValorPair(ValorStr "2", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "4"),
+            ValorPair(ValorStr "4", ValorStr "5"),
+            ValorPair(ValorStr "4", ValorStr "6")])
+    assertEqual "Flow ex4" expectedOutput output
+
+testFlowFactorial :: Test
+testFlowFactorial = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" factorialProg
+    let expectedOutput = (ValorList[
+            ValorPair(ValorStr "1", ValorStr "2"), 
+            ValorPair(ValorStr "2", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "6"),
+            ValorPair(ValorStr "5", ValorStr "3"),
+            ValorPair(ValorStr "4", ValorStr "5"),
+            ValorPair(ValorStr "3", ValorStr "4")])
+    assertEqual "Flow Factorial" expectedOutput output
+
 testChaoticIteration :: Test
 testChaoticIteration = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (ValorInt 4)
@@ -592,5 +780,18 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Init ex1" testInitEx1
                         ,   TestLabel "Init while" testInitExWhile
                         ,   TestLabel "Init if" testInitExIF
+                        ,   TestLabel "Final ex1" testFinalEx1
+                        ,   TestLabel "Final while" testFinalExWhile
+                        ,   TestLabel "Final if" testFinalExIF
+                        ,   TestLabel "Elem" testElem
+                        ,   TestLabel "Not Elem" testNotElem
+                        ,   TestLabel "AddUnique" testAddUnique
+                        ,   TestLabel "AddUnique same" testAddUniqueSame
+                        ,   TestLabel "Union" testUnion
+                        ,   TestLabel "Flow ex1" testFlowEx1
+                        ,   TestLabel "Flow ex2" testFlowEx2
+                        ,   TestLabel "Flow ex3" testFlowEx3
+                        ,   TestLabel "Flow ex4" testFlowEx4
+                        ,   TestLabel "Flow factorial" testFlowFactorial
                         -- l "Chaotic Iteration" testChaoticIteration
                         ]

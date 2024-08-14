@@ -1,4 +1,4 @@
-main :: Any -> int
+main :: Any -> [String]
 main (prog) {
     final (prog)
 }
