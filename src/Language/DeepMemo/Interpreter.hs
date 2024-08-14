@@ -70,7 +70,13 @@ eval :: RContext Mem -> State Mem (Exp -> State Mem VarValor)
 eval context@(vcontext, fcontext, memoizedFunctionName) =
   return
     ( \x -> case x of
-        (ECon exp0 exp1) -> applyBinaryOperator VarString str context exp0 exp1 (++)
+        (ECon exp0 exp1) -> do
+          val0 <- eval context <.> return exp0
+          val1 <- eval context <.> return exp1
+          case (val0, val1) of
+            (VarString s0, VarString s1) -> applyBinaryOperator VarString str context exp0 exp1 (++)
+            (VarList l0, VarList l1) -> return $ VarList (l0 ++ l1)
+            _ -> error "Type error in concatenation"
         (EAdd exp0 exp1) -> applyBinaryOperator VarInteger int context exp0 exp1 (+)
         (ESub exp0 exp1) -> applyBinaryOperator VarInteger int context exp0 exp1 (-)
         (EMul exp0 exp1) -> applyBinaryOperator VarInteger int context exp0 exp1 (*)
@@ -125,6 +131,15 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
             case vals of
               [VarPair (f, s)] -> return s
               _ -> error "Invalid argument to snd"
+          Ident "isPair" -> do
+            vals <- mapM (\e -> eval context <.> return e) pExps
+            case vals of
+              [VarPair _] -> return $ VarInteger (Var [(1, ttPC)])
+              _ -> return $ VarInteger (Var [(0, ttPC)])
+          Ident "isEqual" -> do
+            val1 <- eval context <.> return (pExps !! 0)
+            val2 <- eval context <.> return (pExps !! 1)
+            return $ VarInteger (Var [(boolToInt (val1 == val2), ttPC)])
           _ ->
             if fId == memoizedFunctionName
               then memoizedCall context fId pExps

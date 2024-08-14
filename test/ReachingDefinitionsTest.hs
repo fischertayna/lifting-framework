@@ -712,7 +712,7 @@ testUnion = TestCase $ do
             ValorList [ValorStr "a", ValorStr "b", ValorInt 1],
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
-    let expectedOutput = (ValorList [ValorInt 1, ValorStr "a", ValorBool True, ValorStr "b", ValorInt 4])
+    let expectedOutput = (ValorList [ValorStr "a", ValorStr "b", ValorInt 1, ValorBool True, ValorInt 4])
     assertEqual "union" expectedOutput output
 
 testFlowEx1 :: Test
@@ -757,10 +757,10 @@ testFlowFactorial = TestCase $ do
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
-            ValorPair(ValorStr "3", ValorStr "6"),
-            ValorPair(ValorStr "5", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "4"),
             ValorPair(ValorStr "4", ValorStr "5"),
-            ValorPair(ValorStr "3", ValorStr "4")])
+            ValorPair(ValorStr "5", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "6")])
     assertEqual "Flow Factorial" expectedOutput output
 
 testChaoticIteration :: Test

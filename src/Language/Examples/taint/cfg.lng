@@ -8,11 +8,11 @@ flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then []
         else if (isEqual (fst (prog), "SEQ"))
-            then union(makeSetOfLabels(init(snd(snd (prog))), final(fst(snd (prog)))), union(flow(fst(snd (prog))), flow(snd (snd (prog)))))
+            then union(flow(fst(snd (prog))), union(makeSetOfLabels(init(snd(snd(prog))), final(fst(snd (prog)))), flow(snd (snd (prog)))))
             else if (isEqual (fst (prog), "IF"))
-                then union(union(union (flow (fst (snd (snd (prog)))), flow (snd (snd (snd (prog))))), [(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))]), [(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))])
+                then union([(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))], union(flow (fst (snd (snd (prog)))), union([(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))], flow (snd (snd (snd (prog)))))))
                 else if (isEqual (fst (prog), "WHILE"))
-                    then union(union(flow(snd(snd (prog))), [(snd (fst (snd (prog))), init(snd (snd (prog))))]), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog)))))
+                    then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
                     else "error"
 }
 
@@ -26,16 +26,16 @@ makeSetOfLabels (init, finals) {
 
 union :: [Any] -> [Any] -> [Any]
 union (l1, l2) {
-    if (isNil(l1))
-        then l2
-        else union (tail(l1), addUnique(head(l1), l2))
+    if (isNil(l2))
+        then l1
+        else union (addUnique(head(l2), l1), tail(l2))
 }
 
 addUnique :: Any -> [Any] -> [Any]
 addUnique (x, l) {
     if (elem(x, l))
         then l
-        else [x] ++ l
+        else l ++ [x] 
 }
 
 elem :: Any -> [Any] -> int

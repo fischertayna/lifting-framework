@@ -6,7 +6,7 @@ import MemoTest
 import SLMemoTest
 import DeepMemoTest
 import ReachingDefinitionsTest
-import ReachingDefinitionsTestVInicial
+import DeepMemoReachingDefinitionsTest
 
 main :: IO ()
 main = do
@@ -16,4 +16,5 @@ main = do
     -- runTestTT memoTestSuite
     -- runTestTT slMemoTestSuite
     runTestTT rdTestSuite
+    runTestTT deepMemoRdTestSuite
     putStrLn "Done."
