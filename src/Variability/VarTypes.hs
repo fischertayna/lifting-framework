@@ -254,11 +254,17 @@ valList (Var ls) = ls
 (VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
 (VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
 (VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
+(VarList list1) ++++ (VarList list2) = VarList (list1 ++ list2)
+(VarPair (v1, v2)) ++++ (VarPair (w1, w2)) = VarPair (v1 ++++ w1, v2 ++++ w2)
+v1 ++++ v2 = error $ "Mismatched types for ++++ operator: " 
+                    ++ show v1 ++ " and " ++ show v2
 
 (||||) :: VarValor -> PresenceCondition -> VarValor
 (VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
 (VarString (Var listPCv)) |||| pcR = VarString (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
 (VarBool (Var listPCv)) |||| pcR = VarBool(Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))
+(VarList list) |||| pcR = VarList [v |||| pcR | v <- list]
+(VarPair (v1, v2)) |||| pcR = VarPair (v1 |||| pcR, v2 |||| pcR)
 
 data VarValor
     = VarInteger { int :: Var Integer

@@ -13,7 +13,9 @@ flow (prog) {
                 then union([(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))], union(flow (fst (snd (snd (prog)))), union([(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))], flow (snd (snd (snd (prog)))))))
                 else if (isEqual (fst (prog), "WHILE"))
                     then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
-                    else "error"
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error" ++ fst (prog)]
 }
 
 makeSetOfLabels :: String -> [String] -> [(String, String)]
@@ -57,7 +59,9 @@ init (prog) {
             then snd (fst (snd (prog)))
             else if (isEqual (fst (prog), "WHILE"))
                 then snd (fst (snd (prog)))
-                else "error"
+                else if (isEqual (fst (prog), "SKIP"))
+                    then fst (snd (prog))
+                    else ("error" ++ fst (prog))
 }
 
 final :: Any -> [String]
@@ -70,5 +74,7 @@ final (prog) {
             then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
             else if (isEqual (fst (prog), "WHILE"))
                 then [snd (fst (snd (prog)))]
-                else "error"
+                else if (isEqual (fst (prog), "SKIP"))
+                    then [fst (snd (prog))]
+                    else ["error" ++ fst (prog)]
 }

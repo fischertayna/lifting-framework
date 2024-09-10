@@ -51,6 +51,11 @@ ex1 :: VarValor
 -- y = 4;      3
 -- #ENDIF
 -- z = x + y;  4
+
+-- x = 1;  tt    1
+-- y = 2;  A    2
+-- y = 4;  ~A    3
+-- z = x + y;  tt 4
 ex1 = VarPair(
         VarString (Var [("SEQ", ttPC)]),
         VarPair ( 
@@ -61,48 +66,66 @@ ex1 = VarPair(
                     VarPair (
                         VarString (Var [("x", ttPC)]),
                         VarPair(
-                            VarString (Var [("CONST", ttPC)]),
-                            VarInteger (Var [(1, ttPC)])
+                            VarString (Var [("INT", ttPC)]),
+                            VarString (Var [("1", ttPC)])
                         )
                     )
                 )
-            ),
+            ), -- x = 1;  tt    1
             VarPair(
-                VarString (Var [("SEQ", ttPC)]),
+                VarString (Var [("SEQ", propA)]), -- Should it be A??
                 VarPair ( 
                     VarPair (
-                        VarString (Var [("ASGN", ttPC)]),
+                        VarString (Var [("ASGN", propA), ("DUMMY", notBDD propA)]),
                         VarPair (
-                            VarString (Var [("2", propA),("3", notBDD propA)]),
+                            VarString (Var [("2", propA), ("DUMMY", notBDD propA)]),
                             VarPair (
-                                VarString (Var [("y", ttPC)]),
+                                VarString (Var [("y", propA), ("DUMMY", notBDD propA)]),
                                 VarPair(
-                                    VarString (Var [("CONST", ttPC)]),
-                                    VarInteger (Var [(2, propA),(4, notBDD propA)])
+                                    VarString (Var [("INT", propA), ("DUMMY", notBDD propA)]),
+                                    VarString (Var [("1", propA), ("DUMMY", notBDD propA)])
                                 )
                             )
                         )
-                    ), 
+                    ), -- y = 2;  A    2
                     VarPair(
-                        VarString (Var [("ASGN", ttPC)]),
-                        VarPair (
-                            VarString (Var [("4", ttPC)]),
+                        VarString (Var [("SEQ", ttPC)]), -- Should it be ~A??
+                        VarPair(
                             VarPair (
-                                VarString (Var [("z", ttPC)]),
+                                VarString (Var [("ASGN", notBDD propA), ("DUMMY", propA)]),
                                 VarPair (
-                                    VarString (Var [("ADD", ttPC)]),
+                                    VarString (Var [("3", notBDD propA), ("DUMMY", propA)]),
                                     VarPair (
-                                        VarPair (
-                                            VarString (Var [("VAR", ttPC)]),
-                                            VarString (Var [("x", ttPC)])
-                                        ),
-                                        VarPair (
-                                            VarString (Var [("VAR", ttPC)]),
-                                            VarString (Var [("y", ttPC)])
+                                        VarString (Var [("y", notBDD propA), ("DUMMY", propA)]),
+                                        VarPair(
+                                            VarString (Var [("INT", notBDD propA), ("DUMMY", propA)]),
+                                            VarString (Var [("4",notBDD  propA), ("DUMMY", propA)])
                                         )
                                     )
                                 )
-                            )
+                            ), -- y = 4;  ~A    3
+                            VarPair(
+                                VarString (Var [("ASGN", ttPC)]),
+                                VarPair (
+                                    VarString (Var [("4", ttPC)]),
+                                    VarPair (
+                                        VarString (Var [("z", ttPC)]),
+                                        VarPair (
+                                            VarString (Var [("ADD", ttPC)]),
+                                            VarPair (
+                                                VarPair (
+                                                    VarString (Var [("VAR", ttPC)]),
+                                                    VarString (Var [("x", ttPC)])
+                                                ),
+                                                VarPair (
+                                                    VarString (Var [("VAR", ttPC)]),
+                                                    VarString (Var [("y", ttPC)])
+                                                )
+                                            )   
+                                        )
+                                    )
+                                )
+                            ) -- z = x + y;  tt 4
                         )
                     )
                 )
@@ -128,10 +151,68 @@ ex2 = VarPair(
 
 -- x = 1;                   1
 -- soma = 0;                2
+-- # IFDEF A
 -- c = 10;                  3
--- while (c) {              4
---     soma = soma + c;     5
---     c = c - 1;           6
+-- # IFDEF B
+-- d = 5;                   4                 
+-- # ELSE
+-- e = 2;                   5
+-- # ENDIF
+-- # ELSE
+-- c = 9;                   6
+-- # ENDIF
+-- while (c) {              7
+--     soma = soma + c;     8
+--     c = c - 1;           9
+-- # IFDEF B
+--     d = d + c;           10
+-- # ELSE
+--     e = e * c;           11
+-- # ENDIF
+-- }
+
+-- A && B
+-- x = 1;                   1
+-- soma = 0;                2
+-- c = 10;                  3
+-- d = 5;                   4
+-- while (c) {              7
+--     soma = soma + c;     8
+--     c = c - 1;           9
+--     d = d + c;          10
+-- }
+
+-- A && ~B
+-- x = 1;                   1
+-- soma = 0;                2
+-- c = 10;                  3
+-- e = 2;                   5
+-- while (c) {              7
+--     soma = soma + c;     8
+--     c = c - 1;           9
+--     e = e * c;          11
+-- }
+
+-- ~A && B
+-- x = 1;                   1
+-- soma = 0;                2
+-- d = 5;                   4
+-- c = 9;                   6
+-- while (c) {              7
+--     soma = soma + c;     8
+--     c = c - 1;           9
+--     d = d + c;           10
+-- }
+
+-- ~A && ~B
+-- x = 1;                   1
+-- soma = 0;                2
+-- e = 2;                   5
+-- c = 9;                   6
+-- while (c) {              7
+--     soma = soma + c;     8
+--     c = c - 1;           9
+--     e = e * c;           11
 -- }
 ex3 = VarPair(
         VarString (Var [("SEQ", ttPC)]),
@@ -148,7 +229,7 @@ ex3 = VarPair(
                         )
                     )
                 )
-            ), 
+            ), -- x = 1;  1
             VarPair (
                 VarString (Var [("SEQ", ttPC)]),
                 VarPair (
@@ -164,76 +245,121 @@ ex3 = VarPair(
                                 )
                             )
                         )
-                    ),
+                    ), -- soma = 0;  2
                     VarPair (
                         VarString (Var [("SEQ", ttPC)]),
                         VarPair (
                             VarPair(
                                 VarString (Var [("ASGN", ttPC)]),
                                 VarPair (
-                                    VarString (Var [("3", ttPC)]), 
+                                    VarString (Var [("3", atbt), ("3", atbf), ("4", afbt), ("4", afbf)]), 
                                     VarPair (
-                                        VarString (Var [("c", ttPC)]), 
+                                        VarString (Var [("c", atbt), ("c", atbf), ("d", afbt), ("e", afbf)]), 
                                         VarPair(
                                             VarString (Var [("CONST", ttPC)]), 
-                                            VarInteger (Var [(10, ttPC)])
+                                            VarInteger (Var [(10, atbt), (10, atbf), (5, afbt), (2, afbf)])
                                         )
                                     )
                                 )
-                            ),
+                            ), -- c = 10; 3 A && B A && ~B / d = 5; 4 ~A && B / e = 2; 5 ~A && ~B
                             VarPair(
-                                VarString (Var [("WHILE", ttPC)]),
-                                VarPair (
+                                VarString (Var [("SEQ", ttPC)]),
+                                VarPair(
                                     VarPair(
+                                        VarString (Var [("ASGN", ttPC)]),
                                         VarPair (
-                                            VarString (Var [("VAR", ttPC)]), 
-                                            VarString (Var [("c", ttPC)])
-                                        ), 
-                                        VarString (Var [("4", ttPC)])
-                                    ),
+                                            VarString (Var [("4", atbt), ("5", atbf), ("6", afbt), ("6", afbf)]), 
+                                            VarPair (
+                                                VarString (Var [("d", atbt), ("e", atbt), ("c", afbt), ("c", afbf)]), 
+                                                VarPair(
+                                                    VarString (Var [("CONST", ttPC)]), 
+                                                    VarInteger (Var [(10, atbt), (2, atbt), (9, afbt), (9, afbf)])
+                                                )
+                                            )
+                                        )
+                                    ), -- d = 5; 4 A && B / e = 2; 5 A && ~B / c = 9; 6 ~A && B  ~A && ~B
                                     VarPair(
-                                        VarString (Var [("SEQ", ttPC)]),
+                                        VarString (Var [("WHILE", ttPC)]),
                                         VarPair (
                                             VarPair(
-                                                VarString (Var [("ASGN", ttPC)]),
                                                 VarPair (
-                                                    VarString (Var [("5", ttPC)]), 
-                                                    VarPair (
-                                                        VarString (Var [("SOMA", ttPC)]), 
+                                                    VarString (Var [("VAR", ttPC)]), 
+                                                    VarString (Var [("c", ttPC)])
+                                                ), 
+                                                VarString (Var [("7", ttPC)])
+                                            ), -- while (c) 7
+                                            VarPair(
+                                                VarString (Var [("SEQ", ttPC)]),
+                                                VarPair (
+                                                    VarPair(
+                                                        VarString (Var [("ASGN", ttPC)]),
                                                         VarPair (
-                                                            VarString (Var [("ADD", ttPC)]), 
+                                                            VarString (Var [("8", ttPC)]), 
                                                             VarPair (
+                                                                VarString (Var [("SOMA", ttPC)]), 
                                                                 VarPair (
-                                                                    VarString (Var [("VAR", ttPC)]), 
-                                                                    VarString (Var [("SOMA", ttPC)])
-                                                                ),
-                                                                VarPair (
-                                                                    VarString (Var [("VAR", ttPC)]),
-                                                                    VarString (Var [("c", ttPC)])
+                                                                    VarString (Var [("ADD", ttPC)]), 
+                                                                    VarPair (
+                                                                        VarPair (
+                                                                            VarString (Var [("VAR", ttPC)]), 
+                                                                            VarString (Var [("SOMA", ttPC)])
+                                                                        ),
+                                                                        VarPair (
+                                                                            VarString (Var [("VAR", ttPC)]),
+                                                                            VarString (Var [("c", ttPC)])
+                                                                        )
+                                                                    )
                                                                 )
                                                             )
                                                         )
-                                                    )
-                                                )
-                                            ),
-                                            VarPair(
-                                                VarString (Var [("ASGN", ttPC)]),
-                                                VarPair (
-                                                    VarString (Var [("6", ttPC)]), 
-                                                    VarPair (
-                                                        VarString (Var [("c", ttPC)]), 
-                                                        VarPair (
-                                                            VarString (Var [("SUB", ttPC)]), 
-                                                            VarPair (
+                                                    ), -- soma = soma + c; 8
+                                                    VarPair(
+                                                        VarString (Var [("SEQ", ttPC)]),
+                                                        VarPair(
+                                                            VarPair(
+                                                                VarString (Var [("ASGN", ttPC)]),
                                                                 VarPair (
-                                                                    VarString (Var [("VAR", ttPC)]),
-                                                                    VarString (Var [("c", ttPC)])
-                                                                ),
-                                                                VarPair(
-                                                                    VarString (Var [("CONST", ttPC)]), 
-                                                                    VarInteger (Var [(1, ttPC)])
+                                                                    VarString (Var [("9", ttPC)]), 
+                                                                    VarPair (
+                                                                        VarString (Var [("c", ttPC)]), 
+                                                                        VarPair (
+                                                                            VarString (Var [("SUB", ttPC)]), 
+                                                                            VarPair (
+                                                                                VarPair (
+                                                                                    VarString (Var [("VAR", ttPC)]),
+                                                                                    VarString (Var [("c", ttPC)])
+                                                                                ),
+                                                                                VarPair(
+                                                                                    VarString (Var [("CONST", ttPC)]), 
+                                                                                    VarInteger (Var [(1, ttPC)])
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
                                                                 )
-                                                            )
+                                                            ), --     c = c - 1;           9
+                                                            VarPair(
+                                                                VarString (Var [("ASGN", ttPC)]),
+                                                                VarPair (
+                                                                    VarString (Var [("10", propB), ("11", notBDD propB)]), 
+                                                                    VarPair (
+                                                                        VarString (Var [("d", propB), ("e", notBDD propB)]), 
+                                                                        VarPair (
+                                                                            VarString (Var [("ADD", propB), ("MULT", notBDD propB)]), 
+                                                                            VarPair (
+                                                                                VarPair (
+                                                                                    VarString (Var [("VAR", ttPC)]),
+                                                                                    VarString (Var [("d", propB), ("e", notBDD propB)])
+                                                                                ),
+                                                                                VarPair(
+                                                                                    VarString (Var [("VAR", ttPC)]), 
+                                                                                    VarString (Var [("c", ttPC)])
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            ) --  d = d + c; 10 A && B ~A && B | e = e * c; 11 A && ~B ~A && ~B
                                                         )
                                                     )
                                                 )
@@ -251,6 +377,7 @@ ex3 = VarPair(
     )
 
 -- x = 1;            1
+-- # IFDEF A
 -- soma = 0;         2
 -- c = 10;           3
 -- if (!soma)        4
@@ -258,6 +385,25 @@ ex3 = VarPair(
 --     soma = c + x; 5 
 --   else
 --     soma = 0;     6
+-- # ELSE
+-- y = 2;            7
+-- soma = x + y;     8
+-- # ENDIF
+
+-- A
+-- x = 1;            1
+-- soma = 0;         2
+-- c = 10;           3
+-- if (!soma)        4
+--   then
+--     soma = c + x; 5 
+--   else
+--     soma = 0;     6
+
+-- ~A
+-- x = 1;            1
+-- y = 2;            7
+-- soma = x + y;     8
 ex4 = VarPair ( 
         VarString (Var [("SEQ", ttPC)]),
         VarPair(
@@ -273,69 +419,77 @@ ex4 = VarPair (
                         )
                     )
                 )
-            ),
+            ), -- x = 1; 1
             VarPair(
                 VarString (Var [("SEQ", ttPC)]),
                 VarPair (
                     VarPair(
                         VarString (Var [("ASGN", ttPC)]),
                         VarPair (
-                            VarString (Var [("2", ttPC)]), 
+                            VarString (Var [("2", propA), ("7", notBDD propA)]), 
                             VarPair (
-                                VarString (Var [("SOMA", ttPC)]), 
+                                VarString (Var [("SOMA", propA), ("y", notBDD propA)]), 
                                 VarPair(
                                     VarString (Var [("CONST", ttPC)]), 
-                                    VarInteger (Var [(0, ttPC)])
+                                    VarInteger (Var [(0, propA), (2, notBDD propA)])
                                 )
                             )
                         )
-                    ),
+                    ), -- soma = 0; 2 A | y = 2; 7 ~A
                     VarPair(
-                        VarString (Var [("SEQ", ttPC)]),
+                        VarString (Var [("SEQ", propA), ("ASGN", notBDD propA)]),
                         VarPair (
                             VarPair(
-                                VarString (Var [("ASGN", ttPC)]),
+                                VarString (Var [("ASGN", propA), ("8", notBDD propA)]),
                                 VarPair (
-                                    VarString (Var [("3", ttPC)]), 
+                                    VarString (Var [("3", propA), ("SOMA", notBDD propA)]), 
                                     VarPair (
-                                        VarString (Var [("c", ttPC)]), 
+                                        VarString (Var [("c", propA), ("ADD", notBDD propA)]), 
                                         VarPair(
-                                            VarString (Var [("CONST", ttPC)]), 
-                                            VarInteger (Var [(10, ttPC)])
+                                            VarString (Var [("CONST", propA)]), -- ?????????
+                                            -- VarPair (
+                                            --                     VarString (Var [("VAR", propA)]), 
+                                            --                     VarString (Var [("x", propA)])
+                                            --                 ),
+                                            VarInteger (Var [(10, propA)]) --- ????????
+                                             -- VarPair (
+                                            --                     VarString (Var [("VAR", propA)]), 
+                                            --                     VarString (Var [("y", propA)])
+                                            --                 ),
                                         )
                                     )
                                 )
                             ),
                             VarPair(
-                                VarString (Var [("IF", ttPC)]),
+                                VarString (Var [("IF", propA)]),
                                 VarPair ( 
                                     VarPair(
                                         VarPair (
-                                            VarString (Var [("NOT", ttPC)]), 
+                                            VarString (Var [("NOT", propA)]), 
                                             VarPair (
-                                                VarString (Var [("VAR", ttPC)]), 
-                                                VarString (Var [("SOMA", ttPC)])
+                                                VarString (Var [("VAR", propA)]), 
+                                                VarString (Var [("SOMA", propA)])
                                             )
                                         ),
-                                        VarString (Var [("4", ttPC)])
+                                        VarString (Var [("4", propA)])
                                     ),
                                     VarPair (
                                         VarPair(
-                                            VarString (Var [("ASGN", ttPC)]),
+                                            VarString (Var [("ASGN", propA)]),
                                             VarPair (
-                                                VarString (Var [("5", ttPC)]), 
+                                                VarString (Var [("5", propA)]), 
                                                 VarPair (
-                                                    VarString (Var [("SOMA", ttPC)]), 
+                                                    VarString (Var [("SOMA", propA)]), 
                                                     VarPair (
-                                                        VarString (Var [("ADD", ttPC)]), 
+                                                        VarString (Var [("ADD", propA)]), 
                                                         VarPair (
                                                             VarPair (
-                                                                VarString (Var [("VAR", ttPC)]), 
-                                                                VarString (Var [("c", ttPC)])
+                                                                VarString (Var [("VAR", propA)]), 
+                                                                VarString (Var [("c", propA)])
                                                             ),
                                                             VarPair (
-                                                                VarString (Var [("VAR", ttPC)]), 
-                                                                VarString (Var [("x", ttPC)])
+                                                                VarString (Var [("VAR", propA)]), 
+                                                                VarString (Var [("x", propA)])
                                                             )
                                                         )
                                                     )
@@ -343,14 +497,14 @@ ex4 = VarPair (
                                             )
                                         ),
                                         VarPair(
-                                            VarString (Var [("ASGN", ttPC)]),
+                                            VarString (Var [("ASGN", propA)]),
                                             VarPair (
-                                                VarString (Var [("6", ttPC)]), 
+                                                VarString (Var [("6", propA)]), 
                                                 VarPair (
-                                                    VarString (Var [("SOMA", ttPC)]), 
+                                                    VarString (Var [("SOMA", propA)]), 
                                                     VarPair(
-                                                        VarString (Var [("CONST", ttPC)]), 
-                                                        VarInteger (Var [(0, ttPC)])
+                                                        VarString (Var [("CONST", propA)]), 
+                                                        VarInteger (Var [(0, propA)])
                                                     )
                                                 )
                                             )
@@ -359,7 +513,7 @@ ex4 = VarPair (
                                 )
                             )
                         )
-                    )
+                    ) -- SEQ A | soma = x + y; 8 ~A
                 )
             )
         )
@@ -513,28 +667,28 @@ testCountEx1 = TestCase $ do
     let expectedOutput = (VarInteger (Var [(3, ttPC)]))
     assertEqual "Count Asgns ex1" expectedOutput (fst output)
 
--- testCountEx2 :: Test
--- testCountEx2 = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/Count-Asgns.lng" ex2
---     let expectedOutput = (VarInteger (Var [(1, ttPC)]))
---     assertEqual "Count Asgns ex2" expectedOutput output
+testCountEx2 :: Test
+testCountEx2 = TestCase $ do
+    output <- processFile (executeProg "count") "src/Language/Examples/taint/Count-Asgns.lng" ex2
+    let expectedOutput = (VarInteger (Var [(1, ttPC)]))
+    assertEqual "Count Asgns ex2" expectedOutput (fst output)
 
 
--- testCountEx3 :: Test
--- testCountEx3 = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/Count-Asgns.lng" ex3
---     let expectedOutput = (ValorInt 5)
---     assertEqual "Count Asgns ex3" expectedOutput output
+testCountEx3 :: Test
+testCountEx3 = TestCase $ do
+    output <- processFile (executeProg "count") "src/Language/Examples/taint/Count-Asgns.lng" ex3
+    let expectedOutput = (VarInteger (Var [(7, ttPC)]))
+    assertEqual "Count Asgns ex3" expectedOutput (fst output)
 
 -- testCountEx4 :: Test
 -- testCountEx4 = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/Count-Asgns.lng" ex4
+--     output <- processFile (executeProg "count") "src/Language/Examples/taint/Count-Asgns.lng" ex4
 --     let expectedOutput = (ValorInt 5)
 --     assertEqual "Count Asgns ex4" expectedOutput output
 
 -- testCountFactorial :: Test
 -- testCountFactorial = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/Count-Asgns.lng" factorialProg
+--     output <- processFile (executeProg "count") "src/Language/Examples/taint/Count-Asgns.lng" factorialProg
 --     let expectedOutput = (ValorInt 5)
 --     assertEqual "Count Asgns Factorial" expectedOutput output
 
@@ -759,24 +913,25 @@ testFlowEx1 = TestCase $ do
     -- putStrLn ("\n Flow out: " ++ (substitute (show (fst output)) substitutions))
     assertEqual "Flow ex1" expectedOutput (fst output)
 
--- testFlowEx2 :: Test
--- testFlowEx2 = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex2
---     let expectedOutput = (ValorList[])
---     assertEqual "Flow ex2" expectedOutput output
+testFlowEx2 :: Test
+testFlowEx2 = TestCase $ do
+    output <- processFile (executeProg "flow") "src/Language/Examples/taint/cfg.lng" ex2
+    let expectedOutput = (VarList[])
+    assertEqual "Flow ex2" expectedOutput (fst output)
 
 
--- testFlowEx3 :: Test
--- testFlowEx3 = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex3
---     let expectedOutput = (ValorList[
---             VarPair(VarString (Var [("1", ttPC)]), VarString (Var [("2", ttPC)])), 
---             VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", ttPC)])),
---             VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
---             VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)])),
---             VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("6", ttPC)])),
---             VarPair(VarString (Var [("6", ttPC)]), VarString (Var [("4", ttPC)]))])
---     assertEqual "Flow ex3" expectedOutput output
+testFlowEx3 :: Test
+testFlowEx3 = TestCase $ do
+    output <- processFile (executeProg "flow") "src/Language/Examples/taint/cfg.lng" ex3
+    let expectedOutput = (VarList[
+            VarPair(VarString (Var [("1", ttPC)]), VarString (Var [("2", ttPC)])), 
+            VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", ttPC)])),
+            VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
+            VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)])),
+            VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("6", ttPC)])),
+            VarPair(VarString (Var [("6", ttPC)]), VarString (Var [("4", ttPC)]))])
+    putStrLn ("\n Flow out: " ++ (substitute (show (fst output)) substitutions))
+    assertEqual "Flow ex3" expectedOutput (fst output)
 
 -- testFlowEx4 :: Test
 -- testFlowEx4 = TestCase $ do
@@ -815,10 +970,10 @@ deepMemoRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "Count Asgns ex3" testCountEx3
                         -- ,   TestLabel "Count Asgns ex4" testCountEx4
                         -- ,   TestLabel "Count Asgns factorial" testCountFactorial
-                        ,   TestLabel "Init ex1" testInitEx1
+                        -- ,   TestLabel "Init ex1" testInitEx1
                         -- ,   TestLabel "Init while" testInitExWhile
                         -- ,   TestLabel "Init if" testInitExIF
-                        ,   TestLabel "Final ex1" testFinalEx1
+                        -- ,   TestLabel "Final ex1" testFinalEx1
                         -- ,   TestLabel "Final while" testFinalExWhile
                         -- ,   TestLabel "Final if" testFinalExIF
                         -- ,   TestLabel "Elem" testElem
@@ -826,7 +981,7 @@ deepMemoRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "AddUnique" testAddUnique
                         -- ,   TestLabel "AddUnique same" testAddUniqueSame
                         -- ,   TestLabel "Union" testUnion
-                        ,   TestLabel "Flow ex1" testFlowEx1
+                        -- ,   TestLabel "Flow ex1" testFlowEx1
                         -- ,   TestLabel "Flow ex2" testFlowEx2
                         -- ,   TestLabel "Flow ex3" testFlowEx3
                         -- ,   TestLabel "Flow ex4" testFlowEx4

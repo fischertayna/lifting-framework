@@ -13,5 +13,7 @@ final (prog) {
             then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
             else if (isEqual (fst (prog), "WHILE"))
                 then [snd (fst (snd (prog)))]
-                else "error"
+                else if (isEqual (fst (prog), "DUMMY"))
+                    then ["dummy"]
+                    else ["error"]
 }

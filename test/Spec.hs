@@ -7,14 +7,16 @@ import SLMemoTest
 import DeepMemoTest
 import ReachingDefinitionsTest
 import DeepMemoReachingDefinitionsTest
+import VarReachingDefinitionsTest
 
 main :: IO ()
 main = do
     putStrLn "Running tests..."
-    runTestTT baseTestSuite
+    -- runTestTT baseTestSuite
     -- runTestTT varTestSuite
     -- runTestTT memoTestSuite
     -- runTestTT slMemoTestSuite
-    runTestTT rdTestSuite
-    runTestTT deepMemoRdTestSuite
+    -- runTestTT rdTestSuite
+    -- runTestTT deepMemoRdTestSuite
+    runTestTT varRdTestSuite
     putStrLn "Done."

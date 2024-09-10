@@ -32,7 +32,13 @@ type FContext = Context Ident Function
 evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
   EInt n -> VarInteger (Var [(n, ttPC)])
-  ECon exp0 exp1  -> applyBinaryOperator VarString str context exp0 exp1 (++)
+  ECon exp0 exp1  ->
+    let val0 = evalV context exp0
+        val1 = evalV context exp1
+    in case (val0, val1) of
+        (VarString s0, VarString s1) -> applyBinaryOperator VarString str context exp0 exp1 (++)
+        (VarList l0, VarList l1) -> VarList (l0 ++ l1)
+        _ -> error "Type error in concatenation"
   EAdd exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (+)
   ESub exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (-)
   EMul exp0 exp1 -> applyBinaryOperator VarInteger int context exp0 exp1 (*)
@@ -52,6 +58,13 @@ evalV context@(vcontext, fcontext) x = case x of
     Ident "isNil" -> VarInteger (Var [(boolToInt (null ls), ttPC)])
     Ident "fst" -> f
     Ident "snd" -> s
+    Ident "isPair" -> case arg of
+        VarPair _ -> VarInteger (Var [(1, ttPC)])
+        _ -> VarInteger (Var [(0, ttPC)])
+    Ident "isEqual" -> applyEqualOperator context (pExps !! 0) (pExps !! 1)
+      --   val1 = evalV context (pExps !! 0)
+      --   val2 = evalV context (pExps !! 1)
+      -- in VarInteger (Var [(boolToInt (val1 == val2), ttPC)])
     Ident func -> evalV (paramBindings, fcontext) fExp
     where
       arg = evalV context (head pExps)
@@ -81,6 +94,34 @@ evalPV (Prog fs) input = evalV context (Call (Ident "main") [EVar (Ident "n")])
   where
     initialFContext = updatecF ([(Ident "n", input)], []) fs
     context = initialFContext
+
+applyEqualOperator :: RContext -> Exp -> Exp -> VarValor
+applyEqualOperator context exp0 exp1 =
+  let v0 = evalV context exp0
+      v1 = evalV context exp1
+  in case (v0, v1) of
+      (VarInteger vi0, VarInteger vi1) ->
+        VarInteger $ Var
+          [ (boolToInt (a == b), pc0 /\ pc1)
+          | (a, pc0) <- valList vi0
+          , (b, pc1) <- valList vi1
+          , sat (pc0 /\ pc1)
+          ]
+      (VarBool vb0, VarBool vb1) ->
+        VarInteger $ Var
+          [ (boolToInt (a == b), pc0 /\ pc1)
+          | (a, pc0) <- valList vb0
+          , (b, pc1) <- valList vb1
+          , sat (pc0 /\ pc1)
+          ]
+      (VarString vs0, VarString vs1) ->
+        VarInteger $ Var
+          [ (boolToInt (a == b), pc0 /\ pc1)
+          | (a, pc0) <- valList vs0
+          , (b, pc1) <- valList vs1
+          , sat (pc0 /\ pc1)
+          ]
+      _ -> VarInteger (Var [(0, ttPC)])
 
 applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
 applyBinaryOperator cons f context exp0 exp1 op =
