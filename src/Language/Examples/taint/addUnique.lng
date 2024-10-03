@@ -1,6 +1,11 @@
 main :: (Any, [Any]) -> [Any]
 main (prog) {
-    addUnique (fst (prog), snd (prog))
+    add (fst (prog), snd (prog))
+}
+
+add :: Any -> [Any] -> [Any]
+add (x, l) {
+    union([x], l)
 }
 
 addUnique :: Any -> [Any] -> [Any]

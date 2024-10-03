@@ -18,6 +18,7 @@ import Variability.VarTypes
     (+++),
     (++++), (||||),
     (|||), (/\), (\/),
+    union
   )
 import Prelude hiding (lookup)
 
@@ -62,9 +63,7 @@ evalV context@(vcontext, fcontext) x = case x of
         VarPair _ -> VarInteger (Var [(1, ttPC)])
         _ -> VarInteger (Var [(0, ttPC)])
     Ident "isEqual" -> applyEqualOperator context (pExps !! 0) (pExps !! 1)
-      --   val1 = evalV context (pExps !! 0)
-      --   val2 = evalV context (pExps !! 1)
-      -- in VarInteger (Var [(boolToInt (val1 == val2), ttPC)])
+    Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
     Ident func -> evalV (paramBindings, fcontext) fExp
     where
       arg = evalV context (head pExps)
@@ -123,6 +122,30 @@ applyEqualOperator context exp0 exp1 =
           ]
       _ -> VarInteger (Var [(0, ttPC)])
 
+applyUnion :: RContext -> Exp -> Exp -> VarValor
+applyUnion context exp0 exp1 =
+  let v0 = evalV context exp0
+      v1 = evalV context exp1
+  in case (v0, v1) of
+      (VarList l0, VarList l1) ->
+        VarList (unionLists l0 l1)
+      _ -> error "Union should only be used to lists"
+
+unionLists :: [VarValor] -> [VarValor] -> [VarValor]
+unionLists xs l
+  = foldl
+      (\ l x
+         -> if elemInList x l
+            then l
+            else x : l)
+      l xs
+
+elemInList :: VarValor -> [VarValor] -> Bool
+elemInList _ [] = False
+elemInList x (y:ys)
+  | x == y    = True
+  | otherwise = elemInList x ys
+
 applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
 applyBinaryOperator cons f context exp0 exp1 op =
   cons (Var
@@ -155,7 +178,7 @@ partition (VarBool (Var lvint)) =
     (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
-    
+
 
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing

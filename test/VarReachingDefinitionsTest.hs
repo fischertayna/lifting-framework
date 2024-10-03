@@ -303,6 +303,44 @@ ex3 = VarPair(
         )
     )
     
+testElem :: Test
+testElem = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/elem.lng" (VarPair (
+                                                        VarInteger (Var [(1, propA), (2, notBDD propA)]),
+                                                        VarList [VarBool (Var [(True, ttPC)]), VarString (Var [("2", ttPC)]), VarInteger (Var [(1, ttPC)])]
+                                                    ))
+    let expectedOutput = (VarInteger (Var [(1, propA), (0, notBDD propA)]))
+    -- putStrLn ("\n elem: " ++ (substitute (show output) substitutions))
+    assertEqual "elem" expectedOutput output
+
+testAddUnique :: Test
+testAddUnique = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (VarPair (
+                                                        VarInteger (Var [(1, propA), (2, notBDD propA)]),
+                                                        VarList [VarBool (Var [(True, ttPC)]), VarString (Var [("2", ttPC)]), VarInteger (Var [(1, ttPC)])]
+                                                    ))
+    putStrLn ("\n addUnique: " ++ (substitute (show output) substitutions))
+    let expectedOutput = (VarList [VarBool (Var [(True, ttPC)]), VarString (Var [("2", ttPC)]), VarInteger (Var [(1, ttPC)])])
+    assertEqual "addUnique" expectedOutput output
+
+-- testAddUniqueSame :: Test
+-- testAddUniqueSame = TestCase $ do
+--     output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (ValorPair(
+--             ValorStr "b",
+--             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+--         ))
+--     let expectedOutput = (ValorList [ValorBool True, ValorStr "b", ValorInt 4])
+--     assertEqual "addUnique same" expectedOutput output
+
+-- testUnion :: Test
+-- testUnion = TestCase $ do
+--     output <- processFile executeProg "src/Language/Examples/taint/union.lng" (ValorPair(
+--             ValorList [ValorStr "a", ValorStr "b", ValorInt 1],
+--             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+--         ))
+--     let expectedOutput = (ValorList [ValorStr "a", ValorStr "b", ValorInt 1, ValorBool True, ValorInt 4])
+--     assertEqual "union" expectedOutput output
+
 
 testIsPair :: Test
 testIsPair = TestCase $ do
@@ -432,6 +470,10 @@ testFlowEx3 = TestCase $ do
 
 varRdTestSuite :: Test
 varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
+                        ,   TestLabel "Elem" testElem
+                        ,   TestLabel "AddUnique" testAddUnique
+                        -- ,   TestLabel "AddUnique same" testAddUniqueSame
+                        -- ,   TestLabel "Union" testUnion
                         ,   TestLabel "is equal 1" testIsEqual1
                         ,   TestLabel "is equal 2" testIsEqual2
                         ,   TestLabel "is equal 3" testIsEqual3

@@ -15,7 +15,7 @@ flow (prog) {
                     then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
                     else if (isEqual (fst (prog), "SKIP"))
                         then []
-                        else ["error" ++ fst (prog)]
+                        else ["error " ++ fst (prog)]
 }
 
 makeSetOfLabels :: String -> [String] -> [(String, String)]
@@ -25,29 +25,6 @@ makeSetOfLabels (init, finals) {
         else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
 }
 
-
-union :: [Any] -> [Any] -> [Any]
-union (l1, l2) {
-    if (isNil(l2))
-        then l1
-        else union (addUnique(head(l2), l1), tail(l2))
-}
-
-addUnique :: Any -> [Any] -> [Any]
-addUnique (x, l) {
-    if (elem(x, l))
-        then l
-        else l ++ [x] 
-}
-
-elem :: Any -> [Any] -> int
-elem (x, l) {
-    if (isNil(l))
-        then 0
-        else if (isEqual(head(l), x))
-            then 1
-            else elem(x, tail(l))
-}
 
 init :: Any -> String
 init (prog) {
@@ -61,7 +38,7 @@ init (prog) {
                 then snd (fst (snd (prog)))
                 else if (isEqual (fst (prog), "SKIP"))
                     then fst (snd (prog))
-                    else ("error" ++ fst (prog))
+                    else ("error " ++ fst (prog))
 }
 
 final :: Any -> [String]

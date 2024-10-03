@@ -52,9 +52,10 @@ ex1 :: VarValor
 -- #ENDIF
 -- z = x + y;  4
 
+-- The same as:
 -- x = 1;  tt    1
--- y = 2;  A    2
--- y = 4;  ~A    3
+-- y = 2;  A (complete with SKIP for ~A)
+-- y = 4;  ~A    3 (complete with SKIP for A)
 -- z = x + y;  tt 4
 ex1 = VarPair(
         VarString (Var [("SEQ", ttPC)]),
@@ -371,6 +372,63 @@ ex3 = VarPair(
                         )
 
                     )
+                )
+            )
+        )
+    )
+
+-- c = 5                  // (2)
+-- # IFDEF A             
+-- d = password;          // (3) TAINT PROPAGATION
+-- # ELSE
+-- d = "not-password";    // (4) 
+-- # ENDIF
+
+ex = VarPair(
+        VarString (Var [("SEQ", ttPC)]),
+        VarPair ( 
+            VarPair(
+                VarString (Var [("ASGN", ttPC)]),
+                VarPair (
+                    VarString (Var [("2", ttPC)]), 
+                    VarPair (
+                        VarString (Var [("c", ttPC)]), 
+                        VarPair(
+                            VarString (Var [("CONST", ttPC)]), 
+                            VarInteger (Var [(5, ttPC)])
+                        )
+                    )
+                )
+            ), -- c = 5;  (1)
+            VarPair (
+                VarString (Var [("SEQ", ttPC)]),
+                VarPair (
+                    VarPair(
+                        VarString (Var [("ASGN", propA), ("SKIP", notBDD propA)]),
+                        VarPair (
+                            VarString (Var [("3", propA), ("DUMMY", notBDD propA)]), 
+                            VarPair (
+                                VarString (Var [("d", propA), ("DUMMY", notBDD propA)]), 
+                                VarPair(
+                                    VarString (Var [("VAR", propA), ("DUMMY", notBDD propA)]), 
+                                    VarString (Var [("password", propA), ("DUMMY", notBDD propA)])
+                                )
+                            )
+                        )
+                    ), -- d = password;          // (3)
+                    VarPair(
+                        VarString (Var [("SKIP", propA), ("ASGN", notBDD propA)]),
+                        VarPair (
+                            VarString (Var [("DUMMY", propA), ("4", notBDD propA)]), 
+                            VarPair (
+                                VarString (Var [("DUMMY", propA), ("d", notBDD propA)]), 
+                                VarPair(
+                                    VarString (Var [("DUMMY", propA), ("CONST", notBDD propA)]), 
+                                    VarString (Var [("DUMMY", propA), ("not-password", notBDD propA)])
+                                )
+                            )
+                        )
+                    ) -- d = "not-password";    // (4) 
                 )
             )
         )
