@@ -3,14 +3,14 @@ main (input) {
     killRD (fst(input), assigments(snd(input)))
 }
 
-killRD :: Any -> [(String, String)] -> [(String, [String])]
+killRD :: Any -> [(String, int)] -> [(String, int)]
 killRD (block, assigments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), 0 - 1)], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
         else []
 }
 
-assigments :: Any -> [(String, String)]
+assigments :: Any -> [(String, int)]
 assigments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
@@ -25,7 +25,7 @@ assigments (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-filterRD :: String -> String -> [(String, String)] -> [(String, String)]
+filterRD :: String -> int -> [(String, int)] -> [(String, int)]
 filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []
@@ -35,7 +35,7 @@ filterRD (var, l, assigns) {
 }
 
 
-filterRDv2 :: String -> String -> [(String, String)] -> [(String, String)]
+filterRDv2 :: String -> String -> [(String, int)] -> [(String, int)]
 filterRDv2 (var, l, assigns) {
     if (isNil(assigns))
         then []

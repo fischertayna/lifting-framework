@@ -3,11 +3,11 @@ main (prog) {
     makeSetOfFV (fv (prog))
 }
 
-makeSetOfFV :: [String] -> [(String, String)]
+makeSetOfFV :: [String] -> [(String, int)]
 makeSetOfFV (fvs) {
     if (isNil(fvs))
         then []
-        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
+        else [(head (fvs), 0 - 1)] ++ makeSetOfFV(tail(fvs))
 }
 
 fv :: Any -> [String]

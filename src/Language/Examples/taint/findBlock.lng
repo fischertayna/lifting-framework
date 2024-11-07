@@ -3,7 +3,7 @@ main (prog) {
     findBlock (fst(prog), snd(prog))
 }
 
-findBlock :: String -> Any -> [Any]
+findBlock :: int -> Any -> [Any]
 findBlock (l, prog) {
     if (isEqual (fst (prog), "ASGN"))
         then if (isEqual (fst (snd (prog)), l))

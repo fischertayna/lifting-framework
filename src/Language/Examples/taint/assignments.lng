@@ -1,9 +1,9 @@
-main :: Any -> [(String, String)]
+main :: Any -> [(String, int)]
 main (prog) {
     assigments (prog)
 }
 
-assigments :: Any -> [(String, String)]
+assigments :: Any -> [(String, int)]
 assigments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]

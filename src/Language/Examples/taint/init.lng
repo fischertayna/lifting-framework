@@ -3,7 +3,7 @@ main (prog) {
     init (prog)
 }
 
-init :: Any -> String
+init :: Any -> int
 init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))

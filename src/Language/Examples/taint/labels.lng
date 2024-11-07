@@ -3,7 +3,7 @@ main (prog) {
     labels (prog)
 }
 
-labels :: Any -> [String]
+labels :: Any -> [int]
 labels (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]

@@ -3,7 +3,7 @@ main (prog) {
     genRD (prog)
 }
 
-genRD :: Any -> [(String, [String])]
+genRD :: Any -> [(String, int)]
 genRD (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]

@@ -3,7 +3,7 @@ main (prog) {
     flow (prog)
 }
 
-flow :: Any -> [Any]
+flow :: Any -> [(int, int)]
 flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then []
@@ -18,7 +18,7 @@ flow (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-makeSetOfLabels :: String -> [String] -> [(String, String)]
+makeSetOfLabels :: int -> [int] -> [(int, int)]
 makeSetOfLabels (init, finals) {
     if (isNil(finals))
         then []
@@ -26,7 +26,7 @@ makeSetOfLabels (init, finals) {
 }
 
 
-init :: Any -> String
+init :: Any -> int
 init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))
@@ -41,7 +41,7 @@ init (prog) {
                     else ("error " ++ fst (prog))
 }
 
-final :: Any -> [String]
+final :: Any -> [int]
 final (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]

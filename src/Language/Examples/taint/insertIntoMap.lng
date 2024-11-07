@@ -3,7 +3,7 @@ main (prog) {
     insertIntoMap (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+insertIntoMap :: int -> [(String, int)] -> [(int, [(String, int)])] -> [(int, [(String, int)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
         then []
