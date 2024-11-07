@@ -81,8 +81,6 @@ eval context@(vcontext, fcontext) x = case x of
         val1 = eval context (pExps !! 0)
         val2 = eval context (pExps !! 1)
       in ValorInt (boolToInt (val1 == val2))
-    Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
-    Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> eval (paramBindings, fcontext) fExp
     where
       arg = eval context (head pExps)
@@ -90,42 +88,6 @@ eval context@(vcontext, fcontext) x = case x of
       (f,s) = p arg
       (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (eval context) pExps)
-
-applyUnion :: RContext -> Exp -> Exp -> Valor
-applyUnion context exp0 exp1 =
-  let v0 = eval context exp0
-      v1 = eval context exp1
-  in case (v0, v1) of
-      (ValorList l0, ValorList l1) ->
-        ValorList (unionLists l0 l1)
-      _ -> error "Union should only be used to lists"
-
-unionLists :: [Valor] -> [Valor] -> [Valor]
-unionLists xs l
-  = foldl
-      (\ l x
-         -> if elemInList x l
-            then l
-            else x : l)
-      l xs
-
-elemInList :: Valor -> [Valor] -> Bool
-elemInList _ [] = False
-elemInList x (y:ys)
-  | x == y    = True
-  | otherwise = elemInList x ys
-
-applyDifference :: RContext -> Exp -> Exp -> Valor
-applyDifference context exp0 exp1 =
-  let v0 = eval context exp0
-      v1 = eval context exp1
-  in case (v0, v1) of
-      (ValorList l0, ValorList l1) ->
-        ValorList (differenceLists l0 l1)
-      _ -> error "Difference should only be used on lists"
-
-differenceLists :: [Valor] -> [Valor] -> [Valor]
-differenceLists xs ys = filter (\x -> not (elemInList x ys)) xs
 
 boolToInt :: Bool -> Integer
 boolToInt b
