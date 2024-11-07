@@ -1,36 +1,30 @@
 main :: Any -> [Any]
 main (prog) {
-    reachingDefinitions (prog)
+    updateMappings(prog, labels(prog), ([],[]))
 }
 
-reachingDefinitions :: Any -> ([(String, [String])], [(String, [String])])
-reachingDefinitions(prog) {
-    chaoticIteration(prog, [])
-}
-
-chaoticIteration :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
-chaoticIteration (prog, x) {
-    if (isEqual ((f (prog, x)), x))
-        then x
-        else chaoticIteration (f (prog, x))
-}
-
-f :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
-f (prog, rd) {
-
-}
-
-updateMappings :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
-updateMappings(prog, old) {
-
+updateMappings :: Any -> [String] -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
+updateMappings(prog, labels, mappings) {
+    if (isNil(labels))
+        then mappings
+        else updateMappings(prog, tail(labels), updateMappingsForLabel(prog, head(labels), mappings))
 }
 
 updateMappingsForLabel :: Any -> String -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
 updateMappingsForLabel(prog, l, old) {
-    (rdEntry(l, prog, snd(old)) ++ fst(old), rdExit(l, prog, fst(old)) ++ snd(old))
+    (insertIntoMap(l, rdEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, rdExit(l, prog, fst(old)), snd(old)))
 }
 
-rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+insertIntoMap (key, value, map) {
+    if (isNil(map))
+        then [(key, value)]
+        else if (isEqual(fst(head(map)), key))
+            then [(key, snd(head(map)) ++ value)] ++ tail(map)
+            else [head(map)] ++ insertIntoMap(key, value, tail(map))
+}
+
+rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdEntry (l, prog, exit) {
     if (isEqual (l, init(prog)))
         then makeSetOfFV(fv(prog))
@@ -149,7 +143,7 @@ final (prog) {
                     else ["error" ++ fst (prog)]
 }
 
-rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExit (l, prog, entry) {
     rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
 }

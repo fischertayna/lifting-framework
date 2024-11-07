@@ -3,7 +3,7 @@ main (prog) {
     rdEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdEntry (l, prog, exit) {
     if (isEqual (l, init(prog)))
         then makeSetOfFV(fv(prog))

@@ -1,16 +1,27 @@
 main :: Any -> int
-main (value) {
-    chaoticIteration (value)
+main (input) {
+    chaoticIteration (fst(input), snd(input))
 }
 
-reflexive :: Any -> Any
-reflexive (value) {
-    value
+dumb :: Any -> Any
+dumb (value) {
+    if (isEqual(value, 2))
+        then value + 1
+        else if (isEqual(value, 3))
+            then value + 1
+            else value
 }
 
-chaoticIteration :: Any -> Any
-chaoticIteration (x) {
-    if (isEqual ((reflexive (x)), x))
+chaoticIteration :: int -> Any -> Any
+chaoticIteration (tries, x) {
+    if (isEqual(tries, 0))
         then x
-        else chaoticIteration (reflexive (x))
+        else chaoticRecursion(tries - 1, dumb(x), x)
+}
+
+chaoticRecursion :: int -> Any -> Any
+chaoticRecursion (tries, y, x) {
+    if (isEqual (y, x))
+        then x
+        else chaoticIteration(tries, y)
 }

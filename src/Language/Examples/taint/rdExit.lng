@@ -3,12 +3,12 @@ main (prog) {
     rdExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExit (l, prog, entry) {
     rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
 }
 
-rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
     union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
 }

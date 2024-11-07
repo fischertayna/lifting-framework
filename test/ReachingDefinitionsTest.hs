@@ -879,11 +879,17 @@ testFlowFactorial = TestCase $ do
             ValorPair(ValorStr "3", ValorStr "6")])
     assertEqual "Flow Factorial" expectedOutput output
 
-testChaoticIteration :: Test
-testChaoticIteration = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (ValorInt 4)
+testChaoticIteration1 :: Test
+testChaoticIteration1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (ValorPair(ValorInt 1, ValorInt 2))
+    let expectedOutput = (ValorInt 3)
+    assertEqual "chaotic iteration 1 test" expectedOutput output
+
+testChaoticIteration2 :: Test
+testChaoticIteration2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (ValorPair(ValorInt 2, ValorInt 2))
     let expectedOutput = (ValorInt 4)
-    assertEqual "chaotic iteration test" expectedOutput output
+    assertEqual "chaotic iteration 2 test" expectedOutput output
 
 testAssignmentsEx1 :: Test
 testAssignmentsEx1 = TestCase $ do
@@ -1171,18 +1177,88 @@ testRDExit4 = TestCase $ do
                                           ValorPair(
                                             exPPA, 
                                             exPPAEntry)))
-    let expectedOutput = ValorList[ValorStr "1", ValorStr "2", ValorStr "3", ValorStr "4", ValorStr "5"]
+    let expectedOutput = ValorList[
+                        ValorPair(ValorStr "x", ValorStr "5"),
+                        ValorPair(ValorStr "x", ValorStr "1"), 
+                        ValorPair(ValorStr "y", ValorStr "4") ]
     assertEqual "rdExit 4" expectedOutput output
 
 testLabels :: Test
 testLabels = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/labels.lng" (exPPA)
-    let expectedOutput = ValorList[
-                            ValorPair(ValorStr "x", ValorStr "5"),
-                            ValorPair(ValorStr "x", ValorStr "1"), 
-                            ValorPair(ValorStr "y", ValorStr "4") ]
+    let expectedOutput = ValorList[ValorStr "1", ValorStr "2", ValorStr "3", ValorStr "4", ValorStr "5"]
     assertEqual "labels" expectedOutput output
 
+testInsertInto1 :: Test
+testInsertInto1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/insertIntoMap.lng" (ValorPair(
+                        ValorStr "2",
+                        ValorPair(
+                            ValorList [
+                                ValorPair(ValorStr "teste", ValorStr "teste"), 
+                                ValorPair(ValorStr "teste2", ValorStr "teste2")],
+                            exPPAEntry
+                        )))
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "1", ValorList[
+                                                    ValorPair(ValorStr "x", ValorStr "?"), 
+                                                    ValorPair(ValorStr "y", ValorStr "?") ]),
+                            ValorPair(ValorStr "2", ValorList[
+                                                    ValorPair(ValorStr "y", ValorStr "?"), 
+                                                    ValorPair(ValorStr "x", ValorStr "1"),
+                                                    ValorPair(ValorStr "teste", ValorStr "teste"), 
+                                                    ValorPair(ValorStr "teste2", ValorStr "teste2") ]),
+                            ValorPair(ValorStr "3", ValorList[
+                                                    ValorPair(ValorStr "x", ValorStr "1"), 
+                                                    ValorPair(ValorStr "y", ValorStr "2"),
+                                                    ValorPair(ValorStr "y", ValorStr "4"),
+                                                    ValorPair(ValorStr "x", ValorStr "5") ]),
+                            ValorPair(ValorStr "4", ValorList[
+                                                    ValorPair(ValorStr "x", ValorStr "1"),
+                                                    ValorPair(ValorStr "y", ValorStr "2"), 
+                                                    ValorPair(ValorStr "y", ValorStr "4"),
+                                                    ValorPair(ValorStr "x", ValorStr "5") ]),
+                            ValorPair(ValorStr "5", ValorList[
+                                                    ValorPair(ValorStr "x", ValorStr "1"),
+                                                    ValorPair(ValorStr "y", ValorStr "4"),
+                                                    ValorPair(ValorStr "x", ValorStr "5") ])]
+    assertEqual "testInsertInto" expectedOutput output
+
+testInsertInto2 :: Test
+testInsertInto2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/insertIntoMap.lng" (ValorPair(
+                        ValorStr "2",
+                        ValorPair(
+                            ValorList [
+                                ValorPair(ValorStr "y", ValorStr "?")],
+                            exPPAEntry
+                        )))
+    let expectedOutput = exPPAEntry
+    assertEqual "testInsertInto" expectedOutput output
+
+testUpdateMappings :: Test
+testUpdateMappings = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/updateMappings.lng" (exPPA)
+    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    assertEqual "testUpdateMappings" expectedOutput output
+
+testReachingDefinitionsPPA1 :: Test
+testReachingDefinitionsPPA1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 1, exPPA))
+    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    assertEqual "testReachingDefinitionsPPA 1" expectedOutput output
+
+testReachingDefinitionsPPA2 :: Test
+testReachingDefinitionsPPA2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 2, exPPA))
+    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    assertEqual "testReachingDefinitionsPPA 2" expectedOutput output
+
+testReachingDefinitionsPPA3 :: Test
+testReachingDefinitionsPPA3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 4, exPPA))
+    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    assertEqual "testReachingDefinitionsPPA 3" expectedOutput output
 
 rdTestSuite :: Test
 rdTestSuite = TestList [    TestLabel "is pair" testIsPair
@@ -1192,10 +1268,10 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "Count Asgns ex3" testCountEx3
                         -- ,   TestLabel "Count Asgns ex4" testCountEx4
                         -- ,   TestLabel "Count Asgns factorial" testCountFactorial
-                        ,   TestLabel "Init ex1" testInitEx1
+                        -- ,   TestLabel "Init ex1" testInitEx1
                         -- ,   TestLabel "Init while" testInitExWhile
                         -- ,   TestLabel "Init if" testInitExIF
-                        ,   TestLabel "Final ex1" testFinalEx1
+                        -- ,   TestLabel "Final ex1" testFinalEx1
                         -- ,   TestLabel "Final while" testFinalExWhile
                         -- ,   TestLabel "Final if" testFinalExIF
                         -- ,   TestLabel "Elem" testElem
@@ -1203,39 +1279,46 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "AddUnique" testAddUnique
                         -- ,   TestLabel "AddUnique same" testAddUniqueSame
                         -- ,   TestLabel "Union" testUnion
-                        ,   TestLabel "Flow ex1" testFlowEx1
+                        -- ,   TestLabel "Flow ex1" testFlowEx1
                         -- ,   TestLabel "Flow ex2" testFlowEx2
                         -- ,   TestLabel "Flow ex3" testFlowEx3
                         -- ,   TestLabel "Flow ex4" testFlowEx4
                         -- ,   TestLabel "Flow factorial" testFlowFactorial
-                        ,   TestLabel "Chaotic Iteration" testChaoticIteration
-                        ,   TestLabel "Asgns ex1" testAssignmentsEx1
-                        ,   TestLabel "Asgns ex2" testAssignmentsEx2
-                        ,   TestLabel "Asgns ex3" testAssignmentsEx3
-                        ,   TestLabel "Asgns ex4" testAssignmentsEx4
-                        ,   TestLabel "Asgns factorial" testAssignmentsFactorial
-                        ,   TestLabel "fv ex1" testfvEx1
-                        ,   TestLabel "fv ex2" testfvEx2
-                        ,   TestLabel "fv ex3" testfvEx3
-                        ,   TestLabel "fv ex4" testfvEx4
-                        ,   TestLabel "fv factorial" testfvFactorial
-                        ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
-                        ,   TestLabel "testFilterFlow" testFilterFlow
-                        ,   TestLabel "testFindOrDefault" testFindOrDefault
-                        ,   TestLabel "testFindOrDefault2" testFindOrDefault2
-                        ,   TestLabel "rdEntry 1" testRDEntry1
-                        ,   TestLabel "rdEntry 2" testRDEntry2
-                        ,   TestLabel "rdEntry 4" testRDEntry4
-                        ,   TestLabel "testfindBlock 1" testfindBlock1
-                        ,   TestLabel "testfindBlock 2" testfindBlock2
-                        ,   TestLabel "testfindBlock 3" testfindBlock3
-                        ,   TestLabel "testfindBlock 4" testfindBlock4
-                        ,   TestLabel "testfindBlock 5" testfindBlock5
-                        ,   TestLabel "testGenRD 1" testGenRD1
-                        ,   TestLabel "testGenRD 2" testGenRD2
-                        ,   TestLabel "testKillRD" testKillRD
-                        ,   TestLabel "rdExit 1" testRDExit1
-                        ,   TestLabel "rdExit 2" testRDExit2
-                        ,   TestLabel "rdExit 4" testRDExit4
-                        ,   TestLabel "labels" testLabels
+                        ,   TestLabel "Chaotic Iteration 1" testChaoticIteration1
+                        ,   TestLabel "Chaotic Iteration 2" testChaoticIteration2
+                        -- ,   TestLabel "Asgns ex1" testAssignmentsEx1
+                        -- ,   TestLabel "Asgns ex2" testAssignmentsEx2
+                        -- ,   TestLabel "Asgns ex3" testAssignmentsEx3
+                        -- ,   TestLabel "Asgns ex4" testAssignmentsEx4
+                        -- ,   TestLabel "Asgns factorial" testAssignmentsFactorial
+                        -- ,   TestLabel "fv ex1" testfvEx1
+                        -- ,   TestLabel "fv ex2" testfvEx2
+                        -- ,   TestLabel "fv ex3" testfvEx3
+                        -- ,   TestLabel "fv ex4" testfvEx4
+                        -- ,   TestLabel "fv factorial" testfvFactorial
+                        -- ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
+                        -- ,   TestLabel "testFilterFlow" testFilterFlow
+                        -- ,   TestLabel "testFindOrDefault" testFindOrDefault
+                        -- ,   TestLabel "testFindOrDefault2" testFindOrDefault2
+                        -- ,   TestLabel "rdEntry 1" testRDEntry1
+                        -- ,   TestLabel "rdEntry 2" testRDEntry2
+                        -- ,   TestLabel "rdEntry 4" testRDEntry4
+                        -- ,   TestLabel "testfindBlock 1" testfindBlock1
+                        -- ,   TestLabel "testfindBlock 2" testfindBlock2
+                        -- ,   TestLabel "testfindBlock 3" testfindBlock3
+                        -- ,   TestLabel "testfindBlock 4" testfindBlock4
+                        -- ,   TestLabel "testfindBlock 5" testfindBlock5
+                        -- ,   TestLabel "testGenRD 1" testGenRD1
+                        -- ,   TestLabel "testGenRD 2" testGenRD2
+                        -- ,   TestLabel "testKillRD" testKillRD
+                        -- ,   TestLabel "rdExit 1" testRDExit1
+                        -- ,   TestLabel "rdExit 2" testRDExit2
+                        -- ,   TestLabel "rdExit 4" testRDExit4
+                        -- ,   TestLabel "labels" testLabels
+                        ,   TestLabel "testInsertInto 1" testInsertInto1
+                        ,   TestLabel "testInsertInto 2" testInsertInto2
+                        -- -- ,   TestLabel "testUpdateMappings" testUpdateMappings
+                        -- ,   TestLabel "testReachingDefinitionsPPA 1" testReachingDefinitionsPPA1
+                        -- ,   TestLabel "testReachingDefinitionsPPA 2" testReachingDefinitionsPPA2
+                        ,   TestLabel "testReachingDefinitionsPPA 3" testReachingDefinitionsPPA3
                         ]

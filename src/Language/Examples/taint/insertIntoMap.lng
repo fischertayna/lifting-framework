@@ -1,0 +1,38 @@
+main :: Any -> int
+main (prog) {
+    insertIntoMap (fst(prog), fst(snd(prog)), snd(snd(prog)))
+}
+
+insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+insertIntoMap (key, value, map) {
+    if (isNil(map))
+        then []
+        else if (isEqual(fst(head(map)), key))
+            then [(key, combineLists(value, snd(head(map))))] ++ tail(map)
+            else [head(map)] ++ insertIntoMap(key, value, tail(map))
+}
+
+combineLists :: [Any] -> [Any] -> [Any]
+combineLists (l1, l2) {
+    if (isNil(l1))
+        then l2
+        else combineLists(tail(l1), addUnique(head(l1), l2))
+}
+
+addUnique :: Any -> [Any] -> [Any]
+addUnique (x, l) {
+    if (elem(x, l))
+        then l
+        else l ++ [x] 
+}
+
+elem :: Any -> [Any] -> int
+elem (x, l) {
+    if (isNil(l))
+        then 0
+        else if (isEqual(head(l), x))
+            then 1
+            else elem(x, tail(l))
+}
+
+
