@@ -1242,23 +1242,11 @@ testUpdateMappings = TestCase $ do
     let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
     assertEqual "testUpdateMappings" expectedOutput output
 
-testReachingDefinitionsPPA1 :: Test
-testReachingDefinitionsPPA1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 1, exPPA))
+testReachingDefinitionsPPA :: Test
+testReachingDefinitionsPPA = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 10, exPPA))
     let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
-    assertEqual "testReachingDefinitionsPPA 1" expectedOutput output
-
-testReachingDefinitionsPPA2 :: Test
-testReachingDefinitionsPPA2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 2, exPPA))
-    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
-    assertEqual "testReachingDefinitionsPPA 2" expectedOutput output
-
-testReachingDefinitionsPPA3 :: Test
-testReachingDefinitionsPPA3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (ValorPair(ValorInt 4, exPPA))
-    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
-    assertEqual "testReachingDefinitionsPPA 3" expectedOutput output
+    assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
 rdTestSuite :: Test
 rdTestSuite = TestList [    TestLabel "is pair" testIsPair
@@ -1318,7 +1306,5 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "testInsertInto 1" testInsertInto1
                         ,   TestLabel "testInsertInto 2" testInsertInto2
                         -- ,   TestLabel "testUpdateMappings" testUpdateMappings
-                        -- ,   TestLabel "testReachingDefinitionsPPA 1" testReachingDefinitionsPPA1
-                        -- ,   TestLabel "testReachingDefinitionsPPA 2" testReachingDefinitionsPPA2
-                        -- ,   TestLabel "testReachingDefinitionsPPA 3" testReachingDefinitionsPPA3
+                        ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
                         ]

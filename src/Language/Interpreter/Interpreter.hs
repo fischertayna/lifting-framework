@@ -33,7 +33,7 @@ data Valor
     | ValorPair
         { p :: (Valor, Valor)
         }
-    deriving (Show, Eq)
+    deriving (Show, Eq, Ord)
 
 evalP :: Program -> Valor -> Valor
 evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
@@ -81,6 +81,10 @@ eval context@(vcontext, fcontext) x = case x of
         val1 = eval context (pExps !! 0)
         val2 = eval context (pExps !! 1)
       in ValorInt (boolToInt (val1 == val2))
+    Ident "lt" -> let
+        val1 = eval context (pExps !! 0)
+        val2 = eval context (pExps !! 1)
+      in ValorInt (boolToInt (val1 < val2))
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
     Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> eval (paramBindings, fcontext) fExp
