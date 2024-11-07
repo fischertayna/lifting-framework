@@ -1,6 +1,6 @@
 main :: Any -> int
 main (value) {
-    chaoticIteration (reflexive, value)
+    chaoticIteration (value)
 }
 
 reflexive :: Any -> Any
@@ -8,9 +8,9 @@ reflexive (value) {
     value
 }
 
-chaoticIteration :: (t -> t) -> t -> t
-chaoticIteration (f, x) {
-    if (isEqual ((f (x)), x))
+chaoticIteration :: Any -> Any
+chaoticIteration (x) {
+    if (isEqual ((reflexive (x)), x))
         then x
-        else chaoticIteration (f, (f (x)))
+        else chaoticIteration (reflexive (x))
 }

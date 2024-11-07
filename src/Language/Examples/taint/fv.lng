@@ -1,0 +1,30 @@
+main :: Any -> [String]
+main (prog) {
+    fv (prog)
+}
+
+fv :: Any -> [String]
+fv (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then union ([fst (snd (snd (prog)))], getVarFromAExp(snd (snd (snd (prog)))))
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then union(fv (fst (snd (snd (prog)))), fv (snd (snd (snd (prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then fv(snd(snd (prog)))
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error " ++ fst (prog)]
+}
+
+
+getVarFromAExp :: Any -> [Any]
+getVarFromAExp (aexp) {
+    if (isEqual (fst (aexp), "VAR"))
+        then [snd (aexp)]
+        else if (isEqual (fst (aexp), "CONST"))
+            then []
+            else getVarFromAExp(fst (snd(aexp))) ++ getVarFromAExp(snd (snd(aexp)))
+
+}

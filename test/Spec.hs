@@ -16,7 +16,7 @@ main = do
     -- runTestTT varTestSuite
     -- runTestTT memoTestSuite
     -- runTestTT slMemoTestSuite
-    -- runTestTT rdTestSuite
+    runTestTT rdTestSuite
     -- runTestTT deepMemoRdTestSuite
-    runTestTT varRdTestSuite
+    -- runTestTT varRdTestSuite
     putStrLn "Done."

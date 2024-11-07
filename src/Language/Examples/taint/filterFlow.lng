@@ -1,0 +1,13 @@
+main :: Any -> Any
+main (input) {
+    filterFlow (fst(input), snd(input))
+}
+
+filterFlow :: String -> [(String, String)] -> [(String, String)]
+filterFlow (l, fl) {
+    if (isNil(fl))
+        then []
+        else if (isEqual(snd (head (fl)), l))
+            then [head (fl)] ++ filterFlow(l, tail(fl))
+            else filterFlow(l, tail(fl))
+}

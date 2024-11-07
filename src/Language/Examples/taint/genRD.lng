@@ -1,0 +1,11 @@
+main :: Any -> int
+main (prog) {
+    genRD (prog)
+}
+
+genRD :: Any -> [(String, [String])]
+genRD (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+        else []
+}

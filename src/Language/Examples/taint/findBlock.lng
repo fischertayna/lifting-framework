@@ -1,0 +1,23 @@
+main :: Any -> Any
+main (prog) {
+    findBlock (fst(prog), snd(prog))
+}
+
+findBlock :: String -> Any -> [Any]
+findBlock (l, prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then if (isEqual (fst (snd (prog)), l))
+            then [prog]
+            else []
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(findBlock(l, fst(snd (prog))), findBlock(l, snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then if (isEqual (snd (fst (snd (prog))), l))
+                    then [fst (fst (snd (prog)))]
+                    else union(findBlock(l, fst(snd (snd (prog)))), findBlock(l, snd(snd(snd(prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then if (isEqual (snd (fst (snd (prog))), l))
+                        then [fst (fst (snd (prog)))] 
+                        else findBlock(l, snd(snd (prog)))
+                    else []
+}

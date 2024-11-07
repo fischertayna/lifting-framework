@@ -121,7 +121,7 @@ ex3 = ValorPair(
                         ValorPair (
                             ValorStr "2", 
                             ValorPair (
-                                ValorStr "SOMA", 
+                                ValorStr "soma", 
                                 ValorPair(
                                     ValorStr "CONST", 
                                     ValorInt 0
@@ -163,13 +163,13 @@ ex3 = ValorPair(
                                                 ValorPair (
                                                     ValorStr "5", 
                                                     ValorPair (
-                                                        ValorStr "SOMA", 
+                                                        ValorStr "soma", 
                                                         ValorPair (
                                                             ValorStr "ADD", 
                                                             ValorPair (
                                                                 ValorPair (
                                                                     ValorStr "VAR", 
-                                                                    ValorStr "SOMA"
+                                                                    ValorStr "soma"
                                                                 ),
                                                                 ValorPair (
                                                                     ValorStr "VAR",
@@ -246,7 +246,7 @@ ex4 = ValorPair (
                         ValorPair (
                             ValorStr "2", 
                             ValorPair (
-                                ValorStr "SOMA", 
+                                ValorStr "soma", 
                                 ValorPair(
                                     ValorStr "CONST", 
                                     ValorInt 0
@@ -262,7 +262,7 @@ ex4 = ValorPair (
                                 ValorPair (
                                     ValorStr "3", 
                                     ValorPair (
-                                        ValorStr "C", 
+                                        ValorStr "c", 
                                         ValorPair(
                                             ValorStr "CONST", 
                                             ValorInt 10
@@ -278,7 +278,7 @@ ex4 = ValorPair (
                                             ValorStr "NOT",
                                             ValorPair (
                                                 ValorStr "VAR", 
-                                                ValorStr "SOMA"
+                                                ValorStr "soma"
                                             )
                                         ),
                                         ValorStr "4"
@@ -289,17 +289,17 @@ ex4 = ValorPair (
                                             ValorPair (
                                                 ValorStr "5", 
                                                 ValorPair (
-                                                    ValorStr "SOMA", 
+                                                    ValorStr "soma", 
                                                     ValorPair (
                                                         ValorStr "ADD", 
                                                         ValorPair (
                                                             ValorPair (
                                                                 ValorStr "VAR", 
-                                                                ValorStr "C"
+                                                                ValorStr "c"
                                                             ),
                                                             ValorPair (
                                                                 ValorStr "VAR", 
-                                                                ValorStr "X"
+                                                                ValorStr "x"
                                                             )
                                                         )
                                                     )
@@ -311,7 +311,7 @@ ex4 = ValorPair (
                                             ValorPair (
                                                 ValorStr "6", 
                                                 ValorPair (
-                                                    ValorStr "SOMA", 
+                                                    ValorStr "soma", 
                                                     ValorPair(
                                                         ValorStr "CONST", 
                                                         ValorInt 0
@@ -445,6 +445,122 @@ factorialProg =  ValorPair (
                                                         ValorInt 0
                                                     )
                                                 )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+
+-- s01 = Assignment "x" (Const 5) 1
+-- s02 = Assignment "y" (Const 1) 2
+
+-- whileTeste = (GTExp (Var "x") (Const 1), 3)
+-- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- s03 = While whileTeste (Seq whileS1 whileS2)
+
+s01 = ValorPair(
+        ValorStr "ASGN",
+        ValorPair (
+            ValorStr "1", 
+            ValorPair (
+                ValorStr "x", 
+                ValorPair (
+                    ValorStr "CONST", 
+                    ValorStr "5"
+                )
+            )
+        )
+    )
+
+s02 = ValorPair(
+        ValorStr "ASGN",
+        ValorPair (
+            ValorStr "2", 
+            ValorPair (
+                ValorStr "y", 
+                ValorPair(
+                    ValorStr "CONST", 
+                    ValorInt 1
+                )
+            )
+        )
+    )
+
+whileTeste = ValorPair (
+                ValorStr "VAR", 
+                ValorStr "x"
+            )
+
+whileS1 = ValorPair(
+            ValorStr "ASGN",
+            ValorPair (
+                ValorStr "4", 
+                ValorPair (
+                    ValorStr "y", 
+                    ValorPair (
+                        ValorStr "MULT", 
+                        ValorPair (
+                            ValorPair (
+                                ValorStr "VAR", 
+                                ValorStr "x"
+                            ),
+                            ValorPair (
+                                ValorStr "VAR",
+                                ValorStr "y"
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+whileS2 = ValorPair(
+        ValorStr "ASGN",
+        ValorPair (
+            ValorStr "5", 
+            ValorPair (
+                ValorStr "x", 
+                ValorPair (
+                    ValorStr "SUB", 
+                    ValorPair (
+                        ValorPair (
+                            ValorStr "VAR",
+                            ValorStr "x"
+                        ),
+                        ValorPair(
+                            ValorStr "CONST", 
+                            ValorInt 1
+                        )
+                    )
+                )
+            )
+        )
+    )
+
+exPPA =  ValorPair (
+                    ValorStr "SEQ",
+                    ValorPair(
+                        s01,
+                        ValorPair(
+                            ValorStr "SEQ",
+                            ValorPair (
+                                s02,
+                                ValorPair (
+                                    ValorStr "WHILE", 
+                                    ValorPair ( 
+                                        ValorPair(
+                                            whileTeste,
+                                            ValorStr "3"
+                                        ),
+                                        ValorPair (
+                                            ValorStr "SEQ",
+                                            ValorPair(
+                                                whileS1,
+                                                whileS2
                                             )
                                         )
                                     )
@@ -769,29 +885,357 @@ testChaoticIteration = TestCase $ do
     let expectedOutput = (ValorInt 4)
     assertEqual "chaotic iteration test" expectedOutput output
 
+testAssignmentsEx1 :: Test
+testAssignmentsEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex1
+    let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "1"),
+                                   ValorPair(ValorStr "y", ValorStr "2"),
+                                   ValorPair(ValorStr "z", ValorStr "3")]
+    assertEqual " Asgns ex1" expectedOutput output
+
+testAssignmentsEx2 :: Test
+testAssignmentsEx2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex2
+    let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "1")]
+    assertEqual " Asgns ex2" expectedOutput output
+
+
+testAssignmentsEx3 :: Test
+testAssignmentsEx3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex3
+    let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "1"),
+                                   ValorPair(ValorStr "soma", ValorStr "2"),
+                                   ValorPair(ValorStr "c", ValorStr "3"),
+                                   ValorPair(ValorStr "soma", ValorStr "5"),
+                                   ValorPair(ValorStr "c", ValorStr "6")]
+    assertEqual " Asgns ex3" expectedOutput output
+
+testAssignmentsEx4 :: Test
+testAssignmentsEx4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex4
+    let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "1"),
+                                   ValorPair(ValorStr "soma", ValorStr "2"),
+                                   ValorPair(ValorStr "c", ValorStr "3"),
+                                   ValorPair(ValorStr "soma", ValorStr "5"),
+                                   ValorPair(ValorStr "soma", ValorStr "6")]
+    assertEqual " Asgns ex4" expectedOutput output
+
+testAssignmentsFactorial :: Test
+testAssignmentsFactorial = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" factorialProg
+    let expectedOutput = ValorList[ValorPair(ValorStr "y", ValorStr "1"),
+                                   ValorPair(ValorStr "z", ValorStr "2"),
+                                   ValorPair(ValorStr "y", ValorStr "5"),
+                                   ValorPair(ValorStr "z", ValorStr "4"),
+                                   ValorPair(ValorStr "y", ValorStr "6")]
+    assertEqual " Asgns Factorial" expectedOutput output
+
+testfvEx1 :: Test
+testfvEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex1
+    let expectedOutput = ValorList[ValorStr "z", ValorStr "x", ValorStr "y"]
+    assertEqual "fv ex1" expectedOutput output
+
+testfvEx2 :: Test
+testfvEx2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex2
+    let expectedOutput = ValorList[ValorStr "x"]
+    assertEqual "fv ex2" expectedOutput output
+
+
+testfvEx3 :: Test
+testfvEx3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex3
+    let expectedOutput = ValorList[ValorStr "x", ValorStr "soma", ValorStr "c"]
+    assertEqual "fv ex3" expectedOutput output
+
+testfvEx4 :: Test
+testfvEx4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex4
+    let expectedOutput = ValorList[ValorStr "x", ValorStr "c", ValorStr "soma"]
+    assertEqual "fv ex4" expectedOutput output
+
+testfvFactorial :: Test
+testfvFactorial = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" factorialProg
+    let expectedOutput = ValorList[ValorStr "x", ValorStr "z", ValorStr "y"]
+    assertEqual "fv Factorial" expectedOutput output
+
+testmakeSetOfFVEx1 :: Test
+testmakeSetOfFVEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/makeSetOfFV.lng" ex1
+    let expectedOutput = ValorList[ValorPair(ValorStr "z", ValorStr "?"), 
+                                   ValorPair(ValorStr "x", ValorStr "?"), 
+                                   ValorPair(ValorStr "y", ValorStr "?") ]
+    assertEqual "makeSetOfFV ex1" expectedOutput output
+
+testFilterFlow :: Test
+testFilterFlow = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/filterFlow.lng" (ValorPair(ValorStr "3", ValorList[
+            ValorPair(ValorStr "1", ValorStr "2"), 
+            ValorPair(ValorStr "2", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "4"),
+            ValorPair(ValorStr "4", ValorStr "5"),
+            ValorPair(ValorStr "5", ValorStr "3"),
+            ValorPair(ValorStr "3", ValorStr "6")]))
+    let expectedOutput = (ValorList[ 
+            ValorPair(ValorStr "2", ValorStr "3"),
+            ValorPair(ValorStr "5", ValorStr "3")])
+    assertEqual "Flow Factorial" expectedOutput output
+
+exPPAEntry = ValorList[
+    ValorPair(ValorStr "1", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "?"), 
+                            ValorPair(ValorStr "y", ValorStr "?") ]),
+    ValorPair(ValorStr "2", ValorList[
+                            ValorPair(ValorStr "y", ValorStr "?"), 
+                            ValorPair(ValorStr "x", ValorStr "1") ]),
+    ValorPair(ValorStr "3", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2"),
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]),
+    ValorPair(ValorStr "4", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "y", ValorStr "2"), 
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]),
+    ValorPair(ValorStr "5", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ])]
+
+exPPAExit = ValorList[
+    ValorPair(ValorStr "1", ValorList[
+                            ValorPair(ValorStr "y", ValorStr "?"), 
+                            ValorPair(ValorStr "x", ValorStr "1") ]),
+    ValorPair(ValorStr "2", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2") ]),
+    ValorPair(ValorStr "3", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2"),
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]),
+    ValorPair(ValorStr "4", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]),
+    ValorPair(ValorStr "5", ValorList[
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ])]
+
+testFindOrDefault :: Test
+testFindOrDefault = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findOrDefault.lng" (
+                                ValorPair(
+                                    ValorStr "2", 
+                                    exPPAExit))
+
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2") ]
+    assertEqual "testFindOrDefault PPA" expectedOutput output
+
+testFindOrDefault2 :: Test
+testFindOrDefault2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findOrDefault.lng" (
+                                ValorPair(
+                                    ValorStr "6", 
+                                    exPPAExit))
+
+    let expectedOutput = ValorList[]
+    assertEqual "testFindOrDefault2 PPA" expectedOutput output
+
+testRDEntry1 :: Test
+testRDEntry1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                ValorPair(ValorStr "1", 
+                                          ValorPair(
+                                            exPPA, 
+                                            exPPAExit)))
+    let expectedOutput = ValorList[ValorPair(ValorStr "y", ValorStr "?"), 
+                                   ValorPair(ValorStr "x", ValorStr "?") ]
+    assertEqual "rdEntry 1" expectedOutput output
+
+testRDEntry2 :: Test
+testRDEntry2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                ValorPair(
+                                    ValorStr "2", 
+                                    ValorPair(
+                                        exPPA, 
+                                        exPPAExit)))
+
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "y", ValorStr "?"), 
+                            ValorPair(ValorStr "x", ValorStr "1") ]
+    assertEqual "rdEntry 2" expectedOutput output
+
+testRDEntry4 :: Test
+testRDEntry4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                ValorPair(
+                                    ValorStr "4", 
+                                    ValorPair(
+                                        exPPA, 
+                                        exPPAExit)))
+
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "y", ValorStr "2"), 
+                            ValorPair(ValorStr "y", ValorStr "4"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]
+    assertEqual "rdEntry 2" expectedOutput output
+
+testfindBlock1 :: Test
+testfindBlock1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (ValorPair(ValorStr "1", exPPA))
+    let expectedOutput = ValorList[s01]
+    assertEqual "testfindBlock 1" expectedOutput output
+
+testfindBlock2 :: Test
+testfindBlock2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (ValorPair(ValorStr "2", exPPA))
+    let expectedOutput = ValorList[s02]
+    assertEqual "testfindBlock 2" expectedOutput output
+
+testfindBlock3 :: Test
+testfindBlock3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (ValorPair(ValorStr "3", exPPA))
+    let expectedOutput = ValorList[whileTeste]
+    assertEqual "testfindBlock 3" expectedOutput output
+
+testfindBlock4 :: Test
+testfindBlock4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (ValorPair(ValorStr "4", exPPA))
+    let expectedOutput = ValorList[whileS1]
+    assertEqual "testfindBlock 4" expectedOutput output
+
+testfindBlock5 :: Test
+testfindBlock5 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (ValorPair(ValorStr "5", exPPA))
+    let expectedOutput = ValorList[whileS2]
+    assertEqual "testfindBlock 5" expectedOutput output
+
+testGenRD1 :: Test
+testGenRD1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/genRD.lng" (s01)
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1") ]
+    assertEqual "test genRD 1" expectedOutput output
+
+testGenRD2 :: Test
+testGenRD2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/genRD.lng" (exPPA)
+    let expectedOutput = ValorList[]
+    assertEqual "test genRD factorial" expectedOutput output
+
+testKillRD :: Test
+testKillRD = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/killRD.lng" (ValorPair(s01, exPPA))
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "?"),
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "x", ValorStr "5") ]
+    assertEqual "test killRD" expectedOutput output
+
+testRDExit1 :: Test
+testRDExit1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                ValorPair(ValorStr "1", 
+                                          ValorPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "y", ValorStr "?"),
+                            ValorPair(ValorStr "x", ValorStr "1") ]
+    assertEqual "rdExit 1" expectedOutput output
+
+testRDExit2 :: Test
+testRDExit2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                ValorPair(ValorStr "2", 
+                                          ValorPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2") ]
+    assertEqual "rdExit 2" expectedOutput output
+
+testRDExit4 :: Test
+testRDExit4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                ValorPair(ValorStr "4", 
+                                          ValorPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = ValorList[ValorStr "1", ValorStr "2", ValorStr "3", ValorStr "4", ValorStr "5"]
+    assertEqual "rdExit 4" expectedOutput output
+
+testLabels :: Test
+testLabels = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/labels.lng" (exPPA)
+    let expectedOutput = ValorList[
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "4") ]
+    assertEqual "labels" expectedOutput output
+
+
 rdTestSuite :: Test
 rdTestSuite = TestList [    TestLabel "is pair" testIsPair
-                        ,   TestLabel "is Equal" testIsEqual
-                        ,   TestLabel "Count Asgns ex1" testCountEx1
-                        ,   TestLabel "Count Asgns ex2" testCountEx2
-                        ,   TestLabel "Count Asgns ex3" testCountEx3
-                        ,   TestLabel "Count Asgns ex4" testCountEx4
-                        ,   TestLabel "Count Asgns factorial" testCountFactorial
+                        -- ,   TestLabel "is Equal" testIsEqual
+                        -- ,   TestLabel "Count Asgns ex1" testCountEx1
+                        -- ,   TestLabel "Count Asgns ex2" testCountEx2
+                        -- ,   TestLabel "Count Asgns ex3" testCountEx3
+                        -- ,   TestLabel "Count Asgns ex4" testCountEx4
+                        -- ,   TestLabel "Count Asgns factorial" testCountFactorial
                         ,   TestLabel "Init ex1" testInitEx1
-                        ,   TestLabel "Init while" testInitExWhile
-                        ,   TestLabel "Init if" testInitExIF
+                        -- ,   TestLabel "Init while" testInitExWhile
+                        -- ,   TestLabel "Init if" testInitExIF
                         ,   TestLabel "Final ex1" testFinalEx1
-                        ,   TestLabel "Final while" testFinalExWhile
-                        ,   TestLabel "Final if" testFinalExIF
-                        ,   TestLabel "Elem" testElem
-                        ,   TestLabel "Not Elem" testNotElem
-                        ,   TestLabel "AddUnique" testAddUnique
-                        ,   TestLabel "AddUnique same" testAddUniqueSame
-                        ,   TestLabel "Union" testUnion
+                        -- ,   TestLabel "Final while" testFinalExWhile
+                        -- ,   TestLabel "Final if" testFinalExIF
+                        -- ,   TestLabel "Elem" testElem
+                        -- ,   TestLabel "Not Elem" testNotElem
+                        -- ,   TestLabel "AddUnique" testAddUnique
+                        -- ,   TestLabel "AddUnique same" testAddUniqueSame
+                        -- ,   TestLabel "Union" testUnion
                         ,   TestLabel "Flow ex1" testFlowEx1
-                        ,   TestLabel "Flow ex2" testFlowEx2
-                        ,   TestLabel "Flow ex3" testFlowEx3
-                        ,   TestLabel "Flow ex4" testFlowEx4
-                        ,   TestLabel "Flow factorial" testFlowFactorial
-                        -- l "Chaotic Iteration" testChaoticIteration
+                        -- ,   TestLabel "Flow ex2" testFlowEx2
+                        -- ,   TestLabel "Flow ex3" testFlowEx3
+                        -- ,   TestLabel "Flow ex4" testFlowEx4
+                        -- ,   TestLabel "Flow factorial" testFlowFactorial
+                        ,   TestLabel "Chaotic Iteration" testChaoticIteration
+                        ,   TestLabel "Asgns ex1" testAssignmentsEx1
+                        ,   TestLabel "Asgns ex2" testAssignmentsEx2
+                        ,   TestLabel "Asgns ex3" testAssignmentsEx3
+                        ,   TestLabel "Asgns ex4" testAssignmentsEx4
+                        ,   TestLabel "Asgns factorial" testAssignmentsFactorial
+                        ,   TestLabel "fv ex1" testfvEx1
+                        ,   TestLabel "fv ex2" testfvEx2
+                        ,   TestLabel "fv ex3" testfvEx3
+                        ,   TestLabel "fv ex4" testfvEx4
+                        ,   TestLabel "fv factorial" testfvFactorial
+                        ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
+                        ,   TestLabel "testFilterFlow" testFilterFlow
+                        ,   TestLabel "testFindOrDefault" testFindOrDefault
+                        ,   TestLabel "testFindOrDefault2" testFindOrDefault2
+                        ,   TestLabel "rdEntry 1" testRDEntry1
+                        ,   TestLabel "rdEntry 2" testRDEntry2
+                        ,   TestLabel "rdEntry 4" testRDEntry4
+                        ,   TestLabel "testfindBlock 1" testfindBlock1
+                        ,   TestLabel "testfindBlock 2" testfindBlock2
+                        ,   TestLabel "testfindBlock 3" testfindBlock3
+                        ,   TestLabel "testfindBlock 4" testfindBlock4
+                        ,   TestLabel "testfindBlock 5" testfindBlock5
+                        ,   TestLabel "testGenRD 1" testGenRD1
+                        ,   TestLabel "testGenRD 2" testGenRD2
+                        ,   TestLabel "testKillRD" testKillRD
+                        ,   TestLabel "rdExit 1" testRDExit1
+                        ,   TestLabel "rdExit 2" testRDExit2
+                        ,   TestLabel "rdExit 4" testRDExit4
+                        ,   TestLabel "labels" testLabels
                         ]

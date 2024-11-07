@@ -31,7 +31,6 @@ EFalse. Exp7 ::= "False" ;
 Tbool. Type ::= "bool" ;
 Tint.  Type ::= "int" ;
 TStr.  Type ::= "String" ;
-TAny. Type ::= "Any" ;
 TFun.  Type ::= Function ;
 TPair. Type ::= "(" Type "," Type ")" ;
 TList. Type ::= "[" Type "]" ;

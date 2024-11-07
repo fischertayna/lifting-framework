@@ -1,0 +1,19 @@
+main :: Any -> [(String, String)]
+main (prog) {
+    assigments (prog)
+}
+
+assigments :: Any -> [(String, String)]
+assigments (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then assigments(snd(snd (prog)))
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error " ++ fst (prog)]
+}

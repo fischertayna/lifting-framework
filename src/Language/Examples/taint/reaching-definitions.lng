@@ -1,0 +1,242 @@
+main :: Any -> [Any]
+main (prog) {
+    reachingDefinitions (prog)
+}
+
+reachingDefinitions :: Any -> ([(String, [String])], [(String, [String])])
+reachingDefinitions(prog) {
+    chaoticIteration(prog, [])
+}
+
+chaoticIteration :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
+chaoticIteration (prog, x) {
+    if (isEqual ((f (prog, x)), x))
+        then x
+        else chaoticIteration (f (prog, x))
+}
+
+f :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
+f (prog, rd) {
+
+}
+
+updateMappings :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
+updateMappings(prog, old) {
+
+}
+
+updateMappingsForLabel :: Any -> String -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
+updateMappingsForLabel(prog, l, old) {
+    (rdEntry(l, prog, snd(old)) ++ fst(old), rdExit(l, prog, fst(old)) ++ snd(old))
+}
+
+rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdEntry (l, prog, exit) {
+    if (isEqual (l, init(prog)))
+        then makeSetOfFV(fv(prog))
+        else findInExit(filterFlow(l, flow(prog)), exit)
+}
+
+makeSetOfFV :: [String] -> [(String, String)]
+makeSetOfFV (fvs) {
+    if (isNil(fvs))
+        then []
+        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
+}
+
+findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findInExit (fl, exit) {
+    if (isNil(fl))
+        then []
+        else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
+}
+
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
+findOrDefault (l, exit) {
+    if (isNil(exit))
+        then []
+        else if (isEqual(fst (head (exit)), l))
+            then snd (head (exit))
+            else findOrDefault(l, tail(exit))
+}
+
+
+filterFlow :: String -> [(String, String)] -> [(String, String)]
+filterFlow (l, fl) {
+    if (isNil(fl))
+        then []
+        else if (isEqual(snd (head (fl)), l))
+            then [head (fl)] ++ filterFlow(l, tail(fl))
+            else filterFlow(l, tail(fl))
+}
+
+fv :: Any -> [String]
+fv (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then union ([fst (snd (snd (prog)))], getVarFromAExp(snd (snd (snd (prog)))))
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then union(fv (fst (snd (snd (prog)))), fv (snd (snd (snd (prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then fv(snd(snd (prog)))
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error " ++ fst (prog)]
+}
+
+
+getVarFromAExp :: Any -> [Any]
+getVarFromAExp (aexp) {
+    if (isEqual (fst (aexp), "VAR"))
+        then [snd (aexp)]
+        else if (isEqual (fst (aexp), "CONST"))
+            then []
+            else getVarFromAExp(fst (snd(aexp))) ++ getVarFromAExp(snd (snd(aexp)))
+
+}
+
+flow :: Any -> [(String, String)]
+flow (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then []
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(flow(fst(snd (prog))), union(makeSetOfLabels(init(snd(snd(prog))), final(fst(snd (prog)))), flow(snd (snd (prog)))))
+            else if (isEqual (fst (prog), "IF"))
+                then union([(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))], union(flow (fst (snd (snd (prog)))), union([(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))], flow (snd (snd (snd (prog)))))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error " ++ fst (prog)]
+}
+
+makeSetOfLabels :: String -> [String] -> [(String, String)]
+makeSetOfLabels (init, finals) {
+    if (isNil(finals))
+        then []
+        else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
+}
+
+
+init :: Any -> String
+init (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then fst (snd (prog))
+    else if (isEqual (fst (prog), "SEQ"))
+        then init (fst (snd (prog)))
+        else if (isEqual (fst (prog), "IF"))
+            then snd (fst (snd (prog)))
+            else if (isEqual (fst (prog), "WHILE"))
+                then snd (fst (snd (prog)))
+                else if (isEqual (fst (prog), "SKIP"))
+                    then fst (snd (prog))
+                    else ("error " ++ fst (prog))
+}
+
+final :: Any -> [String]
+final (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then [fst (snd (prog))]
+    else if (isEqual (fst (prog), "SEQ"))
+        then final (snd (snd (prog)))
+        else if (isEqual (fst (prog), "IF"))
+            then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
+            else if (isEqual (fst (prog), "WHILE"))
+                then [snd (fst (snd (prog)))]
+                else if (isEqual (fst (prog), "SKIP"))
+                    then [fst (snd (prog))]
+                    else ["error" ++ fst (prog)]
+}
+
+rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdExit (l, prog, entry) {
+    rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
+}
+
+rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, [(String, String)])]
+rdExitWithBlock (l, prog, entry, block) {
+    union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
+}
+
+findBlock :: String -> Any -> [Any]
+findBlock (l, prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then if (isEqual (fst (snd (prog)), l))
+            then [prog]
+            else []
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(findBlock(l, fst(snd (prog))), findBlock(l, snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then if (isEqual (snd (fst (snd (prog))), l))
+                    then [fst (fst (snd (prog)))]
+                    else union(findBlock(l, fst(snd (snd (prog)))), findBlock(l, snd(snd(snd(prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then if (isEqual (snd (fst (snd (prog))), l))
+                        then [fst (fst (snd (prog)))] 
+                        else findBlock(l, snd(snd (prog)))
+                    else []
+}
+
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
+findOrDefault (l, exit) {
+    if (isNil(exit))
+        then []
+        else if (isEqual(fst (head (exit)), l))
+            then snd (head (exit))
+            else findOrDefault(l, tail(exit))
+}
+
+
+killRD :: Any -> [(String, String)] -> [(String, [String])]
+killRD (block, assigments) {
+    if (isEqual (fst (block), "ASGN"))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        else []
+}
+
+assigments :: Any -> [(String, String)]
+assigments (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+        else if (isEqual (fst (prog), "SEQ"))
+            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
+            else if (isEqual (fst (prog), "IF"))
+                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
+                else if (isEqual (fst (prog), "WHILE"))
+                    then assigments(snd(snd (prog)))
+                    else if (isEqual (fst (prog), "SKIP"))
+                        then []
+                        else ["error " ++ fst (prog)]
+}
+
+filterRD :: String -> String -> [(String, String)] -> [(String, String)]
+filterRD (var, l, assigns) {
+    if (isNil(assigns))
+        then []
+        else if (isEqual(fst(head(assigns)), var))
+            then [head (assigns)] ++ filterRD(var, l, tail(assigns))
+            else filterRD(var, l, tail(assigns))
+}
+
+genRD :: Any -> [(String, [String])]
+genRD (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+        else []
+}
+
+labels :: Any -> [String]
+labels (prog) {
+    if (isEqual (fst (prog), "ASGN"))
+    then [fst (snd (prog))]
+    else if (isEqual (fst (prog), "SEQ"))
+        then labels (fst (snd (prog))) ++ labels (snd (snd (prog)))
+        else if (isEqual (fst (prog), "IF"))
+            then [snd (fst (snd (prog)))] ++ union(labels (fst (snd (snd (prog)))), labels (snd (snd (snd (prog)))))
+            else if (isEqual (fst (prog), "WHILE"))
+                then [snd (fst (snd (prog)))] ++ labels(snd(snd (prog)))
+                else if (isEqual (fst (prog), "SKIP"))
+                    then []
+                    else []
+}
