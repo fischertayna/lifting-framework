@@ -63,7 +63,9 @@ evalV context@(vcontext, fcontext) x = case x of
         VarPair _ -> VarInteger (Var [(1, ttPC)])
         _ -> VarInteger (Var [(0, ttPC)])
     Ident "isEqual" -> applyEqualOperator context (pExps !! 0) (pExps !! 1)
+    Ident "lt" -> applyLtOperator context (pExps !! 0) (pExps !! 1)
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
+    Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> evalV (paramBindings, fcontext) fExp
     where
       arg = evalV context (head pExps)
@@ -122,6 +124,34 @@ applyEqualOperator context exp0 exp1 =
           ]
       _ -> VarInteger (Var [(0, ttPC)])
 
+applyLtOperator :: RContext -> Exp -> Exp -> VarValor
+applyLtOperator context exp0 exp1 =
+  let v0 = evalV context exp0
+      v1 = evalV context exp1
+  in case (v0, v1) of
+      (VarInteger vi0, VarInteger vi1) ->
+        VarInteger $ Var
+          [ (boolToInt (a < b), pc0 /\ pc1)
+          | (a, pc0) <- valList vi0
+          , (b, pc1) <- valList vi1
+          , sat (pc0 /\ pc1)
+          ]
+      (VarBool vb0, VarBool vb1) ->
+        VarInteger $ Var
+          [ (boolToInt (a < b), pc0 /\ pc1)
+          | (a, pc0) <- valList vb0
+          , (b, pc1) <- valList vb1
+          , sat (pc0 /\ pc1)
+          ]
+      (VarString vs0, VarString vs1) ->
+        VarInteger $ Var
+          [ (boolToInt (a < b), pc0 /\ pc1)
+          | (a, pc0) <- valList vs0
+          , (b, pc1) <- valList vs1
+          , sat (pc0 /\ pc1)
+          ]
+      _ -> VarInteger (Var [(0, ttPC)])
+
 applyUnion :: RContext -> Exp -> Exp -> VarValor
 applyUnion context exp0 exp1 =
   let v0 = evalV context exp0
@@ -145,6 +175,18 @@ elemInList _ [] = False
 elemInList x (y:ys)
   | x == y    = True
   | otherwise = elemInList x ys
+
+applyDifference :: RContext -> Exp -> Exp -> VarValor
+applyDifference context exp0 exp1 =
+  let v0 = evalV context exp0
+      v1 = evalV context exp1
+  in case (v0, v1) of
+      (VarList l0, VarList l1) ->
+        VarList (differenceLists l0 l1)
+      _ -> error "Difference should only be used to lists"
+
+differenceLists :: [VarValor] -> [VarValor] -> [VarValor]
+differenceLists xs ys = filter (\x -> not (elemInList x ys)) xs
 
 applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext -> Exp -> Exp -> (a -> a -> a) -> VarValor
 applyBinaryOperator cons f context exp0 exp1 op =
