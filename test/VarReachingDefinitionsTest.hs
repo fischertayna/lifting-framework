@@ -302,6 +302,122 @@ ex3 = VarPair(
             )
         )
     )
+
+-- s01 = Assignment "x" (Const 5) 1
+-- s02 = Assignment "y" (Const 1) 2
+
+-- whileTeste = (GTExp (Var "x") (Const 1), 3)
+-- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- s03 = While whileTeste (Seq whileS1 whileS2)
+
+s01 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarInteger (Var [(1, ttPC)]), 
+            VarPair (
+                VarString (Var [("x", ttPC)]), 
+                VarPair (
+                    VarString (Var [("CONST", ttPC)]), 
+                    VarInteger (Var [(5, ttPC)])
+                )
+            )
+        )
+    )
+
+s02 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarInteger (Var [(2, ttPC)]), 
+            VarPair (
+                VarString (Var [("y", ttPC)]), 
+                VarPair(
+                    VarString (Var [("CONST", ttPC)]), 
+                    VarInteger (Var [(1, ttPC)])
+                )
+            )
+        )
+    )
+
+whileTeste = VarPair (
+                VarString (Var [("VAR", ttPC)]), 
+                VarString (Var [("x", ttPC)])
+            )
+
+whileS1 = VarPair(
+            VarString (Var [("ASGN", ttPC)]),
+            VarPair (
+                VarInteger (Var [(4, ttPC)]), 
+                VarPair (
+                    VarString (Var [("y", ttPC)]), 
+                    VarPair (
+                        VarString (Var [("MULT", ttPC)]), 
+                        VarPair (
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]), 
+                                VarString (Var [("x", ttPC)])
+                            ),
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]),
+                                VarString (Var [("y", ttPC)])
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+whileS2 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarInteger (Var [(5, ttPC)]), 
+            VarPair (
+                VarString (Var [("x", ttPC)]), 
+                VarPair (
+                    VarString (Var [("SUB", ttPC)]), 
+                    VarPair (
+                        VarPair (
+                            VarString (Var [("VAR", ttPC)]),
+                            VarString (Var [("x", ttPC)])
+                        ),
+                        VarPair(
+                            VarString (Var [("CONST", ttPC)]), 
+                            VarInteger (Var [(1, ttPC)])
+                        )
+                    )
+                )
+            )
+        )
+    )
+
+exPPA =  VarPair (
+                    VarString (Var [("SEQ", ttPC)]),
+                    VarPair(
+                        s01,
+                        VarPair(
+                            VarString (Var [("SEQ", ttPC)]),
+                            VarPair (
+                                s02,
+                                VarPair (
+                                    VarString (Var [("WHILE", ttPC)]), 
+                                    VarPair ( 
+                                        VarPair(
+                                            whileTeste,
+                                            VarInteger (Var [(3, ttPC)])
+                                        ),
+                                        VarPair (
+                                            VarString (Var [("SEQ", ttPC)]),
+                                            VarPair(
+                                                whileS1,
+                                                whileS2
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
     
 testElem :: Test
 testElem = TestCase $ do
@@ -325,20 +441,20 @@ testAddUnique = TestCase $ do
 
 -- testAddUniqueSame :: Test
 -- testAddUniqueSame = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (ValorPair(
+--     output <- processFile executeProg "src/Language/Examples/taint/addUnique.lng" (VarPair(
 --             ValorStr "b",
---             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+--             VarList [ValorBool True, ValorStr "b", VarInteger (Var [(4, ttPC)])]
 --         ))
---     let expectedOutput = (ValorList [ValorBool True, ValorStr "b", ValorInt 4])
+--     let expectedOutput = (VarList [ValorBool True, ValorStr "b", VarInteger (Var [(4, ttPC)])])
 --     assertEqual "addUnique same" expectedOutput output
 
 -- testUnion :: Test
 -- testUnion = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/taint/union.lng" (ValorPair(
---             ValorList [ValorStr "a", ValorStr "b", ValorInt 1],
---             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
+--     output <- processFile executeProg "src/Language/Examples/taint/union.lng" (VarPair(
+--             VarList [ValorStr "a", ValorStr "b", VarInteger (Var [(1, ttPC)])],
+--             VarList [ValorBool True, ValorStr "b", VarInteger (Var [(4, ttPC)])]
 --         ))
---     let expectedOutput = (ValorList [ValorStr "a", ValorStr "b", ValorInt 1, ValorBool True, ValorInt 4])
+--     let expectedOutput = (VarList [ValorStr "a", ValorStr "b", VarInteger (Var [(1, ttPC)]), ValorBool True, VarInteger (Var [(4, ttPC)])])
 --     assertEqual "union" expectedOutput output
 
 
@@ -467,6 +583,344 @@ testFlowEx3 = TestCase $ do
     let expectedOutput = (VarList[])
     putStrLn ("\n Flow out 3: " ++ (substitute (show output) substitutions))
     assertEqual "Flow ex3" expectedOutput output
+
+testChaoticIteration1 :: Test
+testChaoticIteration1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (VarPair(VarInteger (Var [(1, ttPC)]), VarInteger (Var [(2, ttPC)])))
+    let expectedOutput = (VarInteger (Var [(3, ttPC)]))
+    assertEqual "chaotic iteration 1 test" expectedOutput output
+
+testChaoticIteration2 :: Test
+testChaoticIteration2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/chaoticIteration.lng" (VarPair(VarInteger (Var [(2, ttPC)]), VarInteger (Var [(2, ttPC)])))
+    let expectedOutput = (VarInteger (Var [(4, ttPC)]))
+    assertEqual "chaotic iteration 2 test" expectedOutput output
+
+testAssignmentsEx1 :: Test
+testAssignmentsEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex1
+    let expectedOutput = VarList[VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                                   VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])),
+                                   VarPair(VarString (Var [("z", ttPC)]), VarInteger (Var [(3, ttPC)]))]
+    assertEqual " Asgns ex1" expectedOutput output
+
+testAssignmentsEx2 :: Test
+testAssignmentsEx2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex2
+    let expectedOutput = VarList[VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)]))]
+    assertEqual " Asgns ex2" expectedOutput output
+
+
+testAssignmentsEx3 :: Test
+testAssignmentsEx3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/assignments.lng" ex3
+    let expectedOutput = VarList[VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                                   VarPair(VarString (Var [("soma", ttPC)]), VarInteger (Var [(2, ttPC)])),
+                                   VarPair(VarString (Var [("c", ttPC)]), VarInteger (Var [(3, ttPC)])),
+                                   VarPair(VarString (Var [("soma", ttPC)]), VarInteger (Var [(5, ttPC)])),
+                                   VarPair(VarString (Var [("c", ttPC)]), VarInteger (Var [(6, ttPC)]))]
+    assertEqual " Asgns ex3" expectedOutput output
+
+
+testfvEx1 :: Test
+testfvEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex1
+    let expectedOutput = VarList[VarString (Var [("z", ttPC)]), VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])]
+    assertEqual "fv ex1" expectedOutput output
+
+testfvEx2 :: Test
+testfvEx2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex2
+    let expectedOutput = VarList[VarString (Var [("x", ttPC)])]
+    assertEqual "fv ex2" expectedOutput output
+
+
+testfvEx3 :: Test
+testfvEx3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/fv.lng" ex3
+    let expectedOutput = VarList[VarString (Var [("x", ttPC)]), VarString (Var [("soma", ttPC)]), VarString (Var [("c", ttPC)])]
+    assertEqual "fv ex3" expectedOutput output
+
+testmakeSetOfFVEx1 :: Test
+testmakeSetOfFVEx1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/makeSetOfFV.lng" ex1
+    let expectedOutput = VarList[VarPair(VarString (Var [("z", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                                   VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                                   VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])) ]
+    assertEqual "makeSetOfFV ex1" expectedOutput output
+
+testFilterFlow :: Test
+testFilterFlow = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/filterFlow.lng" (VarPair(VarInteger (Var [(3, ttPC)]), VarList[
+            VarPair(VarInteger (Var [(1, ttPC)]), VarInteger (Var [(2, ttPC)])), 
+            VarPair(VarInteger (Var [(2, ttPC)]), VarInteger (Var [(3, ttPC)])),
+            VarPair(VarInteger (Var [(3, ttPC)]), VarInteger (Var [(4, ttPC)])),
+            VarPair(VarInteger (Var [(4, ttPC)]), VarInteger (Var [(5, ttPC)])),
+            VarPair(VarInteger (Var [(5, ttPC)]), VarInteger (Var [(3, ttPC)])),
+            VarPair(VarInteger (Var [(3, ttPC)]), VarInteger (Var [(6, ttPC)]))]))
+    let expectedOutput = (VarList[ 
+            VarPair(VarInteger (Var [(2, ttPC)]), VarInteger (Var [(3, ttPC)])),
+            VarPair(VarInteger (Var [(5, ttPC)]), VarInteger (Var [(3, ttPC)]))])
+    assertEqual "Flow Factorial" expectedOutput output
+
+exPPAEntry = VarList[
+    VarPair(VarInteger (Var [(1, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])) ]),
+    VarPair(VarInteger (Var [(2, ttPC)]), VarList[
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])) ]),
+    VarPair(VarInteger (Var [(3, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])),
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+    VarPair(VarInteger (Var [(4, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+    VarPair(VarInteger (Var [(5, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ])]
+
+exPPAExit = VarList[
+    VarPair(VarInteger (Var [(1, ttPC)]), VarList[
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])) ]),
+    VarPair(VarInteger (Var [(2, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])) ]),
+    VarPair(VarInteger (Var [(3, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])),
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+    VarPair(VarInteger (Var [(4, ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+    VarPair(VarInteger (Var [(5, ttPC)]), VarList[
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ])]
+
+testFindOrDefault :: Test
+testFindOrDefault = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findOrDefault.lng" (
+                                VarPair(
+                                    VarInteger (Var [(2, ttPC)]), 
+                                    exPPAExit))
+
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])) ]
+    assertEqual "testFindOrDefault PPA" expectedOutput output
+
+testFindOrDefault2 :: Test
+testFindOrDefault2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findOrDefault.lng" (
+                                VarPair(
+                                    VarInteger (Var [(6, ttPC)]), 
+                                    exPPAExit))
+
+    let expectedOutput = VarList[]
+    assertEqual "testFindOrDefault2 PPA" expectedOutput output
+
+testRDEntry1 :: Test
+testRDEntry1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                VarPair(VarInteger (Var [(1, ttPC)]), 
+                                          VarPair(
+                                            exPPA, 
+                                            exPPAExit)))
+    let expectedOutput = VarList[VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                                   VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(-1, ttPC)])) ]
+    assertEqual "rdEntry 1" expectedOutput output
+
+testRDEntry2 :: Test
+testRDEntry2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                VarPair(
+                                    VarInteger (Var [(2, ttPC)]), 
+                                    VarPair(
+                                        exPPA, 
+                                        exPPAExit)))
+
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])) ]
+    assertEqual "rdEntry 2" expectedOutput output
+
+testRDEntry4 :: Test
+testRDEntry4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" (
+                                VarPair(
+                                    VarInteger (Var [(4, ttPC)]), 
+                                    VarPair(
+                                        exPPA, 
+                                        exPPAExit)))
+
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]
+    assertEqual "rdEntry 2" expectedOutput output
+
+testfindBlock1 :: Test
+testfindBlock1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (VarPair(VarInteger (Var [(1, ttPC)]), exPPA))
+    let expectedOutput = VarList[s01]
+    assertEqual "testfindBlock 1" expectedOutput output
+
+testfindBlock2 :: Test
+testfindBlock2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (VarPair(VarInteger (Var [(2, ttPC)]), exPPA))
+    let expectedOutput = VarList[s02]
+    assertEqual "testfindBlock 2" expectedOutput output
+
+testfindBlock3 :: Test
+testfindBlock3 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (VarPair(VarInteger (Var [(3, ttPC)]), exPPA))
+    let expectedOutput = VarList[whileTeste]
+    assertEqual "testfindBlock 3" expectedOutput output
+
+testfindBlock4 :: Test
+testfindBlock4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (VarPair(VarInteger (Var [(4, ttPC)]), exPPA))
+    let expectedOutput = VarList[whileS1]
+    assertEqual "testfindBlock 4" expectedOutput output
+
+testfindBlock5 :: Test
+testfindBlock5 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/findBlock.lng" (VarPair(VarInteger (Var [(5, ttPC)]), exPPA))
+    let expectedOutput = VarList[whileS2]
+    assertEqual "testfindBlock 5" expectedOutput output
+
+testGenRD1 :: Test
+testGenRD1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/genRD.lng" (s01)
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])) ]
+    assertEqual "test genRD 1" expectedOutput output
+
+testGenRD2 :: Test
+testGenRD2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/genRD.lng" (exPPA)
+    let expectedOutput = VarList[]
+    assertEqual "test genRD factorial" expectedOutput output
+
+testKillRD :: Test
+testKillRD = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/killRD.lng" (VarPair(s01, exPPA))
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(-1, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]
+    assertEqual "test killRD" expectedOutput output
+
+testRDExit1 :: Test
+testRDExit1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                VarPair(VarInteger (Var [(1, ttPC)]), 
+                                          VarPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])),
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])) ]
+    assertEqual "rdExit 1" expectedOutput output
+
+testRDExit2 :: Test
+testRDExit2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                VarPair(VarInteger (Var [(2, ttPC)]), 
+                                          VarPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])) ]
+    assertEqual "rdExit 2" expectedOutput output
+
+testRDExit4 :: Test
+testRDExit4 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/rdExit.lng" (
+                                VarPair(VarInteger (Var [(4, ttPC)]), 
+                                          VarPair(
+                                            exPPA, 
+                                            exPPAEntry)))
+    let expectedOutput = VarList[
+                        VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])),
+                        VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                        VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])) ]
+    assertEqual "rdExit 4" expectedOutput output
+
+testLabels :: Test
+testLabels = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/labels.lng" (exPPA)
+    let expectedOutput = VarList[VarInteger (Var [(1, ttPC)]), VarInteger (Var [(2, ttPC)]), VarInteger (Var [(3, ttPC)]), VarInteger (Var [(4, ttPC)]), VarInteger (Var [(5, ttPC)])]
+    assertEqual "labels" expectedOutput output
+
+testInsertInto1 :: Test
+testInsertInto1 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/insertIntoMap.lng" (VarPair(
+                        VarInteger (Var [(2, ttPC)]),
+                        VarPair(
+                            VarList [
+                                VarPair(VarString (Var [("teste", ttPC)]), VarString (Var [("teste", ttPC)])), 
+                                VarPair(VarString (Var [("teste2", ttPC)]), VarString (Var [("teste2", ttPC)]))],
+                            exPPAEntry
+                        )))
+    let expectedOutput = VarList[
+                            VarPair(VarInteger (Var [(1, ttPC)]), VarList[
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])) ]),
+                            VarPair(VarInteger (Var [(2, ttPC)]), VarList[
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)])), 
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                                                    VarPair(VarString (Var [("teste", ttPC)]), VarString (Var [("teste", ttPC)])), 
+                                                    VarPair(VarString (Var [("teste2", ttPC)]), VarString (Var [("teste2", ttPC)])) ]),
+                            VarPair(VarInteger (Var [(3, ttPC)]), VarList[
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])), 
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])),
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+                            VarPair(VarInteger (Var [(4, ttPC)]), VarList[
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(2, ttPC)])), 
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ]),
+                            VarPair(VarInteger (Var [(5, ttPC)]), VarList[
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(1, ttPC)])),
+                                                    VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(4, ttPC)])),
+                                                    VarPair(VarString (Var [("x", ttPC)]), VarInteger (Var [(5, ttPC)])) ])]
+    assertEqual "testInsertInto" expectedOutput output
+
+testInsertInto2 :: Test
+testInsertInto2 = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/insertIntoMap.lng" (VarPair(
+                        VarInteger (Var [(2, ttPC)]),
+                        VarPair(
+                            VarList [
+                                VarPair(VarString (Var [("y", ttPC)]), VarInteger (Var [(-1, ttPC)]))],
+                            exPPAEntry
+                        )))
+    let expectedOutput = exPPAEntry
+    assertEqual "testInsertInto" expectedOutput output
+
+testUpdateMappings :: Test
+testUpdateMappings = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/updateMappings.lng" (exPPA)
+    let expectedOutput = VarPair(exPPAEntry, exPPAExit)
+    assertEqual "testUpdateMappings" expectedOutput output
+
+testReachingDefinitionsPPA :: Test
+testReachingDefinitionsPPA = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/reachingDefinitions.lng" (VarPair(VarInteger (Var [(1, ttPC)]), exPPA))
+    let expectedOutput = VarPair(exPPAEntry, exPPAExit)
+    assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
 varRdTestSuite :: Test
 varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
