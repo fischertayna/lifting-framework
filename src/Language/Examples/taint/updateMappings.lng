@@ -15,7 +15,7 @@ updateMappingsForLabel(prog, l, old) {
     (insertIntoMap(l, rdEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, rdExit(l, prog, fst(old)), snd(old)))
 }
 
-insertIntoMap :: int -> [(String, int)] -> [(int, [(String, int)])] -> [(int, [(String, int)])]
+insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
         then [(key, value)]
@@ -24,28 +24,28 @@ insertIntoMap (key, value, map) {
             else [head(map)] ++ insertIntoMap(key, value, tail(map))
 }
 
-rdEntry :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdEntry (l, prog, exit) {
     if (isEqual (l, init(prog)))
         then makeSetOfFV(fv(prog))
         else findInExit(filterFlow(l, flow(prog)), exit)
 }
 
-makeSetOfFV :: [String] -> [(String, int)]
+makeSetOfFV :: [String] -> [(String, String)]
 makeSetOfFV (fvs) {
     if (isNil(fvs))
         then []
-        else [(head (fvs), 0 - 1)] ++ makeSetOfFV(tail(fvs))
+        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
 }
 
-findInExit :: [(int, int)] -> [(int, [(String, int)])] -> [(String, int)]
+findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findInExit (fl, exit) {
     if (isNil(fl))
         then []
         else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
 }
 
-findOrDefault :: int -> [(int, [(String, int)])] -> [(String, int)]
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, exit) {
     if (isNil(exit))
         then []
@@ -55,7 +55,7 @@ findOrDefault (l, exit) {
 }
 
 
-filterFlow :: int -> [(int, int)] -> [(int, int)]
+filterFlow :: String -> [(String, String)] -> [(String, String)]
 filterFlow (l, fl) {
     if (isNil(fl))
         then []
@@ -90,7 +90,7 @@ getVarFromAExp (aexp) {
 
 }
 
-flow :: Any -> [(int, int)]
+flow :: Any -> [(String, String)]
 flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then []
@@ -105,7 +105,7 @@ flow (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-makeSetOfLabels :: int -> [int] -> [(int, int)]
+makeSetOfLabels :: String -> [String] -> [(String, String)]
 makeSetOfLabels (init, finals) {
     if (isNil(finals))
         then []
@@ -113,7 +113,7 @@ makeSetOfLabels (init, finals) {
 }
 
 
-init :: Any -> int
+init :: Any -> String
 init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))
@@ -128,7 +128,7 @@ init (prog) {
                     else ("error " ++ fst (prog))
 }
 
-final :: Any -> [int]
+final :: Any -> [String]
 final (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]
@@ -143,17 +143,17 @@ final (prog) {
                     else ["error" ++ fst (prog)]
 }
 
-rdExit :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExit (l, prog, entry) {
     rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
 }
 
-rdExitWithBlock :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
     union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
 }
 
-findBlock :: int -> Any -> [Any]
+findBlock :: String -> Any -> [Any]
 findBlock (l, prog) {
     if (isEqual (fst (prog), "ASGN"))
         then if (isEqual (fst (snd (prog)), l))
@@ -172,7 +172,7 @@ findBlock (l, prog) {
                     else []
 }
 
-findOrDefault :: int -> [(int, [(String, int)])] -> [(String, int)]
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, exit) {
     if (isNil(exit))
         then []
@@ -182,14 +182,14 @@ findOrDefault (l, exit) {
 }
 
 
-killRD :: Any -> [(String, int)] -> [(String, int)]
+killRD :: Any -> [(String, String)] -> [(String, String)]
 killRD (block, assigments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), 0 - 1)], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
         else []
 }
 
-assigments :: Any -> [(String, int)]
+assigments :: Any -> [(String, String)]
 assigments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
@@ -204,7 +204,7 @@ assigments (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-filterRD :: String -> int -> [(String, int)] -> [(String, int)]
+filterRD :: String -> String -> [(String, String)] -> [(String, String)]
 filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []
@@ -213,14 +213,14 @@ filterRD (var, l, assigns) {
             else filterRD(var, l, tail(assigns))
 }
 
-genRD :: Any -> [(String, int)]
+genRD :: Any -> [(String, String)]
 genRD (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
         else []
 }
 
-labels :: Any -> [int]
+labels :: Any -> [String]
 labels (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]

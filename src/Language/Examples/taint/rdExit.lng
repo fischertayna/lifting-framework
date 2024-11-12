@@ -1,19 +1,19 @@
-main :: Any -> int
+main :: Any -> [(String, String)]
 main (prog) {
     rdExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdExit :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExit (l, prog, entry) {
     rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
 }
 
-rdExitWithBlock :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
     union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
 }
 
-findBlock :: int -> Any -> [Any]
+findBlock :: String -> Any -> [Any]
 findBlock (l, prog) {
     if (isEqual (fst (prog), "ASGN"))
         then if (isEqual (fst (snd (prog)), l))
@@ -33,7 +33,7 @@ findBlock (l, prog) {
 }
 
 
-findOrDefault :: int -> [(int, [(String, int)])] -> [(String, int)]
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, exit) {
     if (isNil(exit))
         then []
@@ -43,14 +43,14 @@ findOrDefault (l, exit) {
 }
 
 
-killRD :: Any -> [(String, int)] -> [(String, int)]
+killRD :: Any -> [(String, String)] -> [(String, String)]
 killRD (block, assigments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), 0 - 1)], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
         else []
 }
 
-assigments :: Any -> [(String, int)]
+assigments :: Any -> [(String, String)]
 assigments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
@@ -65,7 +65,7 @@ assigments (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-filterRD :: String -> int -> [(String, int)] -> [(String, int)]
+filterRD :: String -> String -> [(String, String)] -> [(String, String)]
 filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []
@@ -74,7 +74,7 @@ filterRD (var, l, assigns) {
             else filterRD(var, l, tail(assigns))
 }
 
-genRD :: Any -> [(String, int)]
+genRD :: Any -> [(String, String)]
 genRD (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]

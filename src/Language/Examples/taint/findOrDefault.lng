@@ -4,7 +4,7 @@ main (prog) {
     findOrDefault (fst(prog), snd(prog))
 }
 
-findOrDefault :: int -> [(int, [(String, int)])] -> [(String, int)]
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, exit) {
     if (isNil(exit))
         then []

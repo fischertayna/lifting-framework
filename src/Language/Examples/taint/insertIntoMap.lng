@@ -3,7 +3,7 @@ main (prog) {
     insertIntoMap (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-insertIntoMap :: int -> [(String, int)] -> [(int, [(String, int)])] -> [(int, [(String, int)])]
+insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
         then [(key, sortBySecond(value))]
@@ -35,14 +35,14 @@ elem (x, l) {
             else elem(x, tail(l))
 }
 
-sortBySecond :: [(String, int)] -> [(String, int)]
+sortBySecond :: [(String, String)] -> [(String, String)]
 sortBySecond (list) {
     if (isNil(list))
         then []
         else insertBySecond(head(list), sortBySecond(tail(list)))
 }
 
-insertBySecond :: (String, int) -> [(String, int)] -> [(String, int)]
+insertBySecond :: (String, String) -> [(String, String)] -> [(String, String)]
 insertBySecond(pair, sortedList) {
     if (isNil(sortedList))
         then [pair]

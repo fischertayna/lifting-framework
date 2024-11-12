@@ -3,7 +3,7 @@ main (prog) {
     final (prog)
 }
 
-final :: Any -> [int]
+final :: Any -> [String]
 final (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]

@@ -1,9 +1,9 @@
-main :: Any -> int
+main :: Any -> String
 main (prog) {
     init (prog)
 }
 
-init :: Any -> int
+init :: Any -> String
 init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))

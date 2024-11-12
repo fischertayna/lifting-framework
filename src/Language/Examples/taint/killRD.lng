@@ -1,16 +1,16 @@
-main :: Any -> int
+main :: Any -> [(String, String)]
 main (input) {
     killRD (fst(input), assigments(snd(input)))
 }
 
-killRD :: Any -> [(String, int)] -> [(String, int)]
+killRD :: Any -> [(String, String)] -> [(String, String)]
 killRD (block, assigments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), 0 - 1)], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
         else []
 }
 
-assigments :: Any -> [(String, int)]
+assigments :: Any -> [(String, String)]
 assigments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
@@ -25,7 +25,7 @@ assigments (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-filterRD :: String -> int -> [(String, int)] -> [(String, int)]
+filterRD :: String -> String -> [(String, String)] -> [(String, String)]
 filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []

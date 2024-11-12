@@ -1,9 +1,9 @@
-main :: Any -> [Any]
+main :: Any -> [String]
 main (prog) {
     labels (prog)
 }
 
-labels :: Any -> [int]
+labels :: Any -> [String]
 labels (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]

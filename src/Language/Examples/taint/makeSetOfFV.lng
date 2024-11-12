@@ -1,13 +1,13 @@
-main :: Any -> [String]
+main :: Any -> [(String, String)]
 main (prog) {
     makeSetOfFV (fv (prog))
 }
 
-makeSetOfFV :: [String] -> [(String, int)]
+makeSetOfFV :: [String] -> [(String, String)]
 makeSetOfFV (fvs) {
     if (isNil(fvs))
         then []
-        else [(head (fvs), 0 - 1)] ++ makeSetOfFV(tail(fvs))
+        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
 }
 
 fv :: Any -> [String]

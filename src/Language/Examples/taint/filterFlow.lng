@@ -3,7 +3,7 @@ main (input) {
     filterFlow (fst(input), snd(input))
 }
 
-filterFlow :: int -> [(int, int)] -> [(int, int)]
+filterFlow :: String -> [(String, String)] -> [(String, String)]
 filterFlow (l, fl) {
     if (isNil(fl))
         then []

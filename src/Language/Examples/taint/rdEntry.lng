@@ -1,30 +1,30 @@
-main :: Any -> int
+main :: Any -> [(String, String)]
 main (prog) {
     rdEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdEntry :: int -> Any -> [(int, [(String, int)])] -> [(String, int)]
+rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdEntry (l, prog, exit) {
     if (isEqual (l, init(prog)))
         then makeSetOfFV(fv(prog))
         else findInExit(filterFlow(l, flow(prog)), exit)
 }
 
-makeSetOfFV :: [String] -> [(String, int)]
+makeSetOfFV :: [String] -> [(String, String)]
 makeSetOfFV (fvs) {
     if (isNil(fvs))
         then []
-        else [(head (fvs), 0 - 1)] ++ makeSetOfFV(tail(fvs))
+        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
 }
 
-findInExit :: [(int, int)] -> [(int, [(String, int)])] -> [(String, int)]
+findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findInExit (fl, exit) {
     if (isNil(fl))
         then []
         else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
 }
 
-findOrDefault :: int -> [(int, [(String, int)])] -> [(String, int)]
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, exit) {
     if (isNil(exit))
         then []
@@ -34,7 +34,7 @@ findOrDefault (l, exit) {
 }
 
 
-filterFlow :: int -> [(int, int)] -> [(int, int)]
+filterFlow :: String -> [(String, String)] -> [(String, String)]
 filterFlow (l, fl) {
     if (isNil(fl))
         then []
@@ -69,7 +69,7 @@ getVarFromAExp (aexp) {
 
 }
 
-flow :: Any -> [(int, int)]
+flow :: Any -> [(String, String)]
 flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then []
@@ -84,7 +84,7 @@ flow (prog) {
                         else ["error " ++ fst (prog)]
 }
 
-makeSetOfLabels :: int -> [int] -> [(int, int)]
+makeSetOfLabels :: String -> [String] -> [(String, String)]
 makeSetOfLabels (init, finals) {
     if (isNil(finals))
         then []
@@ -92,7 +92,7 @@ makeSetOfLabels (init, finals) {
 }
 
 
-init :: Any -> int
+init :: Any -> String
 init (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then fst (snd (prog))
@@ -107,7 +107,7 @@ init (prog) {
                     else ("error " ++ fst (prog))
 }
 
-final :: Any -> [int]
+final :: Any -> [String]
 final (prog) {
     if (isEqual (fst (prog), "ASGN"))
     then [fst (snd (prog))]
