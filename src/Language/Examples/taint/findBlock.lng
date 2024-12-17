@@ -6,30 +6,30 @@ main (prog) {
 findBlock :: String -> Any -> [Any]
 findBlock (l, prog) {
     if (checkType(prog, "ASGN"))
-        then if (isEqual(getLabelFromAsgn(getStmt(prog)), l))
+        then if (isEqual(labelFromAsgn(getStmt(prog)), l))
             then [prog]
             else []
         else if (checkType(prog, "SEQ"))
-            then union(findBlock(l, getFstStmtOfSeq(getStmt(prog))), findBlock(l, getSndStmtOfSeq(getStmt(prog))))
+            then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
             else if (checkType(prog, "IF"))
-                then if (isEqual(getLabelFromIf(getStmt(prog)), l))
+                then if (isEqual(labelFromIf(getStmt(prog)), l))
                     then [getCondFromIf(getStmt(prog))]
-                    else union(findBlock(l, getThenFromIf(getStmt(prog))), findBlock(l, getElseFromIf(getStmt(prog))))
+                    else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
                 else if (checkType(prog, "WHILE"))
-                    then if (isEqual(getLabelFromWhile(getStmt(prog)), l))
+                    then if (isEqual(labelFromWhile(getStmt(prog)), l))
                         then [getCondFromWhile(getStmt(prog))] 
-                        else findBlock(l, getBlockFromWhile(getStmt(prog)))
+                        else findBlock(l, blockFromWhile(getStmt(prog)))
                     else []
 }
 
-getTypeStmt :: Any -> String
-getTypeStmt (prog) {
+typeStmt :: Any -> String
+typeStmt (prog) {
     fst(prog)
 }
 
 checkType :: Any -> String -> int
 checkType (prog, stmtType) {
-    isEqual(getTypeStmt(prog), stmtType)
+    isEqual(typeStmt(prog), stmtType)
 }
 
 getStmt :: Any -> Any 
@@ -37,18 +37,18 @@ getStmt (prog) {
     snd(prog)
 }
 
-getLabelFromAsgn :: Any -> String
-getLabelFromAsgn (asgn) {
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
     fst(asgn)
 }
 
-getVarFromAsgn :: Any -> String
-getVarFromAsgn (asgn) {
+varFromAsgn :: Any -> String
+varFromAsgn (asgn) {
     fst(snd(asgn))
 }
 
-getValueFromAsgn :: Any -> String
-getValueFromAsgn (asgn) {
+valueFromAsgn :: Any -> String
+valueFromAsgn (asgn) {
     snd(snd(asgn))
 }
 
@@ -62,23 +62,23 @@ getSndOpValue (aexp) {
     snd(snd(aexp))
 }
 
-getLabelFromSkip :: Any -> String
-getLabelFromSkip (skip) {
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
     fst(skip)
 }
 
-getFstStmtOfSeq :: Any -> Any
-getFstStmtOfSeq (seq) {
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
     fst(seq)
 }
 
-getSndStmtOfSeq :: Any -> Any
-getSndStmtOfSeq (seq) {
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
     snd(seq)
 }
 
-getLabelFromIf :: Any -> String
-getLabelFromIf (stm) {
+labelFromIf :: Any -> String
+labelFromIf (stm) {
     snd(fst(stm))
 }
 
@@ -87,18 +87,18 @@ getCondFromIf (stm) {
     fst(fst(stm))
 }
 
-getThenFromIf :: Any -> Any
-getThenFromIf (stm) {
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
     fst(snd(stm))
 }
 
-getElseFromIf :: Any -> Any
-getElseFromIf (stm) {
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
     snd(snd(stm))
 }
 
-getLabelFromWhile :: Any -> String
-getLabelFromWhile (stm) {
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
     snd(fst(stm))
 }
 
@@ -107,7 +107,7 @@ getCondFromWhile (stm) {
     fst(fst(stm))
 }
 
-getBlockFromWhile :: Any -> Any
-getBlockFromWhile (stm) {
+blockFromWhile :: Any -> Any
+blockFromWhile (stm) {
     snd(stm)
 }

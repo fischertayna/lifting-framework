@@ -6,26 +6,26 @@ main (prog) {
 init :: Any -> String
 init (prog) {
     if (checkType(prog, "ASGN"))
-    then getLabelFromAsgn(getStmt(prog))
+    then labelFromAsgn(getStmt(prog))
     else if (checkType(prog, "SEQ"))
-        then init (getFstStmtOfSeq(getStmt(prog)))
+        then init (fstStmtOfSeq(getStmt(prog)))
         else if (checkType(prog, "IF"))
-            then getLabelFromIf(getStmt(prog))
+            then labelFromIf(getStmt(prog))
             else if (checkType(prog, "WHILE"))
-                then getLabelFromWhile(getStmt(prog))
+                then labelFromWhile(getStmt(prog))
                 else if (checkType(prog, "SKIP"))
-                    then getLabelFromSkip(getStmt(prog))
-                    else ("error " ++ getTypeStmt(prog))
+                    then labelFromSkip(getStmt(prog))
+                    else ("error " ++ typeStmt(prog))
 }
 
-getTypeStmt :: Any -> String
-getTypeStmt (prog) {
+typeStmt :: Any -> String
+typeStmt (prog) {
     fst(prog)
 }
 
 checkType :: Any -> String -> int
 checkType (prog, stmtType) {
-    isEqual(getTypeStmt(prog), stmtType)
+    isEqual(typeStmt(prog), stmtType)
 }
 
 getStmt :: Any -> Any 
@@ -33,28 +33,28 @@ getStmt (prog) {
     snd(prog)
 }
 
-getLabelFromAsgn :: Any -> String
-getLabelFromAsgn (asgn) {
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
     fst(asgn)
 }
 
-getLabelFromSkip :: Any -> String
-getLabelFromSkip (skip) {
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
     fst(skip)
 }
 
-getFstStmtOfSeq :: Any -> Any
-getFstStmtOfSeq (seq) {
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
     fst(seq)
 }
 
-getLabelFromIf :: Any -> String
-getLabelFromIf (stm) {
+labelFromIf :: Any -> String
+labelFromIf (stm) {
     snd(fst(stm))
 }
 
-getLabelFromWhile :: Any -> String
-getLabelFromWhile (stm) {
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
     snd(fst(stm))
 }
 

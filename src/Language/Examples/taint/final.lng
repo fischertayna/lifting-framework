@@ -6,26 +6,26 @@ main (prog) {
 final :: Any -> [String]
 final (prog) {
     if (checkType(prog, "ASGN"))
-    then [getLabelFromAsgn(getStmt(prog))]
+    then [labelFromAsgn(getStmt(prog))]
     else if (checkType(prog, "SEQ"))
-        then final(getSndStmtOfSeq(getStmt(prog)))
+        then final(sndStmtOfSeq(getStmt(prog)))
         else if (checkType(prog, "IF"))
-            then final(getThenFromIf(getStmt(prog))) ++ final(getElseFromIf(getStmt(prog)))
+            then final(thenFromIf(getStmt(prog))) ++ final(elseFromIf(getStmt(prog)))
             else if (checkType(prog, "WHILE"))
-                then [getLabelFromWhile(getStmt(prog))]
+                then [labelFromWhile(getStmt(prog))]
                 else if (checkType(prog, "SKIP"))
-                    then [getLabelFromSkip(getStmt(prog))]
+                    then [labelFromSkip(getStmt(prog))]
                     else ["error"]
 }
 
-getTypeStmt :: Any -> String
-getTypeStmt (prog) {
+typeStmt :: Any -> String
+typeStmt (prog) {
     fst(prog)
 }
 
 checkType :: Any -> String -> int
 checkType (prog, stmtType) {
-    isEqual(getTypeStmt(prog), stmtType)
+    isEqual(typeStmt(prog), stmtType)
 }
 
 getStmt :: Any -> Any 
@@ -33,42 +33,42 @@ getStmt (prog) {
     snd(prog)
 }
 
-getLabelFromAsgn :: Any -> String
-getLabelFromAsgn (asgn) {
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
     fst(asgn)
 }
 
-getLabelFromSkip :: Any -> String
-getLabelFromSkip (skip) {
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
     fst(skip)
 }
 
-getFstStmtOfSeq :: Any -> Any
-getFstStmtOfSeq (seq) {
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
     fst(seq)
 }
 
-getSndStmtOfSeq :: Any -> Any
-getSndStmtOfSeq (seq) {
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
     snd(seq)
 }
 
-getLabelFromIf :: Any -> String
-getLabelFromIf (stm) {
+labelFromIf :: Any -> String
+labelFromIf (stm) {
     snd(fst(stm))
 }
 
-getThenFromIf :: Any -> Any
-getThenFromIf (stm) {
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
     fst(snd(stm))
 }
 
-getElseFromIf :: Any -> Any
-getElseFromIf (stm) {
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
     snd(snd(stm))
 }
 
-getLabelFromWhile :: Any -> String
-getLabelFromWhile (stm) {
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
     snd(fst(stm))
 }
