@@ -133,43 +133,41 @@ filterFlow (l, fl) {
 
 fv :: Any -> [String]
 fv (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then union ([fst (snd (snd (prog)))], getVarFromAExp(snd (snd (snd (prog)))))
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(fv (fst (snd (snd (prog)))), fv (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then fv(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+    if (checkType(prog, "ASGN"))
+        then union ([getVarFromAsgn(getStmt(prog))], getVarFromValue(getValueFromAsgn(getStmt(prog))))
+        else if (checkType(prog, "SEQ"))
+            then union(fv(getFstStmtOfSeq(getStmt(prog))), fv(getSndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(fv(getThenFromIf(getStmt(prog))), fv(getElseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then fv(getBlockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ getTypeStmt(prog)]
 }
 
-
-getVarFromAExp :: Any -> [Any]
-getVarFromAExp (aexp) {
-    if (isEqual (fst (aexp), "VAR"))
+getVarFromValue :: Any -> [Any]
+getVarFromValue (aexp) {
+    if (checkType(aexp, "VAR"))
         then [snd (aexp)]
-        else if (isEqual (fst (aexp), "CONST"))
+        else if (checkType(aexp, "CONST"))
             then []
-            else getVarFromAExp(fst (snd(aexp))) ++ getVarFromAExp(snd (snd(aexp)))
-
+            else getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
 }
 
 flow :: Any -> [(String, String)]
 flow (prog) {
-    if (isEqual (fst (prog), "ASGN"))
+    if (checkType(prog, "ASGN"))
         then []
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(flow(fst(snd (prog))), union(makeSetOfLabels(init(snd(snd(prog))), final(fst(snd (prog)))), flow(snd (snd (prog)))))
-            else if (isEqual (fst (prog), "IF"))
-                then union([(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))], union(flow (fst (snd (snd (prog)))), union([(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))], flow (snd (snd (snd (prog)))))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
-                    else if (isEqual (fst (prog), "SKIP"))
+        else if (checkType(prog, "SEQ"))
+            then union(flow(getFstStmtOfSeq(getStmt(prog))), union(makeSetOfLabels(init(getSndStmtOfSeq(getStmt(prog))), final(getFstStmtOfSeq(getStmt(prog)))), flow(getSndStmtOfSeq(getStmt(prog)))))
+            else if (checkType(prog, "IF"))
+                then union([(getLabelFromIf(getStmt(prog)), init(getThenFromIf(getStmt(prog))))], union(flow(getThenFromIf(getStmt(prog))), union([(getLabelFromIf(getStmt(prog)), init(getElseFromIf(getStmt(prog))))], flow(getElseFromIf(getStmt(prog))))))
+                else if (checkType(prog, "WHILE"))
+                    then union([(getLabelFromWhile(getStmt(prog)), init(getBlockFromWhile(getStmt(prog))))], union(flow(getBlockFromWhile(getStmt(prog))), makeSetOfLabels(getLabelFromWhile(getStmt(prog)), final(getBlockFromWhile(getStmt(prog))))))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ getTypeStmt(prog)]
 }
 
 makeSetOfLabels :: String -> [String] -> [(String, String)]
@@ -179,35 +177,34 @@ makeSetOfLabels (init, finals) {
         else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
 }
 
-
 init :: Any -> String
 init (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then fst (snd (prog))
-    else if (isEqual (fst (prog), "SEQ"))
-        then init (fst (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then snd (fst (snd (prog)))
-            else if (isEqual (fst (prog), "WHILE"))
-                then snd (fst (snd (prog)))
-                else if (isEqual (fst (prog), "SKIP"))
-                    then fst (snd (prog))
-                    else ("error " ++ fst (prog))
+    if (checkType(prog, "ASGN"))
+    then getLabelFromAsgn(getStmt(prog))
+    else if (checkType(prog, "SEQ"))
+        then init (getFstStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then getLabelFromIf(getStmt(prog))
+            else if (checkType(prog, "WHILE"))
+                then getLabelFromWhile(getStmt(prog))
+                else if (checkType(prog, "SKIP"))
+                    then getLabelFromSkip(getStmt(prog))
+                    else ("error " ++ getTypeStmt(prog))
 }
 
 final :: Any -> [String]
 final (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then [fst (snd (prog))]
-    else if (isEqual (fst (prog), "SEQ"))
-        then final (snd (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
-            else if (isEqual (fst (prog), "WHILE"))
-                then [snd (fst (snd (prog)))]
-                else if (isEqual (fst (prog), "SKIP"))
-                    then [fst (snd (prog))]
-                    else ["error" ++ fst (prog)]
+    if (checkType(prog, "ASGN"))
+    then [getLabelFromAsgn(getStmt(prog))]
+    else if (checkType(prog, "SEQ"))
+        then final(getSndStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then final(getThenFromIf(getStmt(prog))) ++ final(getElseFromIf(getStmt(prog)))
+            else if (checkType(prog, "WHILE"))
+                then [getLabelFromWhile(getStmt(prog))]
+                else if (checkType(prog, "SKIP"))
+                    then [getLabelFromSkip(getStmt(prog))]
+                    else ["error"]
 }
 
 rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
@@ -217,25 +214,25 @@ rdExit (l, prog, entry) {
 
 rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
+    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
 }
 
 findBlock :: String -> Any -> [Any]
 findBlock (l, prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then if (isEqual (fst (snd (prog)), l))
+    if (checkType(prog, "ASGN"))
+        then if (isEqual(getLabelFromAsgn(getStmt(prog)), l))
             then [prog]
             else []
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(findBlock(l, fst(snd (prog))), findBlock(l, snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then if (isEqual (snd (fst (snd (prog))), l))
-                    then [fst (fst (snd (prog)))]
-                    else union(findBlock(l, fst(snd (snd (prog)))), findBlock(l, snd(snd(snd(prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then if (isEqual (snd (fst (snd (prog))), l))
-                        then [fst (fst (snd (prog)))] 
-                        else findBlock(l, snd(snd (prog)))
+        else if (checkType(prog, "SEQ"))
+            then union(findBlock(l, getFstStmtOfSeq(getStmt(prog))), findBlock(l, getSndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then if (isEqual(getLabelFromIf(getStmt(prog)), l))
+                    then [getCondFromIf(getStmt(prog))]
+                    else union(findBlock(l, getThenFromIf(getStmt(prog))), findBlock(l, getElseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then if (isEqual(getLabelFromWhile(getStmt(prog)), l))
+                        then [getCondFromWhile(getStmt(prog))] 
+                        else findBlock(l, getBlockFromWhile(getStmt(prog)))
                     else []
 }
 
@@ -250,25 +247,25 @@ findOrDefault (l, exit) {
 
 
 killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assigments) {
-    if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+killRD (block, assignments) {
+    if (checkType(block, "ASGN"))
+        then union([((getVarFromAsgn(getStmt(block))), "?")], filterRD(getVarFromAsgn(getStmt(block)), getLabelFromAsgn(getStmt(block)), assignments))
         else []
 }
 
-assigments :: Any -> [(String, String)]
-assigments (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then assigments(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+assignments :: Any -> [(String, String)]
+assignments (prog) {
+    if (checkType(prog, "ASGN"))
+        then [(getVarFromAsgn(getStmt(prog)), getLabelFromAsgn(getStmt(prog)))]
+        else if (checkType(prog, "SEQ"))
+            then union(assignments(getFstStmtOfSeq(getStmt(prog))), assignments(getSndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(assignments(getThenFromIf(getStmt(prog))), assignments(getElseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then assignments(getBlockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ getTypeStmt(prog)]
 }
 
 filterRD :: String -> String -> [(String, String)] -> [(String, String)]
@@ -282,22 +279,112 @@ filterRD (var, l, assigns) {
 
 genRD :: Any -> [(String, String)]
 genRD (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+    if (checkType(prog, "ASGN"))
+        then [(getVarFromAsgn(getStmt(prog)), getLabelFromAsgn(getStmt(prog)))]
         else []
 }
 
 labels :: Any -> [String]
 labels (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then [fst (snd (prog))]
-    else if (isEqual (fst (prog), "SEQ"))
-        then labels (fst (snd (prog))) ++ labels (snd (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then [snd (fst (snd (prog)))] ++ union(labels (fst (snd (snd (prog)))), labels (snd (snd (snd (prog)))))
-            else if (isEqual (fst (prog), "WHILE"))
-                then [snd (fst (snd (prog)))] ++ labels(snd(snd (prog)))
-                else if (isEqual (fst (prog), "SKIP"))
-                    then []
+    if (checkType(prog, "ASGN"))
+    then [getLabelFromAsgn(getStmt(prog))]
+    else if (checkType(prog, "SEQ"))
+        then labels(getFstStmtOfSeq(getStmt(prog))) ++ labels(getSndStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then [getLabelFromIf(getStmt(prog))] ++ union(labels(getThenFromIf(getStmt(prog))), labels(getElseFromIf(getStmt(prog))))
+            else if (checkType(prog, "WHILE"))
+                then [getLabelFromWhile(getStmt(prog))] ++ labels(getBlockFromWhile(getStmt(prog)))
+                else if (checkType(prog, "SKIP"))
+                    then [getLabelFromSkip(getStmt(prog))]
                     else []
+}
+
+getTypeStmt :: Any -> String
+getTypeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(getTypeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+getLabelFromAsgn :: Any -> String
+getLabelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+getVarFromAsgn :: Any -> String
+getVarFromAsgn (asgn) {
+    fst(snd(asgn))
+}
+
+getValueFromAsgn :: Any -> String
+getValueFromAsgn (asgn) {
+    snd(snd(asgn))
+}
+
+getFstOpValue :: Any -> String
+getFstOpValue (aexp) {
+    fst(snd(aexp))
+}
+
+getSndOpValue :: Any -> String
+getSndOpValue (aexp) {
+    snd(snd(aexp))
+}
+
+getLabelFromSkip :: Any -> String
+getLabelFromSkip (skip) {
+    fst(skip)
+}
+
+getFstStmtOfSeq :: Any -> Any
+getFstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+getSndStmtOfSeq :: Any -> Any
+getSndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+getLabelFromIf :: Any -> String
+getLabelFromIf (stm) {
+    snd(fst(stm))
+}
+
+getCondFromIf :: Any -> String
+getCondFromIf (stm) {
+    fst(fst(stm))
+}
+
+getThenFromIf :: Any -> Any
+getThenFromIf (stm) {
+    fst(snd(stm))
+}
+
+getElseFromIf :: Any -> Any
+getElseFromIf (stm) {
+    snd(snd(stm))
+}
+
+getLabelFromWhile :: Any -> String
+getLabelFromWhile (stm) {
+    snd(fst(stm))
+}
+
+getCondFromWhile :: Any -> String
+getCondFromWhile (stm) {
+    fst(fst(stm))
+}
+
+getBlockFromWhile :: Any -> Any
+getBlockFromWhile (stm) {
+    snd(stm)
 }

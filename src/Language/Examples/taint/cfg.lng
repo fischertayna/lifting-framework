@@ -5,17 +5,17 @@ main (prog) {
 
 flow :: Any -> [(String, String)]
 flow (prog) {
-    if (isEqual (fst (prog), "ASGN"))
+    if (checkType(prog, "ASGN"))
         then []
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(flow(fst(snd (prog))), union(makeSetOfLabels(init(snd(snd(prog))), final(fst(snd (prog)))), flow(snd (snd (prog)))))
-            else if (isEqual (fst (prog), "IF"))
-                then union([(snd (fst (snd (prog))), init(fst (snd (snd (prog)))))], union(flow (fst (snd (snd (prog)))), union([(snd (fst (snd (prog))), init(snd (snd (snd (prog)))))], flow (snd (snd (snd (prog)))))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then union([(snd (fst (snd (prog))), init(snd (snd (prog))))], union(flow(snd(snd (prog))), makeSetOfLabels(snd (fst (snd (prog))), final(snd (snd (prog))))))
-                    else if (isEqual (fst (prog), "SKIP"))
+        else if (checkType(prog, "SEQ"))
+            then union(flow(getFstStmtOfSeq(getStmt(prog))), union(makeSetOfLabels(init(getSndStmtOfSeq(getStmt(prog))), final(getFstStmtOfSeq(getStmt(prog)))), flow(getSndStmtOfSeq(getStmt(prog)))))
+            else if (checkType(prog, "IF"))
+                then union([(getLabelFromIf(getStmt(prog)), init(getThenFromIf(getStmt(prog))))], union(flow(getThenFromIf(getStmt(prog))), union([(getLabelFromIf(getStmt(prog)), init(getElseFromIf(getStmt(prog))))], flow(getElseFromIf(getStmt(prog))))))
+                else if (checkType(prog, "WHILE"))
+                    then union([(getLabelFromWhile(getStmt(prog)), init(getBlockFromWhile(getStmt(prog))))], union(flow(getBlockFromWhile(getStmt(prog))), makeSetOfLabels(getLabelFromWhile(getStmt(prog)), final(getBlockFromWhile(getStmt(prog))))))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ getTypeStmt(prog)]
 }
 
 makeSetOfLabels :: String -> [String] -> [(String, String)]
@@ -25,33 +25,92 @@ makeSetOfLabels (init, finals) {
         else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
 }
 
-
 init :: Any -> String
 init (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then fst (snd (prog))
-    else if (isEqual (fst (prog), "SEQ"))
-        then init (fst (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then snd (fst (snd (prog)))
-            else if (isEqual (fst (prog), "WHILE"))
-                then snd (fst (snd (prog)))
-                else if (isEqual (fst (prog), "SKIP"))
-                    then fst (snd (prog))
-                    else ("error " ++ fst (prog))
+    if (checkType(prog, "ASGN"))
+    then getLabelFromAsgn(getStmt(prog))
+    else if (checkType(prog, "SEQ"))
+        then init (getFstStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then getLabelFromIf(getStmt(prog))
+            else if (checkType(prog, "WHILE"))
+                then getLabelFromWhile(getStmt(prog))
+                else if (checkType(prog, "SKIP"))
+                    then getLabelFromSkip(getStmt(prog))
+                    else ("error " ++ getTypeStmt(prog))
 }
 
 final :: Any -> [String]
 final (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then [fst (snd (prog))]
-    else if (isEqual (fst (prog), "SEQ"))
-        then final (snd (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then (final (fst (snd (snd (prog))))) ++ (final (snd (snd (snd (prog)))))
-            else if (isEqual (fst (prog), "WHILE"))
-                then [snd (fst (snd (prog)))]
-                else if (isEqual (fst (prog), "SKIP"))
-                    then [fst (snd (prog))]
-                    else ["error" ++ fst (prog)]
+    if (checkType(prog, "ASGN"))
+    then [getLabelFromAsgn(getStmt(prog))]
+    else if (checkType(prog, "SEQ"))
+        then final(getSndStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then final(getThenFromIf(getStmt(prog))) ++ final(getElseFromIf(getStmt(prog)))
+            else if (checkType(prog, "WHILE"))
+                then [getLabelFromWhile(getStmt(prog))]
+                else if (checkType(prog, "SKIP"))
+                    then [getLabelFromSkip(getStmt(prog))]
+                    else ["error"]
+}
+
+getTypeStmt :: Any -> String
+getTypeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(getTypeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+getLabelFromAsgn :: Any -> String
+getLabelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+getLabelFromSkip :: Any -> String
+getLabelFromSkip (skip) {
+    fst(skip)
+}
+
+getFstStmtOfSeq :: Any -> Any
+getFstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+getSndStmtOfSeq :: Any -> Any
+getSndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+getLabelFromIf :: Any -> String
+getLabelFromIf (stm) {
+    snd(fst(stm))
+}
+
+getThenFromIf :: Any -> Any
+getThenFromIf (stm) {
+    fst(snd(stm))
+}
+
+getElseFromIf :: Any -> Any
+getElseFromIf (stm) {
+    snd(snd(stm))
+}
+
+getLabelFromWhile :: Any -> String
+getLabelFromWhile (stm) {
+    snd(fst(stm))
+}
+
+getBlockFromWhile :: Any -> Any
+getBlockFromWhile (stm) {
+    snd(stm)
 }

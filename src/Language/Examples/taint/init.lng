@@ -5,13 +5,56 @@ main (prog) {
 
 init :: Any -> String
 init (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-    then fst (snd (prog))
-    else if (isEqual (fst (prog), "SEQ"))
-        then init (fst (snd (prog)))
-        else if (isEqual (fst (prog), "IF"))
-            then snd (fst (snd (prog)))
-            else if (isEqual (fst (prog), "WHILE"))
-                then snd (fst (snd (prog)))
-                else "error"
+    if (checkType(prog, "ASGN"))
+    then getLabelFromAsgn(getStmt(prog))
+    else if (checkType(prog, "SEQ"))
+        then init (getFstStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then getLabelFromIf(getStmt(prog))
+            else if (checkType(prog, "WHILE"))
+                then getLabelFromWhile(getStmt(prog))
+                else if (checkType(prog, "SKIP"))
+                    then getLabelFromSkip(getStmt(prog))
+                    else ("error " ++ getTypeStmt(prog))
 }
+
+getTypeStmt :: Any -> String
+getTypeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(getTypeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+getLabelFromAsgn :: Any -> String
+getLabelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+getLabelFromSkip :: Any -> String
+getLabelFromSkip (skip) {
+    fst(skip)
+}
+
+getFstStmtOfSeq :: Any -> Any
+getFstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+getLabelFromIf :: Any -> String
+getLabelFromIf (stm) {
+    snd(fst(stm))
+}
+
+getLabelFromWhile :: Any -> String
+getLabelFromWhile (stm) {
+    snd(fst(stm))
+}
+

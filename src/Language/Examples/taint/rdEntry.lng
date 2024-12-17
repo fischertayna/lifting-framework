@@ -46,7 +46,7 @@ filterFlow (l, fl) {
 fv :: Any -> [String]
 fv (prog) {
     if (isEqual (fst (prog), "ASGN"))
-        then union ([fst (snd (snd (prog)))], getVarFromAExp(snd (snd (snd (prog)))))
+        then union ([fst (snd (snd (prog)))], getVarFromValue(snd (snd (snd (prog)))))
         else if (isEqual (fst (prog), "SEQ"))
             then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
             else if (isEqual (fst (prog), "IF"))
@@ -59,13 +59,13 @@ fv (prog) {
 }
 
 
-getVarFromAExp :: Any -> [Any]
-getVarFromAExp (aexp) {
+getVarFromValue :: Any -> [Any]
+getVarFromValue (aexp) {
     if (isEqual (fst (aexp), "VAR"))
         then [snd (aexp)]
         else if (isEqual (fst (aexp), "CONST"))
             then []
-            else getVarFromAExp(fst (snd(aexp))) ++ getVarFromAExp(snd (snd(aexp)))
+            else getVarFromValue(fst (snd(aexp))) ++ getVarFromValue(snd (snd(aexp)))
 
 }
 

@@ -67,7 +67,7 @@ filterFlow (l, fl) {
 fv :: Any -> [String]
 fv (prog) {
     if (isEqual (fst (prog), "ASGN"))
-        then union ([fst (snd (snd (prog)))], getVarFromAExp(snd (snd (snd (prog)))))
+        then union ([fst (snd (snd (prog)))], getVarFromValue(snd (snd (snd (prog)))))
         else if (isEqual (fst (prog), "SEQ"))
             then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
             else if (isEqual (fst (prog), "IF"))
@@ -80,13 +80,13 @@ fv (prog) {
 }
 
 
-getVarFromAExp :: Any -> [Any]
-getVarFromAExp (aexp) {
+getVarFromValue :: Any -> [Any]
+getVarFromValue (aexp) {
     if (isEqual (fst (aexp), "VAR"))
         then [snd (aexp)]
         else if (isEqual (fst (aexp), "CONST"))
             then []
-            else getVarFromAExp(fst (snd(aexp))) ++ getVarFromAExp(snd (snd(aexp)))
+            else getVarFromValue(fst (snd(aexp))) ++ getVarFromValue(snd (snd(aexp)))
 
 }
 
@@ -150,7 +150,7 @@ rdExit (l, prog, entry) {
 
 rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
+    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -183,22 +183,22 @@ findOrDefault (l, exit) {
 
 
 killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assigments) {
+killRD (block, assignments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assignments))
         else []
 }
 
-assigments :: Any -> [(String, String)]
-assigments (prog) {
+assignments :: Any -> [(String, String)]
+assignments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
         else if (isEqual (fst (prog), "SEQ"))
-            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
+            then union(assignments(fst(snd (prog))), assignments(snd (snd (prog))))
             else if (isEqual (fst (prog), "IF"))
-                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
+                then union(assignments (fst (snd (snd (prog)))), assignments (snd (snd (snd (prog)))))
                 else if (isEqual (fst (prog), "WHILE"))
-                    then assigments(snd(snd (prog)))
+                    then assignments(snd(snd (prog)))
                     else if (isEqual (fst (prog), "SKIP"))
                         then []
                         else ["error " ++ fst (prog)]

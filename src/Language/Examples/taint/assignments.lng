@@ -1,19 +1,89 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    assigments (prog)
+    assignments (prog)
 }
 
-assigments :: Any -> [(String, String)]
-assigments (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then assigments(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+assignments :: Any -> [(String, String)]
+assignments (prog) {
+    if (checkType(prog, "ASGN"))
+        then [(getVarFromAsgn(getStmt(prog)), getLabelFromAsgn(getStmt(prog)))]
+        else if (checkType(prog, "SEQ"))
+            then union(assignments(getFstStmtOfSeq(getStmt(prog))), assignments(getSndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(assignments(getThenFromIf(getStmt(prog))), assignments(getElseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then assignments(getBlockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ getTypeStmt(prog)]
+}
+
+getTypeStmt :: Any -> String
+getTypeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(getTypeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+getLabelFromAsgn :: Any -> String
+getLabelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+getVarFromAsgn :: Any -> String
+getVarFromAsgn (asgn) {
+    fst(snd(asgn))
+}
+
+getValueFromAsgn :: Any -> String
+getValueFromAsgn (asgn) {
+    snd(snd(asgn))
+}
+
+getLabelFromSkip :: Any -> String
+getLabelFromSkip (skip) {
+    fst(skip)
+}
+
+getFstStmtOfSeq :: Any -> Any
+getFstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+getSndStmtOfSeq :: Any -> Any
+getSndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+getLabelFromIf :: Any -> String
+getLabelFromIf (stm) {
+    snd(fst(stm))
+}
+
+getThenFromIf :: Any -> Any
+getThenFromIf (stm) {
+    fst(snd(stm))
+}
+
+getElseFromIf :: Any -> Any
+getElseFromIf (stm) {
+    snd(snd(stm))
+}
+
+getLabelFromWhile :: Any -> String
+getLabelFromWhile (stm) {
+    snd(fst(stm))
+}
+
+getBlockFromWhile :: Any -> Any
+getBlockFromWhile (stm) {
+    snd(stm)
 }

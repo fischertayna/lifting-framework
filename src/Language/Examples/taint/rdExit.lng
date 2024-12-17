@@ -10,7 +10,7 @@ rdExit (l, prog, entry) {
 
 rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assigments(prog))), genRD(block))
+    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -44,22 +44,22 @@ findOrDefault (l, exit) {
 
 
 killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assigments) {
+killRD (block, assignments) {
     if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assigments))
+        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assignments))
         else []
 }
 
-assigments :: Any -> [(String, String)]
-assigments (prog) {
+assignments :: Any -> [(String, String)]
+assignments (prog) {
     if (isEqual (fst (prog), "ASGN"))
         then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
         else if (isEqual (fst (prog), "SEQ"))
-            then union(assigments(fst(snd (prog))), assigments(snd (snd (prog))))
+            then union(assignments(fst(snd (prog))), assignments(snd (snd (prog))))
             else if (isEqual (fst (prog), "IF"))
-                then union(assigments (fst (snd (snd (prog)))), assigments (snd (snd (snd (prog)))))
+                then union(assignments (fst (snd (snd (prog)))), assignments (snd (snd (snd (prog)))))
                 else if (isEqual (fst (prog), "WHILE"))
-                    then assigments(snd(snd (prog)))
+                    then assignments(snd(snd (prog)))
                     else if (isEqual (fst (prog), "SKIP"))
                         then []
                         else ["error " ++ fst (prog)]
