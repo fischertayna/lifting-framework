@@ -254,7 +254,12 @@ valList (Var ls) = ls
 (VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
 (VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
 (VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
-(VarList list1) ++++ (VarList list2) = VarList (list1 ++ list2)
+(VarList list1) ++++ (VarList list2) =
+  VarList
+    [ v1 ++++ v2
+      | v1 <- list1,
+        v2 <- list2
+    ]
 (VarPair (v1, v2)) ++++ (VarPair (w1, w2)) = VarPair (v1 ++++ w1, v2 ++++ w2)
 v1 ++++ v2 = error $ "Mismatched types for ++++ operator: " 
                     ++ show v1 ++ " and " ++ show v2
@@ -266,19 +271,9 @@ v1 ++++ v2 = error $ "Mismatched types for ++++ operator: "
 (VarList list) |||| pcR = VarList [v |||| pcR | v <- list]
 (VarPair (v1, v2)) |||| pcR = VarPair (v1 |||| pcR, v2 |||| pcR)
 
-data VarValor
-    = VarInteger { int :: Var Integer
-        }
-    | VarBool
-        { bool :: Var Bool
-        }
-    | VarString
-        { str :: Var String
-        }
-    | VarList
-        { list :: [VarValor]
-        }
-    | VarPair
-        { pair :: (VarValor, VarValor)
-        }
+data VarValor = VarInteger { int :: Var Integer }
+              | VarBool { bool :: Var Bool }
+              | VarString { str :: Var String }
+              | VarList { list :: [VarValor] }
+              | VarPair { pair :: (VarValor, VarValor) }
     deriving (Show, Eq)
