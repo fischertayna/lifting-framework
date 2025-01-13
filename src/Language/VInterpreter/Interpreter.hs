@@ -14,6 +14,7 @@ import Variability.VarTypes
     VarValor(..),
     ffPC,
     sat,
+    unsat,
     mkBDDVar,
     notBDD,
     tt, ff,
@@ -212,13 +213,55 @@ applyUnion context exp0 exp1 =
       _ -> error "Union should only be used to lists"
 
 unionLists :: [VarValor] -> [VarValor] -> [VarValor]
-unionLists xs l
-  = foldl
-      (\ l x
-         -> if elemInList x l
-            then l
-            else x : l)
-      l xs
+unionLists [] ys = ys
+unionLists (x:xs) ys =
+  let updatedYs = replaceOrAdd x ys
+  in unionLists xs updatedYs
+
+replaceOrAdd :: VarValor -> [VarValor] -> [VarValor]
+replaceOrAdd x [] = [x]
+replaceOrAdd x (y:ys)
+  | areEqualIgnoringPresence x y =
+      case comparePresence presenceX presenceY of
+        Merge    -> combinePresence x y : ys
+        Coexist  -> x : y : ys
+  | otherwise = y : replaceOrAdd x ys
+  where
+    presenceX = extractPresence x
+    presenceY = extractPresence y
+
+data PresenceComparison = Merge | Coexist
+
+comparePresence :: PresenceCondition -> PresenceCondition -> PresenceComparison
+comparePresence pcX pcY
+  | unsat (pcX /\ pcY) = Coexist
+  | otherwise = Merge
+
+extractPresence :: VarValor -> PresenceCondition
+extractPresence (VarString (Var [(_, pc)])) = pc
+extractPresence (VarBool (Var [(_, pc)])) = pc
+extractPresence (VarInteger (Var [(_, pc)])) = pc
+extractPresence (VarList _) = ttPC
+extractPresence (VarPair _) = ttPC
+
+combinePresence :: VarValor -> VarValor -> VarValor
+combinePresence (VarString (Var [(v1, pc1)])) (VarString (Var [(v2, pc2)]))
+  | v1 == v2 = VarString (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarBool (Var [(v1, pc1)])) (VarBool (Var [(v2, pc2)]))
+  | v1 == v2 = VarBool (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarInteger (Var [(v1, pc1)])) (VarInteger (Var [(v2, pc2)]))
+  | v1 == v2 = VarInteger (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarPair (p11, p12)) (VarPair (p21, p22)) =
+  VarPair (combinePresence p11 p21, combinePresence p12 p22)
+combinePresence _ _ = error "Cannot combine different types of VarValor"
+
+areEqualIgnoringPresence :: VarValor -> VarValor -> Bool
+areEqualIgnoringPresence (VarString (Var [(s1, _)])) (VarString (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarBool (Var [(s1, _)])) (VarBool (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarInteger (Var [(s1, _)])) (VarInteger (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarPair (p11, p12)) (VarPair (p21, p22)) = p11 == p21 && p21 == p22
+areEqualIgnoringPresence (VarList l1) (VarList l2) = l1 == l2
+areEqualIgnoringPresence _ _ = False
 
 elemInList :: VarValor -> [VarValor] -> Bool
 elemInList _ [] = False

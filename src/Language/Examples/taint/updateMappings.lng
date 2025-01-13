@@ -82,12 +82,11 @@ fv (prog) {
 
 getVarFromValue :: Any -> [Any]
 getVarFromValue (aexp) {
-    if (isEqual (fst (aexp), "VAR"))
-        then [snd (aexp)]
-        else if (isEqual (fst (aexp), "CONST"))
-            then []
-            else getVarFromValue(fst (snd(aexp))) ++ getVarFromValue(snd (snd(aexp)))
-
+    if (isPair(snd(aexp)))
+        then getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
+        else if (checkType(aexp, "VAR"))
+            then [snd (aexp)]
+            else []
 }
 
 flow :: Any -> [(String, String)]

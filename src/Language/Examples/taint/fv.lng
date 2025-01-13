@@ -20,11 +20,11 @@ fv (prog) {
 
 getVarFromValue :: Any -> [Any]
 getVarFromValue (aexp) {
-    if (checkType(aexp, "VAR"))
-        then [snd (aexp)]
-        else if (checkType(aexp, "CONST"))
-            then []
-            else getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
+    if (isPair(snd(aexp)))
+        then getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
+        else if (checkType(aexp, "VAR"))
+            then [snd (aexp)]
+            else []
 }
 
 typeStmt :: Any -> String
@@ -87,6 +87,11 @@ labelFromIf (stm) {
     snd(fst(stm))
 }
 
+getCondFromIf :: Any -> String
+getCondFromIf (stm) {
+    fst(fst(stm))
+}
+
 thenFromIf :: Any -> Any
 thenFromIf (stm) {
     fst(snd(stm))
@@ -100,6 +105,11 @@ elseFromIf (stm) {
 labelFromWhile :: Any -> String
 labelFromWhile (stm) {
     snd(fst(stm))
+}
+
+getCondFromWhile :: Any -> String
+getCondFromWhile (stm) {
+    fst(fst(stm))
 }
 
 blockFromWhile :: Any -> Any

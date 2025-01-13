@@ -1,27 +1,4 @@
 main :: ([Any], [Any]) -> [Any]
 main (prog) {
-    unionF (fst (prog), snd (prog))
-}
-
-unionF :: [Any] -> [Any] -> [Any]
-unionF (l1, l2) {
-    if (isNil(l2))
-        then l1
-        else unionF (addUnique(head(l2), l1), tail(l2))
-}
-
-addUnique :: Any -> [Any] -> [Any]
-addUnique (x, l) {
-    if (elem(x, l))
-        then l
-        else l ++ [x] 
-}
-
-elem :: Any -> [Any] -> int
-elem (x, l) {
-    if (isNil(l))
-        then 0
-        else if (isEqual(head(l), x))
-            then 1
-            else elem(x, tail(l))
+    union (fst (prog), snd (prog))
 }

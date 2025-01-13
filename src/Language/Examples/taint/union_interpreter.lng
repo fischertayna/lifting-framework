@@ -1,4 +1,0 @@
-main :: ([Any], [Any]) -> [Any]
-main (prog) {
-    union (fst (prog), snd (prog))
-}

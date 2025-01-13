@@ -12,26 +12,115 @@ makeSetOfFV (fvs) {
 
 fv :: Any -> [String]
 fv (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then union ([fst (snd (snd (prog)))], getVarFromValue(snd (snd (snd (prog)))))
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(fv(fst(snd (prog))), fv(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(fv (fst (snd (snd (prog)))), fv (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then fv(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+    if (checkType(prog, "ASGN"))
+        then union ([varFromAsgn(getStmt(prog))], getVarFromValue(valueFromAsgn(getStmt(prog))))
+        else if (checkType(prog, "SEQ"))
+            then union(fv(fstStmtOfSeq(getStmt(prog))), fv(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(fv(thenFromIf(getStmt(prog))), fv(elseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then fv(blockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ typeStmt(prog)]
 }
-
 
 getVarFromValue :: Any -> [Any]
 getVarFromValue (aexp) {
-    if (isEqual (fst (aexp), "VAR"))
-        then [snd (aexp)]
-        else if (isEqual (fst (aexp), "CONST"))
-            then []
-            else getVarFromValue(fst (snd(aexp))) ++ getVarFromValue(snd (snd(aexp)))
+    if (isPair(snd(aexp)))
+        then getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
+        else if (checkType(aexp, "VAR"))
+            then [snd (aexp)]
+            else []
+}
 
+
+typeStmt :: Any -> String
+typeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(typeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+varFromAsgn :: Any -> String
+varFromAsgn (asgn) {
+    fst(snd(asgn))
+}
+
+valueFromAsgn :: Any -> String
+valueFromAsgn (asgn) {
+    snd(snd(asgn))
+}
+
+getFstOpValue :: Any -> String
+getFstOpValue (aexp) {
+    fst(snd(aexp))
+}
+
+getSndOpValue :: Any -> String
+getSndOpValue (aexp) {
+    snd(snd(aexp))
+}
+
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
+    fst(skip)
+}
+
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+labelFromIf :: Any -> String
+labelFromIf (stm) {
+    snd(fst(stm))
+}
+
+getCondFromIf :: Any -> String
+getCondFromIf (stm) {
+    fst(fst(stm))
+}
+
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
+    fst(snd(stm))
+}
+
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
+    snd(snd(stm))
+}
+
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
+    snd(fst(stm))
+}
+
+getCondFromWhile :: Any -> String
+getCondFromWhile (stm) {
+    fst(fst(stm))
+}
+
+blockFromWhile :: Any -> Any
+blockFromWhile (stm) {
+    snd(stm)
 }
