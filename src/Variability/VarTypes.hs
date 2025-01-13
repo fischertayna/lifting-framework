@@ -11,6 +11,7 @@ import GHC.StableName (makeStableName)
 import Control.Exception (assert)
 import Data.List (sort)
 import Data.Maybe (fromJust)
+import Debug.Trace (trace)
 
 type HashTable k v = H.BasicHashTable k v
 
@@ -251,18 +252,47 @@ valList (Var ls) = ls
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
 
 (++++) :: VarValor -> VarValor -> VarValor
-(VarInteger lvint1) ++++ (VarInteger lvint2) = VarInteger (lvint1 +++ lvint2)
-(VarBool lvint1) ++++ (VarBool lvint2) = VarBool (lvint1 +++ lvint2)
-(VarString lvint1) ++++ (VarString lvint2) = VarString (lvint1 +++ lvint2)
-(VarList list1) ++++ (VarList list2) =
-  VarList
-    [ v1 ++++ v2
-      | v1 <- list1,
-        v2 <- list2
-    ]
-(VarPair (v1, v2)) ++++ (VarPair (w1, w2)) = VarPair (v1 ++++ w1, v2 ++++ w2)
-v1 ++++ v2 = error $ "Mismatched types for ++++ operator: " 
-                    ++ show v1 ++ " and " ++ show v2
+(VarInteger lvint1) ++++ (VarInteger lvint2)
+  | isEmpty lvint1 = VarInteger lvint2
+  | isEmpty lvint2 = VarInteger lvint1
+  | otherwise      = VarInteger (lvint1 +++ lvint2)
+(VarBool lvint1) ++++ (VarBool lvint2)
+  | isEmpty lvint1 = VarBool lvint2
+  | isEmpty lvint2 = VarBool lvint1
+  | otherwise      = VarBool (lvint1 +++ lvint2)
+(VarString lvint1) ++++ (VarString lvint2)
+  | isEmpty lvint1 = VarString lvint2
+  | isEmpty lvint2 = VarString lvint1
+  | otherwise      = VarString (lvint1 +++ lvint2)
+(VarList list1) ++++ (VarList list2)
+  | isEmptyVarList list1 && isEmptyVarList list2 = VarList []
+  | isEmptyVarList list1 = VarList list2
+  | isEmptyVarList list2 = VarList list1
+  | otherwise = VarList [handleEmpty v1 v2 | v1 <- list1, v2 <- list2]
+(VarPair (v1, v2)) ++++ (VarPair (w1, w2)) =
+  VarPair (handleEmpty v1 w1, handleEmpty v2 w2)
+v1 ++++ v2 = error $ "Mismatched types for ++++ operator: " ++ show v1 ++ " and " ++ show v2
+
+
+isEmpty :: Var a -> Bool
+isEmpty (Var vals) = null vals
+
+isEmptyVarList :: [VarValor] -> Bool
+isEmptyVarList = all isEmptyVarValor
+
+isEmptyVarValor :: VarValor -> Bool
+isEmptyVarValor (VarInteger (Var vals)) = null vals
+isEmptyVarValor (VarBool (Var vals)) = null vals
+isEmptyVarValor (VarString (Var vals)) = null vals
+isEmptyVarValor (VarList []) = True
+isEmptyVarValor (VarList _) = False
+isEmptyVarValor (VarPair (v1, v2)) = isEmptyVarValor v1 && isEmptyVarValor v2
+
+handleEmpty :: VarValor -> VarValor -> VarValor
+handleEmpty v1 v2
+  | isEmptyVarValor v1 = v2 -- Only v1 is empty
+  | isEmptyVarValor v2 = v1 -- Only v2 is empty
+  | otherwise          = v1 ++++ v2 -- Neither is empty
 
 (||||) :: VarValor -> PresenceCondition -> VarValor
 (VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))

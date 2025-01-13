@@ -77,9 +77,9 @@ ex1 = VarPair(
                 VarString (Var [("SEQ", propA)]), -- Should it be A??
                 VarPair ( 
                     VarPair (
-                        VarString (Var [("ASGN", propA), ("DUMMY", notBDD propA)]),
+                        VarString (Var [("ASGN", propA), ("SKIP", notBDD propA)]),
                         VarPair (
-                            VarString (Var [("2", propA), ("DUMMY", notBDD propA)]),
+                            VarString (Var [("2", propA), ("2", notBDD propA)]),
                             VarPair (
                                 VarString (Var [("y", propA), ("DUMMY", notBDD propA)]),
                                 VarPair(
@@ -93,9 +93,9 @@ ex1 = VarPair(
                         VarString (Var [("SEQ", ttPC)]), -- Should it be ~A??
                         VarPair(
                             VarPair (
-                                VarString (Var [("ASGN", notBDD propA), ("DUMMY", propA)]),
+                                VarString (Var [("ASGN", notBDD propA), ("SKIP", propA)]),
                                 VarPair (
-                                    VarString (Var [("3", notBDD propA), ("DUMMY", propA)]),
+                                    VarString (Var [("3", notBDD propA), ("3", propA)]),
                                     VarPair (
                                         VarString (Var [("y", notBDD propA), ("DUMMY", propA)]),
                                         VarPair(
@@ -701,6 +701,247 @@ factorialProg =  VarPair (
                         )
                     )
                 )
+
+-- -- s01 = Assignment "x" (Const 5) 1
+-- -- s02 = Assignment "y" (Const 1) 2
+
+-- -- whileTeste = (GTExp (Var "x") (Const 1), 3)
+-- -- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- -- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- -- example = While whileTeste (Seq whileS1 whileS2)
+
+s01 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarString (Var [("1", ttPC)]),
+            VarPair (
+                VarString (Var [("x", ttPC)]),
+                VarPair (
+                    VarString (Var [("CONST", ttPC)]),
+                    VarString (Var [("5", ttPC)])
+                ))))
+
+s02 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarString (Var [("2", ttPC)]),
+            VarPair (
+                VarString (Var [("y", ttPC)]), 
+                VarPair(
+                    VarString (Var [("CONST", ttPC)]),
+                    VarString (Var [("1", ttPC)])
+                ))))
+
+whileTeste = VarPair (
+                VarString (Var [("VAR", ttPC)]),
+                VarString (Var [("x", ttPC)])
+            )
+
+whileS1 = VarPair(
+            VarString (Var [("ASGN", ttPC)]),
+            VarPair (
+                VarString (Var [("4", ttPC)]),
+                VarPair (
+                    VarString (Var [("y", ttPC)]),
+                    VarPair (
+                        VarString (Var [("MULT", ttPC)]), 
+                        VarPair (
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]),
+                                VarString (Var [("x", ttPC)])
+                            ),
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]),
+                                VarString (Var [("y", ttPC)])
+                            ))))))
+
+whileS2 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarString (Var [("5", ttPC)]),
+            VarPair (
+                VarString (Var [("x", ttPC)]),
+                VarPair (
+                    VarString (Var [("SUB", ttPC)]),
+                    VarPair (
+                        VarPair (
+                            VarString (Var [("VAR", ttPC)]),
+                            VarString (Var [("x", ttPC)])
+                        ),
+                        VarPair(
+                            VarString (Var [("CONST", ttPC)]),
+                            VarString (Var [("1", ttPC)])
+                        ))))))
+
+example =  VarPair (
+                VarString (Var [("SEQ", ttPC)]),
+                VarPair(
+                    s01,
+                    VarPair(
+                        VarString (Var [("SEQ", ttPC)]),
+                        VarPair (
+                            s02,
+                            VarPair (
+                                VarString (Var [("WHILE", ttPC)]),
+                                VarPair ( 
+                                    VarPair(
+                                        whileTeste,
+                                        VarString (Var [("3", ttPC)])
+                                    ),
+                                    VarPair (
+                                        VarString (Var [("SEQ", ttPC)]),
+                                        VarPair(
+                                            whileS1,
+                                            whileS2
+                                        ))))))))
+
+-- #IFDEF A
+-- vs01 = Assignment "x" (Const 5) 1
+-- #ELSE
+-- vas011 = Assignment "z" (Const 2) 11
+-- vas022 = Assignment "x" (Mult (Const 5) (Var "y")) 12
+-- #ENDIF
+-- vs02 = Assignment "y" (Const 1) 2
+
+-- vwhileTeste = (GTExp (Var "x") (Const 1), 3)
+-- vwhileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- vwhileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- vexample = While whileTeste (Seq whileS1 whileS2)
+
+-- equivalent
+
+-- vs01 = Assignment "x" (Const 5) 1                        A  ||  skip ~A  19
+-- vas011 = Assignment "z" (Const 2) 11                     ~A ||  skip A  119
+-- vas022 = Assignment "x" (Mult (Const 5) (Var "y")) 12    ~A ||  skip A  129
+
+-- vs02 = Assignment "y" (Const 1) 2
+
+-- vwhileTeste = (GTExp (Var "x") (Const 1), 3)
+-- vwhileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- vwhileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- vexample = While whileTeste (Seq whileS1 whileS2)
+
+vs01 = VarPair(
+        VarString (Var [("ASGN", propA), ("SKIP", notBDD propA)]),
+        VarPair (
+            VarString (Var [("1", propA), ("19", notBDD propA)]),
+            VarPair (
+                VarString (Var [("x", propA), ("DUMMY", notBDD propA)]),
+                VarPair (
+                    VarString (Var [("CONST", propA), ("DUMMY", notBDD propA)]),
+                    VarString (Var [("5", propA), ("DUMMY", notBDD propA)])
+                ))))
+
+vas011 = VarPair(
+            VarString (Var [("ASGN", notBDD propA), ("SKIP", propA)]),
+            VarPair (
+                VarString (Var [("11", notBDD propA), ("119", propA)]),
+                VarPair (
+                    VarString (Var [("z", notBDD propA), ("DUMMY", propA)]),
+                    VarPair (
+                        VarString (Var [("CONST", notBDD propA), ("DUMMY", propA)]),
+                        VarString (Var [("2", notBDD propA), ("DUMMY", propA)])
+                    ))))
+
+vas012 = VarPair(
+            VarString (Var [("ASGN", notBDD propA), ("SKIP", propA)]),
+            VarPair (
+                VarString (Var [("12", notBDD propA), ("129", propA)]),
+                VarPair (
+                    VarString (Var [("x", notBDD propA), ("DUMMY", propA)]),
+                    VarPair (
+                        VarString (Var [("MULT", notBDD propA), ("DUMMY", propA)]), 
+                        VarPair (
+                            VarPair (
+                                VarString (Var [("CONST", notBDD propA), ("DUMMY", propA)]),
+                                VarString (Var [("5", notBDD propA), ("DUMMY", propA)])
+                            ),
+                            VarPair (
+                                VarString (Var [("VAR", notBDD propA), ("DUMMY", propA)]),
+                                VarString (Var [("y",notBDD propA), ("DUMMY", propA)])
+                            ))))))
+
+vs02 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarString (Var [("2", ttPC)]),
+            VarPair (
+                VarString (Var [("y", ttPC)]), 
+                VarPair(
+                    VarString (Var [("CONST", ttPC)]),
+                    VarString (Var [("1", ttPC)])
+                ))))
+
+vwhileTeste = VarPair (
+                VarString (Var [("VAR", ttPC)]),
+                VarString (Var [("x", ttPC)])
+            )
+
+vwhileS1 = VarPair(
+            VarString (Var [("ASGN", ttPC)]),
+            VarPair (
+                VarString (Var [("4", ttPC)]),
+                VarPair (
+                    VarString (Var [("y", ttPC)]),
+                    VarPair (
+                        VarString (Var [("MULT", ttPC)]), 
+                        VarPair (
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]),
+                                VarString (Var [("x", ttPC)])
+                            ),
+                            VarPair (
+                                VarString (Var [("VAR", ttPC)]),
+                                VarString (Var [("y", ttPC)])
+                            ))))))
+
+vwhileS2 = VarPair(
+        VarString (Var [("ASGN", ttPC)]),
+        VarPair (
+            VarString (Var [("5", ttPC)]),
+            VarPair (
+                VarString (Var [("x", ttPC)]),
+                VarPair (
+                    VarString (Var [("SUB", ttPC)]),
+                    VarPair (
+                        VarPair (
+                            VarString (Var [("VAR", ttPC)]),
+                            VarString (Var [("x", ttPC)])
+                        ),
+                        VarPair(
+                            VarString (Var [("CONST", ttPC)]),
+                            VarString (Var [("1", ttPC)])
+                        ))))))
+
+vexample =  VarPair (
+                VarString (Var [("SEQ", ttPC)]),
+                VarPair(
+                    vs01,
+                    VarPair(
+                        VarString (Var [("SEQ", ttPC)]),
+                        VarPair(
+                            vas011,
+                            VarPair(
+                                VarString (Var [("SEQ", ttPC)]),
+                                VarPair(
+                                    vas012,
+                                    VarPair(
+                                        VarString (Var [("SEQ", ttPC)]),
+                                        VarPair (
+                                            vs02,
+                                            VarPair (
+                                                VarString (Var [("WHILE", ttPC)]),
+                                                VarPair ( 
+                                                    VarPair(
+                                                        vwhileTeste,
+                                                        VarString (Var [("3", ttPC)])
+                                                    ),
+                                                    VarPair (
+                                                        VarString (Var [("SEQ", ttPC)]),
+                                                        VarPair(
+                                                            vwhileS1,
+                                                            vwhileS2
+                                                        ))))))))))))
 
 
 testIsPair :: Test

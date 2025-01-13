@@ -9,10 +9,14 @@ import Language.Frontend.AbsLanguage
   )
 import Variability.VarTypes
   ( PresenceCondition,
+    Prop,
     Var (..),
     VarValor(..),
     ffPC,
     sat,
+    mkBDDVar,
+    notBDD,
+    tt, ff,
     ttPC,
     valList,
     (+++),
@@ -21,6 +25,8 @@ import Variability.VarTypes
     union
   )
 import Prelude hiding (lookup)
+import Debug.Trace
+import qualified Data.Text as T
 
 type Context k v = [(k, v)]
 
@@ -29,6 +35,50 @@ type RContext = (VContext, FContext)
 type VContext = Context Ident VarValor
 
 type FContext = Context Ident Function
+
+propAS :: Prop
+propAS = mkBDDVar "A"
+
+propBS :: Prop
+propBS = mkBDDVar "B"
+
+atbtS :: Prop
+atbtS = propAS /\ propBS
+
+atbfS :: Prop
+atbfS = propAS /\ notBDD propBS
+
+afbtS :: Prop
+afbtS = notBDD propAS /\ propBS
+
+afbfS :: Prop
+afbfS = notBDD propAS /\ notBDD propBS
+
+substitutionsS :: [(String, String)]
+substitutionsS =
+    [ (show atbtS, " atbt")
+    , (show afbtS, " afbt")
+    , (show atbfS, " atbf")
+    , (show afbfS, " afbf")
+    , (show tt, " tt")
+    , (show ff, " ff")
+    , (show ttPC, " ttPC")
+    , (show ffPC, " ffPC")
+    , (show propAS, " A")
+    , (show (notBDD propAS), " ~A")
+    ]
+
+replaceStringS :: String -> String -> String -> String
+replaceStringS old new text = T.unpack (T.replace (T.pack old) (T.pack new) (T.pack text))
+
+substituteS :: String -> [(String, String)] -> String
+substituteS text substitutions =
+    let replaceAll :: [(String, String)] -> String -> String
+        replaceAll [] txt = txt
+        replaceAll ((key, value):xs) txt =
+            replaceAll xs (replaceStringS key value txt)
+    
+    in replaceAll substitutions text
 
 evalV :: RContext -> Exp -> VarValor
 evalV context@(vcontext, fcontext) x = case x of
