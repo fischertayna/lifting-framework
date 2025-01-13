@@ -852,7 +852,7 @@ testInsertInto2 = TestCase $ do
                             exPPAEntry
                         )))
     let expectedOutput = exPPAEntry
-    putStrLn ("\n testInsertInto2 : " ++ (substitute (show output) substitutions))
+    -- putStrLn ("\n testInsertInto2 : " ++ (substitute (show output) substitutions))
     assertEqual "testInsertInto" expectedOutput output
 
 testUpdateMappings :: Test
@@ -961,8 +961,8 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "rdExit 4" testRDExit4
                         ,   TestLabel "labels" testLabels
                         ,   TestLabel "testInsertInto 1" testInsertInto1
-                        -- ,   TestLabel "testInsertInto 2" testInsertInto2
-                        -- ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
+                        ,   TestLabel "testInsertInto 2" testInsertInto2
+                        ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
                         ,   TestLabel "union 1" testUnion1
                         ,   TestLabel "union 2" testUnion2
                         ,   TestLabel "union 2_2" testUnion2_2

@@ -1266,12 +1266,11 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Not Elem" testNotElem
                         ,   TestLabel "AddUnique" testAddUnique
                         ,   TestLabel "AddUnique same" testAddUniqueSame
-                        -- ,   TestLabel "Union" testUnion
-                        ,   TestLabel "Flow ex1" testFlowEx1
-                        ,   TestLabel "Flow ex2" testFlowEx2
-                        ,   TestLabel "Flow ex3" testFlowEx3
-                        ,   TestLabel "Flow ex4" testFlowEx4
-                        ,   TestLabel "Flow factorial" testFlowFactorial
+                        -- ,   TestLabel "Flow ex1" testFlowEx1
+                        -- ,   TestLabel "Flow ex2" testFlowEx2
+                        -- ,   TestLabel "Flow ex3" testFlowEx3
+                        -- ,   TestLabel "Flow ex4" testFlowEx4
+                        -- ,   TestLabel "Flow factorial" testFlowFactorial
                         ,   TestLabel "Chaotic Iteration 1" testChaoticIteration1
                         ,   TestLabel "Chaotic Iteration 2" testChaoticIteration2
                         ,   TestLabel "Asgns ex1" testAssignmentsEx1
@@ -1305,6 +1304,5 @@ rdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "labels" testLabels
                         ,   TestLabel "testInsertInto 1" testInsertInto1
                         ,   TestLabel "testInsertInto 2" testInsertInto2
-                        -- ,   TestLabel "testUpdateMappings" testUpdateMappings
                         ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
                         ]

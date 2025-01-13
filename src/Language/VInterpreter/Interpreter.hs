@@ -259,8 +259,8 @@ areEqualIgnoringPresence :: VarValor -> VarValor -> Bool
 areEqualIgnoringPresence (VarString (Var [(s1, _)])) (VarString (Var [(s2, _)])) = s1 == s2
 areEqualIgnoringPresence (VarBool (Var [(s1, _)])) (VarBool (Var [(s2, _)])) = s1 == s2
 areEqualIgnoringPresence (VarInteger (Var [(s1, _)])) (VarInteger (Var [(s2, _)])) = s1 == s2
-areEqualIgnoringPresence (VarPair (p11, p12)) (VarPair (p21, p22)) = p11 == p21 && p21 == p22
-areEqualIgnoringPresence (VarList l1) (VarList l2) = l1 == l2
+areEqualIgnoringPresence (VarPair (p11, p12)) (VarPair (p21, p22)) = (p11 == p21 && p12 == p22)
+areEqualIgnoringPresence (VarList l1) (VarList l2) = (l1 == l2)
 areEqualIgnoringPresence _ _ = False
 
 elemInList :: VarValor -> [VarValor] -> Bool
