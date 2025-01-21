@@ -17,32 +17,6 @@ makeSetOfFV (fvs) {
         else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
 }
 
-findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
-findInExit (fl, exit) {
-    if (isNil(fl))
-        then []
-        else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
-}
-
-findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
-findOrDefault (l, exit) {
-    if (isNil(exit))
-        then []
-        else if (isEqual(fst (head (exit)), l))
-            then snd (head (exit))
-            else findOrDefault(l, tail(exit))
-}
-
-
-filterFlow :: String -> [(String, String)] -> [(String, String)]
-filterFlow (l, fl) {
-    if (isNil(fl))
-        then []
-        else if (isEqual(snd (head (fl)), l))
-            then [head (fl)] ++ filterFlow(l, tail(fl))
-            else filterFlow(l, tail(fl))
-}
-
 fv :: Any -> [String]
 fv (prog) {
     if (checkType(prog, "ASGN"))
@@ -65,6 +39,32 @@ getVarFromValue (aexp) {
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []
+}
+
+
+findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findInExit (fl, exit) {
+    if (isNil(fl))
+        then []
+        else union(findOrDefault(fst(head (fl)), exit), findInExit(tail(fl), exit))
+}
+
+findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
+findOrDefault (l, exit) {
+    if (isNil(exit))
+        then []
+        else if (isEqual(fst (head (exit)), l))
+            then snd (head (exit))
+            else findOrDefault(l, tail(exit))
+}
+
+filterFlow :: String -> [(String, String)] -> [(String, String)]
+filterFlow (l, fl) {
+    if (isNil(fl))
+        then []
+        else if (isEqual(snd (head (fl)), l))
+            then union([head (fl)], filterFlow(l, tail(fl)))
+            else filterFlow(l, tail(fl))
 }
 
 flow :: Any -> [(String, String)]

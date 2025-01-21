@@ -86,7 +86,7 @@ findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, 
 findInExit (fl, exit) {
     if (isNil(fl))
         then []
-        else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
+        else union(findOrDefault(fst(head (fl)), exit), findInExit(tail(fl), exit))
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
@@ -104,7 +104,7 @@ filterFlow (l, fl) {
     if (isNil(fl))
         then []
         else if (isEqual(snd (head (fl)), l))
-            then [head (fl)] ++ filterFlow(l, tail(fl))
+            then union([head (fl)], filterFlow(l, tail(fl)))
             else filterFlow(l, tail(fl))
 }
 
@@ -200,17 +200,21 @@ findBlock (l, prog) {
         then if (isEqual(labelFromAsgn(getStmt(prog)), l))
             then [prog]
             else []
-        else if (checkType(prog, "SEQ"))
-            then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
-            else if (checkType(prog, "IF"))
-                then if (isEqual(labelFromIf(getStmt(prog)), l))
-                    then [getCondFromIf(getStmt(prog))]
-                    else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
-                else if (checkType(prog, "WHILE"))
-                    then if (isEqual(labelFromWhile(getStmt(prog)), l))
-                        then [getCondFromWhile(getStmt(prog))] 
-                        else findBlock(l, blockFromWhile(getStmt(prog)))
-                    else []
+        else if (checkType(prog, "SKIP"))
+            then if (isEqual(labelFromSkip(getStmt(prog)), l))
+                then [prog]
+                else []
+            else if (checkType(prog, "SEQ"))
+                then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
+                else if (checkType(prog, "IF"))
+                    then if (isEqual(labelFromIf(getStmt(prog)), l))
+                        then [getCondFromIf(getStmt(prog))]
+                        else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
+                    else if (checkType(prog, "WHILE"))
+                        then if (isEqual(labelFromWhile(getStmt(prog)), l))
+                            then [getCondFromWhile(getStmt(prog))] 
+                            else findBlock(l, blockFromWhile(getStmt(prog)))
+                        else []
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
@@ -250,7 +254,7 @@ filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []
         else if (isEqual(fst(head(assigns)), var))
-            then [head (assigns)] ++ filterRD(var, l, tail(assigns))
+            then union([head (assigns)], filterRD(var, l, tail(assigns)))
             else filterRD(var, l, tail(assigns))
 }
 

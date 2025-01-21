@@ -12,6 +12,7 @@ import Control.Exception (assert)
 import Data.List (sort)
 import Data.Maybe (fromJust)
 import Debug.Trace (trace)
+import qualified Data.Text as T
 
 type HashTable k v = H.BasicHashTable k v
 
@@ -251,28 +252,86 @@ valList (Var ls) = ls
 (+++) :: Var a -> Var a -> Var a
 (Var lvint1) +++ (Var lvint2) = Var (lvint1 ++ lvint2)
 
+propA :: Prop
+propA = mkBDDVar "A"
+
+propB :: Prop
+propB = mkBDDVar "B"
+
+atbt :: Prop
+atbt = propA /\ propB
+
+atbf :: Prop
+atbf = propA /\ notBDD propB
+
+afbt :: Prop
+afbt = notBDD propA /\ propB
+
+afbf :: Prop
+afbf = notBDD propA /\ notBDD propB
+
+substitutions :: [(String, String)]
+substitutions =
+    [ (show atbt, " atbt")
+    , (show afbt, " afbt")
+    , (show atbf, " atbf")
+    , (show afbf, " afbf")
+    , (show tt, " tt")
+    , (show ff, " ff")
+    , (show ttPC, " ttPC")
+    , (show ffPC, " ffPC")
+    , (show propA, " A")
+    , (show (notBDD propA), " ~A")
+    ]
+
+replaceString :: String -> String -> String -> String
+replaceString old new text = T.unpack (T.replace (T.pack old) (T.pack new) (T.pack text))
+
+substitute :: String -> String
+substitute text =
+    let replaceAll :: [(String, String)] -> String -> String
+        replaceAll [] txt = txt
+        replaceAll ((key, value):xs) txt =
+            replaceAll xs (replaceString key value txt)
+    
+    in replaceAll substitutions text
+
 (++++) :: VarValor -> VarValor -> VarValor
 (VarInteger lvint1) ++++ (VarInteger lvint2)
-  | isEmpty lvint1 = VarInteger lvint2
-  | isEmpty lvint2 = VarInteger lvint1
-  | otherwise      = VarInteger (lvint1 +++ lvint2)
+  | isEmpty lvint1 = doTrace "Integer: lvint1 is empty" (VarInteger lvint1) (VarInteger lvint2) (VarInteger lvint2)
+  | isEmpty lvint2 = doTrace "Integer: lvint2 is empty" (VarInteger lvint1) (VarInteger lvint2) (VarInteger lvint1)
+  | otherwise      = doTrace "Integer: combining" (VarInteger lvint1) (VarInteger lvint2) (VarInteger (lvint1 +++ lvint2))
 (VarBool lvint1) ++++ (VarBool lvint2)
-  | isEmpty lvint1 = VarBool lvint2
-  | isEmpty lvint2 = VarBool lvint1
-  | otherwise      = VarBool (lvint1 +++ lvint2)
+  | isEmpty lvint1 = doTrace "Bool: lvint1 is empty" (VarBool lvint1) (VarBool lvint2) (VarBool lvint2)
+  | isEmpty lvint2 = doTrace "Bool: lvint2 is empty" (VarBool lvint1) (VarBool lvint2) (VarBool lvint1)
+  | otherwise      = doTrace "Bool: combining" (VarBool lvint1) (VarBool lvint2) (VarBool (lvint1 +++ lvint2))
 (VarString lvint1) ++++ (VarString lvint2)
-  | isEmpty lvint1 = VarString lvint2
-  | isEmpty lvint2 = VarString lvint1
-  | otherwise      = VarString (lvint1 +++ lvint2)
+  | isEmpty lvint1 = doTrace "String: lvint1 is empty" (VarString lvint1) (VarString lvint2) (VarString lvint2)
+  | isEmpty lvint2 = doTrace "String: lvint2 is empty" (VarString lvint1) (VarString lvint2) (VarString lvint1)
+  | otherwise      = doTrace "String: combining" (VarString lvint1) (VarString lvint2) (VarString (lvint1 +++ lvint2))
 (VarList list1) ++++ (VarList list2)
-  | isEmptyVarList list1 && isEmptyVarList list2 = VarList []
-  | isEmptyVarList list1 = VarList list2
-  | isEmptyVarList list2 = VarList list1
-  | otherwise = VarList [handleEmpty v1 v2 | v1 <- list1, v2 <- list2]
+  | isEmptyVarList list1 && isEmptyVarList list2 = doTrace "List: both lists empty" (VarList list1) (VarList list2) (VarList [])
+  | isEmptyVarList list1 = doTrace "List: list1 is empty" (VarList list1) (VarList list2) (VarList list2)
+  | isEmptyVarList list2 = doTrace "List: list2 is empty" (VarList list1) (VarList list2) (VarList list1)
+  | otherwise = 
+      let paddedList1 = padToLength list1 list2
+          paddedList2 = padToLength list2 list1
+          combined = zipWith handleEmpty paddedList1 paddedList2
+      in doTrace "List: combining lists" (VarList list1) (VarList list2) (VarList combined)
+--  | otherwise = doTrace "List: combining lists" (VarList list1) (VarList list2) (VarList (list1 ++ list2))
+--  | otherwise = doTrace "List: combining lists" (VarList list1) (VarList list2) (VarList [handleEmpty v1 v2 | v1 <- list1, v2 <- list2])
 (VarPair (v1, v2)) ++++ (VarPair (w1, w2)) =
-  VarPair (handleEmpty v1 w1, handleEmpty v2 w2)
+  doTrace "Pair: combining" (VarPair (v1, v2)) (VarPair (w1, w2)) (VarPair (handleEmpty v1 w1, handleEmpty v2 w2))
 v1 ++++ v2 = error $ "Mismatched types for ++++ operator: " ++ show v1 ++ " and " ++ show v2
 
+-- Helper function for tracing
+doTrace :: (Show a, Show b) => String -> a -> b -> b -> b
+doTrace msg val1 val2 result = doTraceOrResult False msg val1 val2 result
+
+doTraceOrResult :: (Show a, Show b) => Bool -> String -> a -> b -> b -> b
+doTraceOrResult active msg val1 val2 result
+  | active = trace ("\n\nTrace: \n" ++ msg ++ "\n val1: " ++ substitute (show val1) ++ "\n val2: " ++ substitute (show val2) ++ "\n result: " ++ substitute (show result)) result
+  | otherwise = result
 
 isEmpty :: Var a -> Bool
 isEmpty (Var vals) = null vals
@@ -288,11 +347,17 @@ isEmptyVarValor (VarList []) = True
 isEmptyVarValor (VarList _) = False
 isEmptyVarValor (VarPair (v1, v2)) = isEmptyVarValor v1 && isEmptyVarValor v2
 
+padToLength :: [VarValor] -> [VarValor] -> [VarValor]
+padToLength xs ys = xs ++ replicate (length ys - length xs) emptyVarValor
+
+emptyVarValor :: VarValor
+emptyVarValor = VarList []
+
 handleEmpty :: VarValor -> VarValor -> VarValor
 handleEmpty v1 v2
-  | isEmptyVarValor v1 = v2 -- Only v1 is empty
-  | isEmptyVarValor v2 = v1 -- Only v2 is empty
-  | otherwise          = v1 ++++ v2 -- Neither is empty
+  | isEmptyVarValor v1 = v2
+  | isEmptyVarValor v2 = v1
+  | otherwise          = v1 ++++ v2
 
 (||||) :: VarValor -> PresenceCondition -> VarValor
 (VarInteger (Var listPCv)) |||| pcR = VarInteger (Var ([(v, pc') | (v, pc) <- listPCv, let pc' = pc /\ pcR, sat pc']))

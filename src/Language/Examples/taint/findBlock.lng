@@ -9,17 +9,21 @@ findBlock (l, prog) {
         then if (isEqual(labelFromAsgn(getStmt(prog)), l))
             then [prog]
             else []
-        else if (checkType(prog, "SEQ"))
-            then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
-            else if (checkType(prog, "IF"))
-                then if (isEqual(labelFromIf(getStmt(prog)), l))
-                    then [getCondFromIf(getStmt(prog))]
-                    else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
-                else if (checkType(prog, "WHILE"))
-                    then if (isEqual(labelFromWhile(getStmt(prog)), l))
-                        then [getCondFromWhile(getStmt(prog))] 
-                        else findBlock(l, blockFromWhile(getStmt(prog)))
-                    else []
+        else if (checkType(prog, "SKIP"))
+            then if (isEqual(labelFromSkip(getStmt(prog)), l))
+                then [prog]
+                else []
+            else if (checkType(prog, "SEQ"))
+                then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
+                else if (checkType(prog, "IF"))
+                    then if (isEqual(labelFromIf(getStmt(prog)), l))
+                        then [getCondFromIf(getStmt(prog))]
+                        else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
+                    else if (checkType(prog, "WHILE"))
+                        then if (isEqual(labelFromWhile(getStmt(prog)), l))
+                            then [getCondFromWhile(getStmt(prog))] 
+                            else findBlock(l, blockFromWhile(getStmt(prog)))
+                        else []
 }
 
 typeStmt :: Any -> String
