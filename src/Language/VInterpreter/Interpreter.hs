@@ -31,6 +31,7 @@ import Variability.VarTypes
 import Prelude hiding (lookup)
 import Debug.Trace
 import qualified Data.Text as T
+import Data.List (sortBy)
 
 type Context k v = [(k, v)]
 
@@ -117,6 +118,7 @@ evalV context@(vcontext, fcontext) x = case x of
         VarPair _ -> VarInteger (Var [(1, ttPC)])
         _ -> VarInteger (Var [(0, ttPC)])
     Ident "isEqual" -> applyEqualOperator context (pExps !! 0) (pExps !! 1)
+    Ident "sortList" -> applySortList context (pExps !! 0)
     Ident "lt" -> applyLtOperator context (pExps !! 0) (pExps !! 1)
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
     Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
@@ -183,29 +185,57 @@ applyLtOperator :: RContext -> Exp -> Exp -> VarValor
 applyLtOperator context exp0 exp1 =
   let v0 = evalV context exp0
       v1 = evalV context exp1
-  in case (v0, v1) of
-      (VarInteger vi0, VarInteger vi1) ->
-        VarInteger $ Var
-          [ (boolToInt (a < b), pc0 /\ pc1)
-          | (a, pc0) <- valList vi0
-          , (b, pc1) <- valList vi1
-          , sat (pc0 /\ pc1)
-          ]
-      (VarBool vb0, VarBool vb1) ->
-        VarInteger $ Var
-          [ (boolToInt (a < b), pc0 /\ pc1)
-          | (a, pc0) <- valList vb0
-          , (b, pc1) <- valList vb1
-          , sat (pc0 /\ pc1)
-          ]
-      (VarString vs0, VarString vs1) ->
-        VarInteger $ Var
-          [ (boolToInt (a < b), pc0 /\ pc1)
-          | (a, pc0) <- valList vs0
-          , (b, pc1) <- valList vs1
-          , sat (pc0 /\ pc1)
-          ]
-      _ -> VarInteger (Var [(0, ttPC)])
+      result = case (v0, v1) of
+          (VarInteger vi0, VarInteger vi1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vi0
+              , (b, pc1) <- valList vi1
+              , sat (pc0 /\ pc1)
+              ]
+          (VarBool vb0, VarBool vb1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vb0
+              , (b, pc1) <- valList vb1
+              , sat (pc0 /\ pc1)
+              ]
+          (VarString vs0, VarString vs1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vs0
+              , (b, pc1) <- valList vs1
+              , sat (pc0 /\ pc1)
+              ]
+          _ -> VarInteger (Var [(0, ttPC)])
+    in doTraceOrResult False "lt: " v0 v1 result
+
+applySortList :: RContext -> Exp -> VarValor
+applySortList context exp =
+  let v0 = evalV context exp
+      result = case v0 of
+          VarList vals -> VarList $ sortBy compareVarValor vals
+          _ -> error "sortList expects a VarList"
+  in doTraceOrResult False "sortList: " v0 (VarList[]) result
+
+
+compareVarValor :: VarValor -> VarValor -> Ordering
+compareVarValor (VarInteger (Var ((v1, _):_))) (VarInteger (Var ((v2, _):_))) = compare v1 v2
+compareVarValor (VarString (Var ((s1, _):_))) (VarString (Var ((s2, _):_))) = compare s1 s2
+compareVarValor (VarBool (Var ((b1, _):_))) (VarBool (Var ((b2, _):_))) = compare (boolToInt b1) (boolToInt b2)
+compareVarValor (VarPair (k1, v1)) (VarPair (k2, v2)) =
+  case compareVarValor k1 k2 of
+    EQ -> compareVarValor v1 v2
+    result -> result
+compareVarValor (VarInteger (Var [])) _ = error "VarInteger has no values"
+compareVarValor (VarString (Var [])) _ = error "VarString has no values"
+compareVarValor (VarBool (Var [])) _ = error "VarBool has no values"
+compareVarValor _ (VarInteger (Var [])) = error "VarInteger has no values"
+compareVarValor _ (VarString (Var [])) = error "VarString has no values"
+compareVarValor _ (VarBool (Var [])) = error "VarBool has no values"
+compareVarValor v1 v2 =
+  error $ "Cannot compare elements of types: " ++ show v1 ++ " and " ++ show v2
+
 
 doTrace :: (Show a, Show b) => String -> a -> b -> b -> b
 doTrace msg val1 val2 result = doTraceOrResult False msg val1 val2 result

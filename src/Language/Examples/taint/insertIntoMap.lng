@@ -6,10 +6,10 @@ main (prog) {
 insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
-        then [(key, sortBySecond(value))]
+        then [(key, sortList(value))]
         else if (isEqual(fst(head(map)), key))
-            then [(key, sortBySecond(union(value, snd(head(map)))))] ++ tail(map)
-            else [head(map)] ++ insertIntoMap(key, value, tail(map))
+            then union(tail(map), [(key, sortList(union(value, snd(head(map)))))])
+            else union(insertIntoMap(key, value, tail(map)), [head(map)])
 }
 
 sortBySecond :: [(String, String)] -> [(String, String)]
@@ -24,10 +24,10 @@ insertBySecond(pair, sortedList) {
     if (isNil(sortedList))
         then [pair]
         else if (lt(snd(pair), snd(head(sortedList))))
-            then [pair] ++ sortedList
+            then union(sortedList, [pair])
             else if (isEqual(snd(pair), snd(head(sortedList))))
                 then if (lt(fst(pair), fst(head(sortedList))))
-                    then [pair] ++ sortedList
-                    else [head(sortedList)] ++ insertBySecond(pair, tail(sortedList))
-                else [head(sortedList)] ++ insertBySecond(pair, tail(sortedList))
+                    then union(sortedList, [pair])
+                    else union(insertBySecond(pair, tail(sortedList)), [head(sortedList)])
+                else union(insertBySecond(pair, tail(sortedList)), [head(sortedList)])
 }

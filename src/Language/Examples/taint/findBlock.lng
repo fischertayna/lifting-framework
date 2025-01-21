@@ -1,6 +1,6 @@
 main :: Any -> Any
 main (prog) {
-    findBlock (fst(prog), snd(prog))
+    head (findBlock (fst(prog), snd(prog)))
 }
 
 findBlock :: String -> Any -> [Any]

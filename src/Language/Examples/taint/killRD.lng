@@ -30,7 +30,7 @@ filterRD (var, l, assigns) {
     if (isNil(assigns))
         then []
         else if (isEqual(fst(head(assigns)), var))
-            then [head (assigns)] ++ filterRD(var, l, tail(assigns))
+            then union([head (assigns)], filterRD(var, l, tail(assigns)))
             else filterRD(var, l, tail(assigns))
 }
 

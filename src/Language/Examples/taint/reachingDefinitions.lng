@@ -42,30 +42,10 @@ updateMappingsForLabel(prog, l, old) {
 insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
-        then [(key, value)]
+        then [(key, sortList(value))]
         else if (isEqual(fst(head(map)), key))
-            then union([(key, union(snd(head(map)), value))], tail(map))
-            else union([head(map)], insertIntoMap(key, value, tail(map)))
-}
-
-sortBySecond :: [(String, String)] -> [(String, String)]
-sortBySecond (list) {
-    if (isNil(list))
-        then []
-        else insertBySecond(head(list), sortBySecond(tail(list)))
-}
-
-insertBySecond :: (String, String) -> [(String, String)] -> [(String, String)]
-insertBySecond(pair, sortedList) {
-    if (isNil(sortedList))
-        then [pair]
-        else if (lt(snd(pair), snd(head(sortedList))))
-            then union([pair], sortedList)
-            else if (isEqual(snd(pair), snd(head(sortedList))))
-                then if (lt(fst(pair), fst(head(sortedList))))
-                    then union([pair], sortedList)
-                    else union([head(sortedList)], insertBySecond(pair, tail(sortedList)))
-                else union([head(sortedList)], insertBySecond(pair, tail(sortedList)))
+            then union(tail(map), [(key, sortList(union(value, snd(head(map)))))])
+            else union(insertIntoMap(key, value, tail(map)), [head(map)])
 }
 
 rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
@@ -270,11 +250,11 @@ labels (prog) {
     if (checkType(prog, "ASGN"))
     then [labelFromAsgn(getStmt(prog))]
     else if (checkType(prog, "SEQ"))
-        then union(labels(fstStmtOfSeq(getStmt(prog))), labels(sndStmtOfSeq(getStmt(prog))))
+        then union(labels(sndStmtOfSeq(getStmt(prog))), labels(fstStmtOfSeq(getStmt(prog))))
         else if (checkType(prog, "IF"))
-            then union([labelFromIf(getStmt(prog))], union(labels(thenFromIf(getStmt(prog))), labels(elseFromIf(getStmt(prog)))))
+            then union(union(labels(elseFromIf(getStmt(prog))), labels(thenFromIf(getStmt(prog)))), [labelFromIf(getStmt(prog))])
             else if (checkType(prog, "WHILE"))
-                then union([labelFromWhile(getStmt(prog))], labels(blockFromWhile(getStmt(prog))))
+                then union(labels(blockFromWhile(getStmt(prog))), [labelFromWhile(getStmt(prog))])
                 else if (checkType(prog, "SKIP"))
                     then [labelFromSkip(getStmt(prog))]
                     else []

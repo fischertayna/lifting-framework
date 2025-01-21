@@ -8,11 +8,11 @@ labels (prog) {
     if (checkType(prog, "ASGN"))
     then [labelFromAsgn(getStmt(prog))]
     else if (checkType(prog, "SEQ"))
-        then labels(fstStmtOfSeq(getStmt(prog))) ++ labels(sndStmtOfSeq(getStmt(prog)))
+        then union(labels(sndStmtOfSeq(getStmt(prog))), labels(fstStmtOfSeq(getStmt(prog))))
         else if (checkType(prog, "IF"))
-            then [labelFromIf(getStmt(prog))] ++ union(labels(thenFromIf(getStmt(prog))), labels(elseFromIf(getStmt(prog))))
+            then union(union(labels(elseFromIf(getStmt(prog))), labels(thenFromIf(getStmt(prog)))), [labelFromIf(getStmt(prog))])
             else if (checkType(prog, "WHILE"))
-                then [labelFromWhile(getStmt(prog))] ++ labels(blockFromWhile(getStmt(prog)))
+                then union(labels(blockFromWhile(getStmt(prog))), [labelFromWhile(getStmt(prog))])
                 else if (checkType(prog, "SKIP"))
                     then [labelFromSkip(getStmt(prog))]
                     else []

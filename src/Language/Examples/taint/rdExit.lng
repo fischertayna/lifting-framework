@@ -49,24 +49,24 @@ findOrDefault (l, exit) {
 
 killRD :: Any -> [(String, String)] -> [(String, String)]
 killRD (block, assignments) {
-    if (isEqual (fst (block), "ASGN"))
-        then union([((fst (snd (snd (block)))), "?")], filterRD(fst(snd(snd(block))), fst(snd(block)), assignments))
+    if (checkType(block, "ASGN"))
+        then union([((varFromAsgn(getStmt(block))), "?")], filterRD(varFromAsgn(getStmt(block)), labelFromAsgn(getStmt(block)), assignments))
         else []
 }
 
 assignments :: Any -> [(String, String)]
 assignments (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(assignments(fst(snd (prog))), assignments(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(assignments (fst (snd (snd (prog)))), assignments (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then assignments(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+    if (checkType(prog, "ASGN"))
+        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
+        else if (checkType(prog, "SEQ"))
+            then union(assignments(fstStmtOfSeq(getStmt(prog))), assignments(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(assignments(thenFromIf(getStmt(prog))), assignments(elseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then assignments(blockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ typeStmt(prog)]
 }
 
 filterRD :: String -> String -> [(String, String)] -> [(String, String)]
@@ -80,8 +80,8 @@ filterRD (var, l, assigns) {
 
 genRD :: Any -> [(String, String)]
 genRD (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
+    if (checkType(prog, "ASGN"))
+        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
         else []
 }
 
