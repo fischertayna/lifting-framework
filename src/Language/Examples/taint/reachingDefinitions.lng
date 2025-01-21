@@ -42,10 +42,10 @@ updateMappingsForLabel(prog, l, old) {
 insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
 insertIntoMap (key, value, map) {
     if (isNil(map))
-        then [(key, sortBySecond(value))]
+        then [(key, value)]
         else if (isEqual(fst(head(map)), key))
-            then [(key, sortBySecond(union(value, snd(head(map)))))] ++ tail(map)
-            else [head(map)] ++ insertIntoMap(key, value, tail(map))
+            then union([(key, union(snd(head(map)), value))], tail(map))
+            else union([head(map)], insertIntoMap(key, value, tail(map)))
 }
 
 sortBySecond :: [(String, String)] -> [(String, String)]
@@ -60,12 +60,12 @@ insertBySecond(pair, sortedList) {
     if (isNil(sortedList))
         then [pair]
         else if (lt(snd(pair), snd(head(sortedList))))
-            then [pair] ++ sortedList
+            then union([pair], sortedList)
             else if (isEqual(snd(pair), snd(head(sortedList))))
                 then if (lt(fst(pair), fst(head(sortedList))))
-                    then [pair] ++ sortedList
-                    else [head(sortedList)] ++ insertBySecond(pair, tail(sortedList))
-                else [head(sortedList)] ++ insertBySecond(pair, tail(sortedList))
+                    then union([pair], sortedList)
+                    else union([head(sortedList)], insertBySecond(pair, tail(sortedList)))
+                else union([head(sortedList)], insertBySecond(pair, tail(sortedList)))
 }
 
 rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
@@ -79,7 +79,7 @@ makeSetOfFV :: [String] -> [(String, String)]
 makeSetOfFV (fvs) {
     if (isNil(fvs))
         then []
-        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
+        else union([(head (fvs), "?")], makeSetOfFV(tail(fvs)))
 }
 
 findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
@@ -126,7 +126,7 @@ fv (prog) {
 getVarFromValue :: Any -> [Any]
 getVarFromValue (aexp) {
     if (isPair(snd(aexp)))
-        then getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
+        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []
@@ -151,7 +151,7 @@ makeSetOfLabels :: String -> [String] -> [(String, String)]
 makeSetOfLabels (init, finals) {
     if (isNil(finals))
         then []
-        else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
+        else union([(head (finals), init)], makeSetOfLabels(init, tail(finals)))
 }
 
 init :: Any -> String
@@ -176,7 +176,7 @@ final (prog) {
     else if (checkType(prog, "SEQ"))
         then final(sndStmtOfSeq(getStmt(prog)))
         else if (checkType(prog, "IF"))
-            then final(thenFromIf(getStmt(prog))) ++ final(elseFromIf(getStmt(prog)))
+            then union(final(thenFromIf(getStmt(prog))), final(elseFromIf(getStmt(prog))))
             else if (checkType(prog, "WHILE"))
                 then [labelFromWhile(getStmt(prog))]
                 else if (checkType(prog, "SKIP"))
@@ -270,11 +270,11 @@ labels (prog) {
     if (checkType(prog, "ASGN"))
     then [labelFromAsgn(getStmt(prog))]
     else if (checkType(prog, "SEQ"))
-        then labels(fstStmtOfSeq(getStmt(prog))) ++ labels(sndStmtOfSeq(getStmt(prog)))
+        then union(labels(fstStmtOfSeq(getStmt(prog))), labels(sndStmtOfSeq(getStmt(prog))))
         else if (checkType(prog, "IF"))
-            then [labelFromIf(getStmt(prog))] ++ union(labels(thenFromIf(getStmt(prog))), labels(elseFromIf(getStmt(prog))))
+            then union([labelFromIf(getStmt(prog))], union(labels(thenFromIf(getStmt(prog))), labels(elseFromIf(getStmt(prog)))))
             else if (checkType(prog, "WHILE"))
-                then [labelFromWhile(getStmt(prog))] ++ labels(blockFromWhile(getStmt(prog)))
+                then union([labelFromWhile(getStmt(prog))], labels(blockFromWhile(getStmt(prog))))
                 else if (checkType(prog, "SKIP"))
                     then [labelFromSkip(getStmt(prog))]
                     else []

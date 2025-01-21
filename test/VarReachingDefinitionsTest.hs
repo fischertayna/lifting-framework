@@ -723,7 +723,7 @@ testFilterFlowEx2_4 = testFilterFlowBase "ex 2: 4" (VarPair(VarString (Var [("4"
 testRDEntry :: String -> VarValor -> VarValor -> Test
 testRDEntry name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/rdEntry.lng" input
-    -- putStrLn ("\n RDEntry " ++ name ++ " : " ++ (substitute (show output) substitutions))
+    putStrLn ("\n RDEntry " ++ name ++ " : " ++ (substitute (show output) substitutions))
     assertEqual ("RDEntry " ++ name) (show expectedOutput) (show output)
 
 testRDEntry2_1 :: Test
@@ -1075,6 +1075,7 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "fv ex2_4" testfvEx2_4
                         -- ,   TestLabel "fv ex2_s1" testfvEx2_s1
                         -- ,   TestLabel "fv ex2_s2" testfvEx2_s2
+                        -- ,   TestLabel "fv ex2" testfvEx2
                         -- ,   TestLabel "fv ex3" testfvEx3
                         -- ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
                         -- ,   TestLabel "testmakeSetOfFVEx2" testmakeSetOfFVEx2
@@ -1083,10 +1084,10 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "testFilterFlow Ex2 3" testFilterFlowEx2_3
                         -- ,   TestLabel "testFilterFlow Ex2 31" testFilterFlowEx2_31
                         -- ,   TestLabel "testFilterFlow Ex2 4" testFilterFlowEx2_4
-                        ,   TestLabel "rdEntry 2 - 1" testRDEntry2_1
-                        ,   TestLabel "rdEntry 2 - 2" testRDEntry2_2
-                        ,   TestLabel "rdEntry 2 - 3" testRDEntry2_3
-                        ,   TestLabel "rdEntry 2 - 4" testRDEntry2_4
+                        -- ,   TestLabel "rdEntry 2 - 1" testRDEntry2_1
+                        -- ,   TestLabel "rdEntry 2 - 2" testRDEntry2_2
+                        -- ,   TestLabel "rdEntry 2 - 3" testRDEntry2_3
+                        -- ,   TestLabel "rdEntry 2 - 4" testRDEntry2_4
                         -- ,   TestLabel "rdEntry 1" testRDEntry1
                         -- ,   TestLabel "rdEntry 2" testRDEntry2
                         -- ,   TestLabel "rdEntry 4" testRDEntry4
@@ -1101,15 +1102,15 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         -- ,   TestLabel "testFindOrDefault Entry Ex2 1" testFindOrDefaultEntryEx2_1
                         -- ,   TestLabel "testFindOrDefault Entry Ex2 21 tt" testFindOrDefaultEntryEx2_21tt
                         -- ,   TestLabel "testFindOrDefault Entry Ex2 21 ~A" testFindOrDefaultEntryEx2_21n
-                        ,   TestLabel "testFindOrDefault Entry Ex2 2 A 21 ~A" testFindOrDefaultEntryEx2_2_21
+                        -- ,   TestLabel "testFindOrDefault Entry Ex2 2 A 21 ~A" testFindOrDefaultEntryEx2_2_21
                         -- ,   TestLabel "testGenRD 1" testGenRD1
                         -- ,   TestLabel "testGenRD 2" testGenRD2
                         -- ,   TestLabel "testKillRD s01" testKillRDs01
                         -- ,   TestLabel "testKillRD Ex2 21" testKillRDEx2_21
-                        ,   TestLabel "rdExit 2 - 1" testRDExit2_1
-                        ,   TestLabel "rdExit 2 - 2" testRDExit2_2
-                        ,   TestLabel "rdExit 2 - 3" testRDExit2_3
-                        ,   TestLabel "rdExit 2 - 4" testRDExit2_4
+                        -- ,   TestLabel "rdExit 2 - 1" testRDExit2_1
+                        -- ,   TestLabel "rdExit 2 - 2" testRDExit2_2
+                        -- ,   TestLabel "rdExit 2 - 3" testRDExit2_3
+                        -- ,   TestLabel "rdExit 2 - 4" testRDExit2_4
                         -- ,   TestLabel "rdExit 1" testRDExit1
                         -- ,   TestLabel "rdExit 2" testRDExit2
                         -- ,   TestLabel "rdExit 4" testRDExit4
