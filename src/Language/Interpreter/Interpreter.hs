@@ -8,6 +8,7 @@ import Language.Frontend.AbsLanguage
     Program (..),
   )
 import Prelude hiding (lookup)
+import Data.List (sortBy)
 
 type Context k v = [(k, v)]
 
@@ -85,6 +86,7 @@ eval context@(vcontext, fcontext) x = case x of
         val1 = eval context (pExps !! 0)
         val2 = eval context (pExps !! 1)
       in ValorInt (boolToInt (val1 < val2))
+    Ident "sortList" -> applySortList context (pExps !! 0)
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
     Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> eval (paramBindings, fcontext) fExp
@@ -94,6 +96,20 @@ eval context@(vcontext, fcontext) x = case x of
       (f,s) = p arg
       (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (eval context) pExps)
+
+applySortList :: RContext -> Exp -> Valor
+applySortList context exp =
+  let v0 = eval context exp
+  in case v0 of
+      ValorList vals -> ValorList $ sortBy compareVarValor vals
+      _ -> error "sortList expects a VarList"
+
+compareVarValor :: Valor -> Valor -> Ordering
+compareVarValor (ValorPair (k1, v1)) (ValorPair (k2, v2)) =
+  case compareVarValor k1 k2 of
+    EQ -> compareVarValor v1 v2
+    result -> result
+compareVarValor v1 v2 = compare v1 v2
 
 applyUnion :: RContext -> Exp -> Exp -> Valor
 applyUnion context exp0 exp1 =
@@ -105,13 +121,16 @@ applyUnion context exp0 exp1 =
       _ -> error "Union should only be used to lists"
 
 unionLists :: [Valor] -> [Valor] -> [Valor]
-unionLists xs l
-  = foldl
-      (\ l x
-         -> if elemInList x l
-            then l
-            else x : l)
-      l xs
+unionLists [] ys = ys
+unionLists (x:xs) ys =
+  let updatedYs = replaceOrAdd x ys
+  in unionLists xs updatedYs
+
+replaceOrAdd :: Valor -> [Valor] -> [Valor]
+replaceOrAdd x [] = [x]
+replaceOrAdd x (y:ys)
+  | x == y = (y : ys)      
+  | otherwise = (y : replaceOrAdd x ys)
 
 elemInList :: Valor -> [Valor] -> Bool
 elemInList _ [] = False

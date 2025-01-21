@@ -43,7 +43,7 @@ substitutions =
     , (show (notBDD propA), " ~A")
     ]
 
--- ex1, ex2, ex3, ex4, factorialProg :: VarValor
+-- ex1, ex2, exPPA, ex4, factorialProg :: VarValor
 ex1 :: VarValor
 
 -- x = 1;      1
@@ -513,8 +513,8 @@ testCountEx2_4 = testCount "ex2_4" ex2_4 (VarInteger (Var [(1, ttPC)]))
 testCountEx2_s1 :: Test
 testCountEx2_s1 = testCount "ex2_s1" ex2_s1 (VarInteger (Var [(2, notBDD propA), (1, propA)]))
 
-testCountEx3 :: Test
-testCountEx3 = testCount "PPA" exPPA (VarInteger (Var [(4, ttPC)]))
+testCountExPPA :: Test
+testCountExPPA = testCount "PPA" exPPA (VarInteger (Var [(4, ttPC)]))
 
 testInit :: String -> VarValor -> VarValor -> Test
 testInit name input expectedOutput = TestCase $ do
@@ -539,13 +539,12 @@ testInitEx2_3 = testInit "Ex2_3" ex2_3 (VarString (Var [("3", notBDD propA), ("3
 testInitEx2_4 :: Test
 testInitEx2_4 = testInit "Ex2_4" ex2_4 (VarString (Var [("4", ttPC)]))
 
-testInitEx3 :: Test
-testInitEx3 = testInit "PPA" exPPA (VarString (Var [("1", ttPC)]))
+testInitExPPA :: Test
+testInitExPPA = testInit "PPA" exPPA (VarString (Var [("1", ttPC)]))
 
 testFinal :: String -> VarValor -> VarValor -> Test
 testFinal name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/final.lng" input
-    -- putStrLn ("\n final expected ex3: " ++ (substitute (show expectedOutput) substitutions))
     -- putStrLn ("\n final out " ++ name ++ ": " ++ (substitute (show output) substitutions))
     assertEqual ("final " ++ name) expectedOutput output
 
@@ -567,8 +566,8 @@ testFinalEx2_3 = testFinal "ex2_3" ex2_3 (VarList [VarString (Var [("3", notBDD 
 testFinalEx2_4 :: Test
 testFinalEx2_4 = testFinal "ex2_4" ex2_4 (VarList [VarString (Var [("4", ttPC)])])
 
-testFinalEx3 :: Test
-testFinalEx3 = testFinal "PPA" exPPA (VarList [VarString (Var [("3", ttPC)])])
+testFinalExPPA :: Test
+testFinalExPPA = testFinal "PPA" exPPA (VarList [VarString (Var [("3", ttPC)])])
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
@@ -588,8 +587,8 @@ flow2 = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", prop
 testFlowEx2 :: Test
 testFlowEx2 = testFlow "ex2" ex2 (flow2)
 
-testFlowEx3 :: Test
-testFlowEx3 = testFlow "PPA" exPPA (VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", ttPC)])),
+testFlowExPPA :: Test
+testFlowExPPA = testFlow "PPA" exPPA (VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", ttPC)])),
                                 VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
@@ -632,8 +631,8 @@ testAssignmentsEx2 = testAssignments "ex2" ex2 (VarList[VarPair(VarString (Var [
                                    VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
                                    VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)]))])
 
-testAssignmentsEx3 :: Test
-testAssignmentsEx3 = testAssignments "PPA" exPPA (VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
+testAssignmentsExPPA :: Test
+testAssignmentsExPPA = testAssignments "PPA" exPPA (VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
                                    VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])),
                                    VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
                                    VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)]))])
@@ -668,8 +667,8 @@ testfvEx2_s2 = testfv "ex2_s2" ex2_s2 (VarList[VarString (Var [("x", ttPC)]), Va
 testfvEx2 :: Test
 testfvEx2 = testfv "ex2" ex2 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
 
-testfvEx3 :: Test
-testfvEx3 = testfv "PPA" exPPA (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])])
+testfvExPPA :: Test
+testfvExPPA = testfv "PPA" exPPA (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])])
 
 testmakeSetOfFV :: String -> VarValor -> VarValor -> Test
 testmakeSetOfFV name input expectedOutput = TestCase $ do
@@ -1029,31 +1028,31 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Count Asgns ex2_3" testCountEx2_3
                         ,   TestLabel "Count Asgns ex2_4" testCountEx2_4
                         ,   TestLabel "Count Asgns ex2_s1" testCountEx2_s1
-                        ,   TestLabel "Count Asgns ex3" testCountEx3
+                        ,   TestLabel "Count Asgns exPPA" testCountExPPA
                         ,   TestLabel "Init Ex2_1" testInitEx2_1
                         ,   TestLabel "Init Ex2_2" testInitEx2_2
                         ,   TestLabel "Init Ex2_3" testInitEx2_3
                         ,   TestLabel "Init Ex2_4" testInitEx2_4
                         ,   TestLabel "Init ex1" testInitEx1
                         ,   TestLabel "Init ex2" testInitEx2
-                        ,   TestLabel "Init ex3" testInitEx3
+                        ,   TestLabel "Init exPPA" testInitExPPA
                         ,   TestLabel "Final ex1" testFinalEx1
                         ,   TestLabel "Final ex2" testFinalEx2
                         ,   TestLabel "Final ex2_1" testFinalEx2_1
                         ,   TestLabel "Final ex2_2" testFinalEx2_2
                         ,   TestLabel "Final ex2_3" testFinalEx2_3
                         ,   TestLabel "Final ex2_4" testFinalEx2_4
-                        ,   TestLabel "Final ex3" testFinalEx3
+                        ,   TestLabel "Final exPPA" testFinalExPPA
                         ,   TestLabel "Flow ex1" testFlowEx1
                         ,   TestLabel "Flow ex2" testFlowEx2
-                        ,   TestLabel "Flow ex3" testFlowEx3
+                        ,   TestLabel "Flow exPPA" testFlowExPPA
                         ,   TestLabel "Chaotic Iteration 1" testChaoticIteration1
                         ,   TestLabel "Chaotic Iteration 2" testChaoticIteration2
                         ,   TestLabel "Asgns ex1" testAssignmentsEx1
                         ,   TestLabel "Asgns ex2_1" testAssignmentsEx2_1
                         ,   TestLabel "Asgns ex2_2" testAssignmentsEx2_2
                         ,   TestLabel "Asgns ex2" testAssignmentsEx2
-                        ,   TestLabel "Asgns ex3" testAssignmentsEx3
+                        ,   TestLabel "Asgns exPPA" testAssignmentsExPPA
                         ,   TestLabel "fv ex1" testfvEx1
                         ,   TestLabel "fv ex2_1" testfvEx2_1
                         ,   TestLabel "fv ex2_2" testfvEx2_2
@@ -1062,7 +1061,7 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "fv ex2_s1" testfvEx2_s1
                         ,   TestLabel "fv ex2_s2" testfvEx2_s2
                         ,   TestLabel "fv ex2" testfvEx2
-                        ,   TestLabel "fv ex3" testfvEx3
+                        ,   TestLabel "fv exPPA" testfvExPPA
                         ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
                         ,   TestLabel "testmakeSetOfFVEx2" testmakeSetOfFVEx2
                         ,   TestLabel "testFilterFlow" testFilterFlow
