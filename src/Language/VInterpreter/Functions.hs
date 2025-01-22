@@ -1,0 +1,248 @@
+module Language.VInterpreter.Functions where
+
+import Data.Maybe (fromJust)
+import Language.Frontend.AbsLanguage
+  ( Exp (..),
+    Function (..),
+    Ident (..),
+    Program (..),
+  )
+import Variability.VarTypes
+  ( PresenceCondition,
+    Prop,
+    Var (..),
+    VarValor(..),
+    negPC,
+    ffPC,
+    sat,
+    unsat,
+    doTraceOrResult,
+    disj,
+    mkBDDVar,
+    notBDD,
+    tt, ff,
+    ttPC,
+    valList,
+    (+++),
+    (++++), (||||),
+    (|||), (/\), (\/),
+    union
+  )
+import Prelude hiding (lookup)
+import Debug.Trace
+import qualified Data.Text as T
+import Data.List (sortBy)
+
+boolToInt :: Bool -> Integer
+boolToInt b
+  | not b = 0
+  | otherwise = 1
+
+applyEqualOperator :: VarValor -> VarValor -> VarValor
+applyEqualOperator v0 v1 =
+    let result = case (v0, v1) of
+            (VarInteger vi0, VarInteger vi1) ->
+                VarInteger $ Var
+                    [ (boolToInt (a == b), pc0 /\ pc1)
+                    | (a, pc0) <- valList vi0
+                    , (b, pc1) <- valList vi1
+                    , sat (pc0 /\ pc1)
+                    ]
+            (VarBool vb0, VarBool vb1) ->
+                VarInteger $ Var
+                    [ (boolToInt (a == b), pc0 /\ pc1)
+                    | (a, pc0) <- valList vb0
+                    , (b, pc1) <- valList vb1
+                    , sat (pc0 /\ pc1)
+                    ]
+            (VarString vs0, VarString vs1) ->
+                VarInteger $ Var
+                    [ (boolToInt (a == b), pc0 /\ pc1)
+                    | (a, pc0) <- valList vs0
+                    , (b, pc1) <- valList vs1
+                    , sat (pc0 /\ pc1)
+                    ]
+            _ -> VarInteger (Var [(0, ttPC)])
+    in doTraceOrResult False "eq: " v0 v1 result
+
+applyLtOperator :: VarValor -> VarValor -> VarValor
+applyLtOperator v0 v1 =
+  let result = case (v0, v1) of
+          (VarInteger vi0, VarInteger vi1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vi0
+              , (b, pc1) <- valList vi1
+              , sat (pc0 /\ pc1)
+              ]
+          (VarBool vb0, VarBool vb1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vb0
+              , (b, pc1) <- valList vb1
+              , sat (pc0 /\ pc1)
+              ]
+          (VarString vs0, VarString vs1) ->
+            VarInteger $ Var
+              [ (boolToInt (a < b), pc0 /\ pc1)
+              | (a, pc0) <- valList vs0
+              , (b, pc1) <- valList vs1
+              , sat (pc0 /\ pc1)
+              ]
+          _ -> VarInteger (Var [(0, ttPC)])
+    in doTraceOrResult False "lt: " v0 v1 result
+
+applySortList :: VarValor -> VarValor
+applySortList v0 =
+  let result = case v0 of
+          VarList vals -> VarList $ sortBy compareVarValor vals
+          _ -> error "sortList expects a VarList"
+  in doTraceOrResult False "sortList: " v0 (VarList[]) result
+
+
+compareVarValor :: VarValor -> VarValor -> Ordering
+compareVarValor (VarInteger (Var ((v1, _):_))) (VarInteger (Var ((v2, _):_))) = compare v1 v2
+compareVarValor (VarString (Var ((s1, _):_))) (VarString (Var ((s2, _):_))) = compare s1 s2
+compareVarValor (VarBool (Var ((b1, _):_))) (VarBool (Var ((b2, _):_))) = compare (boolToInt b1) (boolToInt b2)
+compareVarValor (VarPair (k1, v1)) (VarPair (k2, v2)) =
+  case compareVarValor k1 k2 of
+    EQ -> compareVarValor v1 v2
+    result -> result
+compareVarValor (VarInteger (Var [])) _ = error "VarInteger has no values"
+compareVarValor (VarString (Var [])) _ = error "VarString has no values"
+compareVarValor (VarBool (Var [])) _ = error "VarBool has no values"
+compareVarValor _ (VarInteger (Var [])) = error "VarInteger has no values"
+compareVarValor _ (VarString (Var [])) = error "VarString has no values"
+compareVarValor _ (VarBool (Var [])) = error "VarBool has no values"
+compareVarValor v1 v2 =
+  error $ "Cannot compare elements of types: " ++ show v1 ++ " and " ++ show v2
+
+
+doTrace :: (Show a, Show b) => String -> a -> b -> b -> b
+doTrace msg val1 val2 result = doTraceOrResult False msg val1 val2 result
+
+applyUnion :: VarValor -> VarValor -> VarValor
+applyUnion v0 v1 =
+  let result = case (v0, v1) of
+                    (VarList l0, VarList l1) ->
+                      VarList (unionLists l0 l1)
+                    _ -> error "Union should only be used to lists"
+     in doTraceOrResult False "union: " v0 v1 result
+
+unionLists :: [VarValor] -> [VarValor] -> [VarValor]
+unionLists [] ys = ys
+unionLists (x:xs) ys =
+  let updatedYs = replaceOrAdd x ys
+  in unionLists xs updatedYs
+
+replaceOrAdd :: VarValor -> [VarValor] -> [VarValor]
+replaceOrAdd x [] = [x]
+replaceOrAdd x (y:ys)
+  | x == y = (y : ys)
+  | areEqualIgnoringPresence x y =
+      let presenceX = extractPresence x
+          presenceY = extractPresence y
+      in case comparePresence presenceX presenceY of
+        Merge    -> doTrace "merge elements: " x (y:ys) (combinePresence x y : ys)
+        Coexist  -> doTrace "coexist: " x (y:ys) (x : y : ys)        
+  | otherwise = doTrace "otherwise" x (y:ys) (y : replaceOrAdd x ys)
+data PresenceComparison = Merge | Coexist
+
+comparePresence :: PresenceCondition -> PresenceCondition -> PresenceComparison
+comparePresence pcX pcY
+  | unsat (pcX /\ pcY) = Coexist
+  | otherwise = Merge
+
+extractPresence :: VarValor -> PresenceCondition
+extractPresence (VarString (Var [(_, pc)])) = pc
+extractPresence (VarBool (Var [(_, pc)])) = pc
+extractPresence (VarInteger (Var [(_, pc)])) = pc
+extractPresence (VarList _) = ttPC
+extractPresence (VarPair _) = ttPC
+
+combinePresence :: VarValor -> VarValor -> VarValor
+combinePresence (VarString (Var [(v1, pc1)])) (VarString (Var [(v2, pc2)]))
+  | v1 == v2 = VarString (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarBool (Var [(v1, pc1)])) (VarBool (Var [(v2, pc2)]))
+  | v1 == v2 = VarBool (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarInteger (Var [(v1, pc1)])) (VarInteger (Var [(v2, pc2)]))
+  | v1 == v2 = VarInteger (Var [(v1, pc1 \/ pc2)])
+combinePresence (VarPair (p11, p12)) (VarPair (p21, p22)) =
+  VarPair (combinePresence p11 p21, combinePresence p12 p22)
+combinePresence _ _ = error "Cannot combine different types of VarValor"
+
+areEqualIgnoringPresence :: VarValor -> VarValor -> Bool
+areEqualIgnoringPresence (VarString (Var [(s1, _)])) (VarString (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarBool (Var [(s1, _)])) (VarBool (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarInteger (Var [(s1, _)])) (VarInteger (Var [(s2, _)])) = s1 == s2
+areEqualIgnoringPresence (VarPair (p11, p12)) (VarPair (p21, p22)) = (p11 == p21 && p12 == p22)
+areEqualIgnoringPresence (VarList l1) (VarList l2) = (l1 == l2)
+areEqualIgnoringPresence v1 v2 = v1 == v2
+
+applyDifference :: VarValor -> VarValor -> VarValor
+applyDifference v0 v1 =
+  let result = case (v0, v1) of
+                  (VarList l0, VarList l1) ->
+                    VarList (differenceLists l0 l1)
+                  _ -> error "Difference should only be used to lists"
+      in doTraceOrResult False "difference: " v0 v1 result
+
+differenceLists :: [VarValor] -> [VarValor] -> [VarValor]
+differenceLists xs ys =
+  let subtracted = map (`subtractFromList` ys) xs
+  in filter (not . isEmptyVarValor) subtracted
+
+subtractFromList :: VarValor -> [VarValor] -> VarValor
+subtractFromList (VarPair (k1, v1)) ys =
+  case filter (\(VarPair (k2, _)) -> areEqualIgnoringPresence k1 k2) ys of
+    [] -> VarPair (k1, v1)
+    matches ->
+      let newK = subtractVals k1 (map (\(VarPair (k, _)) -> k) matches)
+          newV = subtractVals v1 (map (\(VarPair (_, v)) -> v) matches)
+      in if isEmptyVarValor newK && isEmptyVarValor newV
+         then VarList []
+         else VarPair (newK, newV)
+subtractFromList var _ = var
+
+subtractVals :: VarValor -> [VarValor] -> VarValor
+subtractVals (VarString (Var vals1)) vars =
+  let vals2 = concatMap (\(VarString (Var v)) -> v) vars
+      result = map (\(v1, pc1) -> 
+                      let adjustedPC = pc1 /\ negPC (disj (map snd vals2))
+                      in (v1, adjustedPC)) vals1
+      filteredResult = filter (not . unsat . snd) result
+   in VarString (Var filteredResult)
+
+isEmptyVarValor :: VarValor -> Bool
+isEmptyVarValor (VarString (Var vals)) = null vals
+isEmptyVarValor (VarList vals) = all isEmptyVarValor vals
+isEmptyVarValor (VarPair (k, v)) = isEmptyVarValor k || isEmptyVarValor v
+isEmptyVarValor _ = False
+
+applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> VarValor -> VarValor -> (a -> a -> a) -> VarValor
+applyBinaryOperator cons f vv1 vv2 op =
+  cons (Var
+    [ (v1 `op` v2, pc1 /\ pc2)
+      | (v1, pc1) <- valList (f vv1),
+        (v2, pc2) <- valList (f vv2),
+        sat (pc1 /\ pc2)
+    ])
+
+applyUnaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> VarValor -> (a -> a) -> VarValor
+applyUnaryOperator cons f v0 op =
+  cons (Var
+    [ (op v, pc1)
+      | (v, pc1) <- valList (f v0)
+    ])
+
+partition :: VarValor -> (PresenceCondition, PresenceCondition)
+partition (VarInteger (Var lvint)) =
+  foldr
+    (\(v, pc) (pct, pcf) -> if v /= 0 then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (ffPC, ffPC)
+    lvint
+partition (VarBool (Var lvint)) =
+  foldr
+    (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
+    (ffPC, ffPC)
+    lvint
