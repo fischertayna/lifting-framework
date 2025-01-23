@@ -197,16 +197,6 @@ findBlock (l, prog) {
                         else []
 }
 
-findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
-findOrDefault (l, exit) {
-    if (isNil(exit))
-        then []
-        else if (isEqual(fst (head (exit)), l))
-            then snd (head (exit))
-            else findOrDefault(l, tail(exit))
-}
-
-
 killRD :: Any -> [(String, String)] -> [(String, String)]
 killRD (block, assignments) {
     if (checkType(block, "ASGN"))
