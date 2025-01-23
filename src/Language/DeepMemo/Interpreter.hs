@@ -16,6 +16,7 @@ import Variability.VarTypes
   ( PresenceCondition,
     VarValor(..),
     Var (..),
+    Context,
     negPC,
     ffPC,
     sat,
@@ -46,10 +47,10 @@ import Language.VInterpreter.Functions
     applyUnion,
     applyDifference,
     partition,
+    lookup,
+    update,
     boolToInt
   )
-
-type Context k v = [(k, v)]
 
 type RContext m = (VContext m, FContext, Ident)
 
@@ -203,18 +204,6 @@ memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
            in do
                 paramList <- paramListM
                 retrieveOrRun paramList (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
-
-lookup :: Eq k => Context k v -> k -> Maybe v
-lookup [] _ = Nothing
-lookup ((i, v) : cs) s
-  | i == s = Just v
-  | otherwise = lookup cs s
-
-update :: Eq k => Context k v -> k -> v -> Context k v
-update [] s v = [(s, v)]
-update ((i, v) : cs) s nv
-  | i == s = (i, nv) : cs
-  | otherwise = (i, v) : update cs s nv
 
 updatecF :: RContext Mem -> [Function] -> RContext Mem
 updatecF c [] = c

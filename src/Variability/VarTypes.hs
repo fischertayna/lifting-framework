@@ -120,8 +120,6 @@ disj = foldr orBDD ff
 
 type PresenceCondition = Prop
 
-type Context = PresenceCondition
-
 type PCExpr = Prop
 
 {-# INLINE (/\) #-}
@@ -372,3 +370,5 @@ data VarValor = VarInteger { int :: Var Integer }
               | VarList { list :: [VarValor] }
               | VarPair { pair :: (VarValor, VarValor) }
     deriving (Show, Eq)
+
+type Context k v = [(k, v)]

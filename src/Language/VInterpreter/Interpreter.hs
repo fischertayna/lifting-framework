@@ -11,6 +11,7 @@ import Variability.VarTypes
   ( PresenceCondition,
     Var (..),
     VarValor(..),
+    Context,
     ffPC,
     ttPC,
     valList,
@@ -27,10 +28,10 @@ import Language.VInterpreter.Functions
     applyUnion,
     applyDifference,
     partition,
+    lookup,
+    update,
     boolToInt
   )
-
-type Context k v = [(k, v)]
 
 type RContext = (VContext, FContext)
 
@@ -105,17 +106,6 @@ restrictContext (vcontext, fcontext) pc = (restrictedVContext, fcontext)
   where
     restrictedVContext = [(vId, restrictedVInt) | (vId, v) <- vcontext, let restrictedVInt = v |||| pc]
 
-lookup :: Eq k => Context k v -> k -> Maybe v
-lookup [] _ = Nothing
-lookup ((i, v) : cs) s
-  | i == s = Just v
-  | otherwise = lookup cs s
-
-update :: Eq k => Context k v -> k -> v -> Context k v
-update [] s v = [(s, v)]
-update ((i, v) : cs) s nv
-  | i == s = (i, nv) : cs
-  | otherwise = (i, v) : update cs s nv
 
 updatecF :: RContext -> [Function] -> RContext
 updatecF c [] = c

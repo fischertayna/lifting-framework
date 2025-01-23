@@ -12,6 +12,7 @@ import Variability.VarTypes
     Prop,
     Var (..),
     VarValor(..),
+    Context,
     negPC,
     ffPC,
     sat,
@@ -246,3 +247,15 @@ partition (VarBool (Var lvint)) =
     (\(v, pc) (pct, pcf) -> if v then (pct \/ pc, pcf) else (pct, pcf \/ pc))
     (ffPC, ffPC)
     lvint
+
+lookup :: Eq k => Context k v -> k -> Maybe v
+lookup [] _ = Nothing
+lookup ((i, v) : cs) s
+  | i == s = Just v
+  | otherwise = lookup cs s
+
+update :: Eq k => Context k v -> k -> v -> Context k v
+update [] s v = [(s, v)]
+update ((i, v) : cs) s nv
+  | i == s = (i, nv) : cs
+  | otherwise = (i, v) : update cs s nv
