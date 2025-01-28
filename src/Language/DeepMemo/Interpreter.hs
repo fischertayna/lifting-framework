@@ -17,6 +17,7 @@ import Variability.VarTypes
     VarValor(..),
     Var (..),
     Context,
+    substitute,
     negPC,
     ffPC,
     sat,
@@ -52,25 +53,32 @@ import Language.VInterpreter.Functions
     boolToInt
   )
 
-type RContext m = (VContext m, FContext, Ident)
+type RContext m = (VContext m, FContext, [Ident])
 
 type VContext m = Context Ident (State m VarValor)
 
 type FContext = Context Ident Function
 
-type Mem =  (KeyValueArray [VarValor] VarValor)
+data FuncKey = FuncKey
+  { funcName :: String
+  , funcArgs :: [VarValor]
+  } deriving (Eq, Show)
 
-evalP :: Program -> String -> State Mem (VarValor -> State Mem VarValor)
-evalP (Prog fs) memoizedFunctionName =
+type Mem =  (KeyValueArray FuncKey VarValor)
+
+evalP :: Program -> [String] -> State Mem (VarValor -> State Mem VarValor)
+evalP (Prog fs) memoizedFunctionNames =
   return
     ( \input ->
-        let initialFContext = updatecF ([(Ident "n", return input)], [], Ident memoizedFunctionName) fs
+        -- trace ("\n\n evalP: Called with memoizedFunctionNames: " ++ show memoizedFunctionNames ++ "\n") $
+        let memoizedIdents = map Ident memoizedFunctionNames
+            initialFContext = updatecF ([(Ident "n", return input)], [], memoizedIdents) fs
          in let context = initialFContext
              in eval context <.> return (Call (Ident "main") [EVar (Ident "n")])
     )
 
 eval :: RContext Mem -> State Mem (Exp -> State Mem VarValor)
-eval context@(vcontext, fcontext, memoizedFunctionName) =
+eval context@(vcontext, fcontext, memoizedFunctionNames) = do
   return
     ( \x -> case x of
         EInt n -> return (VarInteger (Var [(n, ttPC)]))
@@ -123,12 +131,14 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
             return $ VarInteger (Var [(boolToInt (null ls), ttPC)])
           Ident "fst" -> do
             arg <- (eval context <.> return (pExps !! 0))
-            let (f,s) = pair arg
-            return $ f
+            case arg of
+              VarPair (f, _) -> return f
+              _ -> error $ "fst: Expected VarPair but got: " ++ substitute (show arg)
           Ident "snd" -> do
             arg <- (eval context <.> return (pExps !! 0))
-            let (f,s) = pair arg
-            return $ s
+            case arg of
+              VarPair (_, s) -> return s
+              _ -> error $ "snd: Expected VarPair but got: " ++ substitute (show arg)
           Ident "isPair" -> do
             arg <- (eval context <.> return (pExps !! 0))
             case arg of
@@ -140,13 +150,16 @@ eval context@(vcontext, fcontext, memoizedFunctionName) =
           Ident "union" -> applyUnionWithState context (pExps !! 0) (pExps !! 1)
           Ident "difference" -> applyDifferenceWithState context (pExps !! 0) (pExps !! 1)
           _ ->
-            if fId == memoizedFunctionName
-              then memoizedCall context fId pExps
-              else
-                ( let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
-                  in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
-                      in eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp
-                )
+            if fId `elem` memoizedFunctionNames
+              then 
+                  trace ("\n eval: Memoized function call to " ++ show (getIdentString fId)) $
+                  memoizedCall context fId pExps
+              else 
+                trace ("\n eval: Regular function call to " ++ show (getIdentString fId)) $ do
+                let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
+                -- trace ("\n eval: Function declaration: " ++ show decls ++ ", body: " ++ show fExp) $
+                    paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
+                    in eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
     )
 
 applyBinaryOperatorWithState :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext Mem -> Exp -> Exp -> (a -> a -> a) -> State Mem VarValor
@@ -200,10 +213,14 @@ memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem VarValor
 memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
   let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
    in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
+          name = (getIdentString fId)
        in let paramListM = mapM snd paramBindings
            in do
+                -- trace ("\n memoizedCall "++ show name ++ ": decls = " ++ show decls) $ return ()
+                -- trace ("\n memoizedCall "++ show name ++ ": paramBindings = " ++ show (map fst paramBindings)) $ return ()
                 paramList <- paramListM
-                retrieveOrRun paramList (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
+                -- trace ("\n memoizedCall "++ show name ++ ": paramList = " ++ show paramList) $ return ()
+                retrieveOrRun name (FuncKey name paramList) (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
 
 updatecF :: RContext Mem -> [Function] -> RContext Mem
 updatecF c [] = c

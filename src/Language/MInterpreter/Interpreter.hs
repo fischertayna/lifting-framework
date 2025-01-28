@@ -147,7 +147,7 @@ memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
        in let paramListM = mapM snd paramBindings
            in do
                 paramList <- paramListM
-                retrieveOrRun paramList (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
+                retrieveOrRun (getIdentString fId) paramList (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
 
 lookup :: Eq k => Context k v -> k -> Maybe v
 lookup [] _ = Nothing

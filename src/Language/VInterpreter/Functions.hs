@@ -63,6 +63,10 @@ applyEqualOperator v0 v1 =
                     , (b, pc1) <- valList vs1
                     , sat (pc0 /\ pc1)
                     ]
+            (VarPair p1, VarPair p2) ->
+                VarInteger (Var [(boolToInt (p1 == p2), ttPC)])
+            (VarList l1, VarList l2) ->
+                VarInteger (Var [(boolToInt (l1 == l2), ttPC)])
             _ -> VarInteger (Var [(0, ttPC)])
     in doTraceOrResult False "eq: " v0 v1 result
 

@@ -49,6 +49,6 @@ data Type
     | TList Type
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-newtype Ident = Ident String
+newtype Ident = Ident { getIdentString :: String }
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 

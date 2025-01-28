@@ -27,18 +27,18 @@ varList = VarList [
                       VarInteger (Var [(3, pcA), ( 2, notBDD pcA)])
                     ]
 
-initialState :: KeyValueArray [VarValor] VarValor
+initialState :: KeyValueArray FuncKey VarValor
 initialState = []
 
-memoizedFunctionName :: String
-memoizedFunctionName = "fib"
+memoizedNames :: [String]
+memoizedNames = ["fib"]
 
-executeProg :: String -> String -> VarValor -> (VarValor, Mem)
-executeProg memoizedFunctionName prog input =
+executeProg :: [String] -> String -> VarValor -> (VarValor, Mem)
+executeProg memoizedFunctionNames prog input =
   let Ok p = pProgram (myLexer prog)
-  in runState (evalP p memoizedFunctionName <.> return input) initialState
+  in runState (evalP p memoizedFunctionNames <.> return input) initialState
 
 calc :: String -> String
 calc s =
-  let r = executeProg memoizedFunctionName s varList
+  let r = executeProg memoizedNames s varList
   in show $ r
