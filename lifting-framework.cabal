@@ -44,6 +44,8 @@ library
         Language.VInterpreter.Interpreter
         Language.VInterpreter.Composition
         Language.VInterpreter.Functions
+        Language.VMemoInterpreter.Driver
+        Language.VMemoInterpreter.Interpreter
         Language.Typechecker.Driver
         Language.Typechecker.Typechecker
         Language.DeepMemo.Interpreter

@@ -24,15 +24,15 @@ instance (Eq k, Show k, Show v) => KeyMemory k v (KeyValueArray k v) where
 
 retrieveOrRun :: (KeyMemory k v m, Show v, Show k) => String -> k -> (() -> State m v) -> State m v
 retrieveOrRun name x t = do
-  trace ("\n\n retrieveOrRun " ++ show name ++ ": Checking for key: " ++ show x) $ return ()
+  -- trace ("\n\n retrieveOrRun " ++ show name ++ ": Checking for key: " ++ show x) $ return ()
   mlookup x >>= \case
     Just v -> do
-      trace ("\n retrieveOrRun " ++ show name ++ ": Cache hit for key: " ++ show x ++ " with value: " ++ show v) $ return ()
+      -- trace ("\n retrieveOrRun " ++ show name ++ ": Cache hit for key: " ++ show x ++ "\n with value: " ++ show v) $ return ()
       return v
     Nothing -> do
-      trace ("\n retrieveOrRun " ++ show name ++ ": Cache miss for key: " ++ show x) $ return ()
+      -- trace ("\n retrieveOrRun " ++ show name ++ ": Cache miss for key: " ++ show x) $ return ()
       v <- t ()
-      trace ("\n retrieveOrRun " ++ show name ++ ": Computed value: " ++ show v ++ " for key: " ++ show x) $ return ()
+      -- trace ("\n retrieveOrRun " ++ show name ++ ": Computed value: " ++ show v ++ " for key: " ++ show x) $ return ()
       mupdate x v
-      trace ("\n retrieveOrRun " ++ show name ++ ": Updated cache with key: " ++ show x ++ " and value: " ++ show v) $ return ()
+      -- trace ("\n retrieveOrRun " ++ show name ++ ": Updated cache with key: " ++ show x ++ " and value: " ++ show v) $ return ()
       return v

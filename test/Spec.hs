@@ -8,6 +8,7 @@ import DeepMemoTest
 import ReachingDefinitionsTest
 import DeepMemoReachingDefinitionsTest
 import VarReachingDefinitionsTest
+import VMemoReachingDefinitionsTest
 
 main :: IO ()
 main = do
@@ -16,7 +17,8 @@ main = do
     -- runTestTT varTestSuite
     -- runTestTT memoTestSuite
     -- runTestTT slMemoTestSuite
-    -- runTestTT rdTestSuite
-    -- runTestTT varRdTestSuite
+    runTestTT rdTestSuite
+    runTestTT varRdTestSuite
+    runTestTT vMemoRdTestSuite
     runTestTT deepMemoRdTestSuite
     putStrLn "Done."

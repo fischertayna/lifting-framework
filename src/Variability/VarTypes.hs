@@ -192,6 +192,13 @@ instance Applicative Var where
     (<*>) :: Var (a -> b) -> Var a -> Var b
     (<*>) = apply
 
+-- instance Monad Var where
+--   (>>=) :: Var a -> (a -> Var b) -> Var b
+--   (Var vs) >>= f = unions [applyOnVal f v | v <- vs]
+--     where
+--       applyOnVal :: (a -> Var b) -> Val a -> Var b
+--       applyOnVal f (a, pca) = let (Var bv) = f a in mkVars [(b, pcr) | (b, pcb) <- bv, let pcr = pca /\ pcb, sat pcr]
+
 disjInv :: Var t -> Bool
 disjInv v'@(Var v) = all (\((_, pc1), (_, pc2)) -> unsat (pc1 /\ pc2)) (pairs v)
 
@@ -370,5 +377,20 @@ data VarValor = VarInteger { int :: Var Integer }
               | VarList { list :: [VarValor] }
               | VarPair { pair :: (VarValor, VarValor) }
     deriving (Show, Eq)
+
+instance Hashable VarValor where
+  hashWithSalt salt (VarInteger i) = hashWithSalt salt i
+  hashWithSalt salt (VarBool b)    = hashWithSalt salt b
+  hashWithSalt salt (VarString s)  = hashWithSalt salt s
+  hashWithSalt salt (VarList vs)   = hashWithSalt salt vs
+  hashWithSalt salt (VarPair (v1, v2)) = salt `hashWithSalt` v1 `hashWithSalt` v2
+
+instance (Hashable t, Ord t) => Hashable (Var t) where
+  hashWithSalt salt (Var vals) = salt `hashWithSalt` vals
+
+-- Other instances
+
+showPCs :: Var a -> String
+showPCs (Var v) = "{" ++ L.intercalate ", " (map (\(_, pc) -> show pc) v) ++ "}"
 
 type Context k v = [(k, v)]

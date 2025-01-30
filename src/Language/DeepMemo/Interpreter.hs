@@ -52,6 +52,7 @@ import Language.VInterpreter.Functions
     update,
     boolToInt
   )
+import Data.Hashable (hash, Hashable)
 
 type RContext m = (VContext m, FContext, [Ident])
 
@@ -60,9 +61,15 @@ type VContext m = Context Ident (State m VarValor)
 type FContext = Context Ident Function
 
 data FuncKey = FuncKey
-  { funcName :: String
-  , funcArgs :: [VarValor]
+  { funcName :: String   -- Name of the function
+  , funcArgsHash :: Int  -- Hash of the function arguments
   } deriving (Eq, Show)
+
+createFuncKey :: String -> [VarValor] -> FuncKey
+createFuncKey name args = FuncKey
+  { funcName = name
+  , funcArgsHash = hash args
+  }
 
 type Mem =  (KeyValueArray FuncKey VarValor)
 
@@ -152,14 +159,17 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) = do
           _ ->
             if fId `elem` memoizedFunctionNames
               then 
-                  trace ("\n eval: Memoized function call to " ++ show (getIdentString fId)) $
+                  -- trace ("\n eval: Memoized function call to " ++ show (getIdentString fId)) $
                   memoizedCall context fId pExps
               else 
-                trace ("\n eval: Regular function call to " ++ show (getIdentString fId)) $ do
-                let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
-                -- trace ("\n eval: Function declaration: " ++ show decls ++ ", body: " ++ show fExp) $
-                    paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
-                    in eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
+                -- trace ("\n eval: Regular function call to " ++ show (getIdentString fId)) $ 
+                regularCall context fId pExps
+                -- let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
+                -- -- trace ("\n eval: Function declaration: " ++ show decls ++ ", body: " ++ show fExp) $
+                --     paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
+                --     in eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
+                --     -- result = eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
+                --     -- in trace ("\n eval: Function (" ++ show (getIdentString fId) ++ ") result: " ++ show result) $ result
     )
 
 applyBinaryOperatorWithState :: (Var a -> VarValor) -> (VarValor -> Var a) -> RContext Mem -> Exp -> Exp -> (a -> a -> a) -> State Mem VarValor
@@ -209,8 +219,24 @@ applyDifferenceWithState context exp0 exp1 = do
   let result = applyDifference v0 v1
   return $ result
 
+regularCall :: RContext Mem -> Ident -> [Exp] -> State Mem VarValor
+regularCall context@(vcontext, fcontext, memoizedFunctionNames) fId pExps =
+  let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
+   in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
+          name = (getIdentString fId)
+          in  eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
+        -- in let paramListM = mapM snd paramBindings
+        --     in do
+        --       -- trace ("\n regularCall "++ show name ++ ": decls = " ++ show decls) $ return ()
+        --       -- trace ("\n regularCall "++ show name ++ ": paramBindings = " ++ show (map fst paramBindings)) $ return ()
+        --       -- paramList <- paramListM
+        --       -- trace ("\n regularCall "++ show name ++ ": paramList = " ++ show paramList) $ return ()
+        --       result <- eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp
+        --       -- trace ("\n regularCall "++ show name ++ ": result = " ++ show result) $ return ()
+        --       return result
+
 memoizedCall :: RContext Mem -> Ident -> [Exp] -> State Mem VarValor
-memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
+memoizedCall context@(vcontext, fcontext, memoizedFunctionNames) fId pExps =
   let (Fun _ _ decls fExp) = fromJust $ lookup fcontext fId
    in let paramBindings = zip decls (map (\e -> eval context <.> return e) pExps)
           name = (getIdentString fId)
@@ -220,11 +246,11 @@ memoizedCall context@(vcontext, fcontext, memoizedFunctionName) fId pExps =
                 -- trace ("\n memoizedCall "++ show name ++ ": paramBindings = " ++ show (map fst paramBindings)) $ return ()
                 paramList <- paramListM
                 -- trace ("\n memoizedCall "++ show name ++ ": paramList = " ++ show paramList) $ return ()
-                retrieveOrRun name (FuncKey name paramList) (\_ -> eval (paramBindings, fcontext, memoizedFunctionName) <.> return fExp)
+                retrieveOrRun name (createFuncKey name paramList) (\_ -> eval (paramBindings, fcontext, memoizedFunctionNames) <.> return fExp)
 
 updatecF :: RContext Mem -> [Function] -> RContext Mem
 updatecF c [] = c
-updatecF (vcontext, fcontext, memoizedFunctionName) (f@(Fun _ fId _ _) : fs) = updatecF (vcontext, newFContext, memoizedFunctionName) fs
+updatecF (vcontext, fcontext, memoizedFunctionNames) (f@(Fun _ fId _ _) : fs) = updatecF (vcontext, newFContext, memoizedFunctionNames) fs
   where
     newFContext = update fcontext fId f
 
@@ -235,7 +261,7 @@ restrictVarValue varState pc = do
   return restrictedVarValue
 
 restrictContext :: RContext Mem -> PresenceCondition -> RContext Mem
-restrictContext context@(vcontext, fcontext, memoizedFunctionName) pc = (restrictedVContext, fcontext, memoizedFunctionName)
+restrictContext context@(vcontext, fcontext, memoizedFunctionNames) pc = (restrictedVContext, fcontext, memoizedFunctionNames)
   where
     restrictedVContext = [(vId, restrictVarValue v pc) | (vId, v) <- vcontext]
 

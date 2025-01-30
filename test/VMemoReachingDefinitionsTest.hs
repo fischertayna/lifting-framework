@@ -1,7 +1,7 @@
-module DeepMemoReachingDefinitionsTest where
+module VMemoReachingDefinitionsTest where
 
-import Language.DeepMemo.Interpreter
-import Language.DeepMemo.Driver
+import Language.VMemoInterpreter.Interpreter
+import Language.VMemoInterpreter.Driver
 import Variability.VarTypes (Prop, VarValor(..), Var (Var), propA, propB, atbt, atbf, afbt, afbf, apply, substitute, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||))
 
 import Language.Frontend.ErrM
@@ -10,6 +10,7 @@ import Helper (processFile)
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
+
 
 -- ex1, ex2, exPPA, ex4, factorialProg :: VarValor
 ex1 :: VarValor
@@ -412,7 +413,8 @@ testIsPair = TestCase $ do
 testCount :: String -> VarValor -> VarValor -> Test
 testCount name input expectedOutput = TestCase $ do
     output <- processFile (executeProg ["count"]) "src/Language/Examples/taint/Count-Asgns.lng" input
-    -- putStrLn ("\n Count out: " ++ (substitute (show output)))
+    -- putStrLn ("\n CountAsgns" ++ name ++ " result: " ++ (substitute (show (fst output))))
+    -- putStrLn ("\n\n CountAsgns" ++ name ++ " memory: " ++ (substitute (show (snd output))))
     assertEqual ("Count Asgns " ++ name) expectedOutput (fst output)
 
 
@@ -910,10 +912,9 @@ testUpdateMappings = TestCase $ do
 
 testReachingDefinitions :: String -> VarValor -> VarValor -> Test
 testReachingDefinitions name input expectedOutput = TestCase $ do
-    -- output <- processFile (executeProg ["labels", "flow", "fv", "assignments", "init", "final", "findBlock", "makeSetOfFV", "killRD", "genRD", "filterFlow"]) "src/Language/Examples/taint/reachingDefinitions.lng" input
-    output <- processFile (executeProg []) "src/Language/Examples/taint/reachingDefinitions.lng" input
-    putStrLn ("\n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show (fst output))))
-    putStrLn ("\n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show (fst output))))
+    output <- processFile (executeProg ["labels", "flow", "fv", "assignments", "init", "final", "findBlock", "makeSetOfFV", "killRD", "genRD", "filterFlow"]) "src/Language/Examples/taint/reachingDefinitions.lng" input
+    -- output <- processFile (executeProg []) "src/Language/Examples/taint/reachingDefinitions.lng" input
+    -- putStrLn ("\n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show (fst output))))
     assertEqual ("ReachingDefinitions " ++ name) expectedOutput (fst output)
 
 testReachingDefinitionsEx2 :: Test
@@ -1080,11 +1081,11 @@ testUnion7 = testUnion "VarList {list = [VarString {str = {('a', A), ('b', ~A)}}
 testUnion8 :: Test
 testUnion8 = testUnion "VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]} and VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]}" (VarPair(VarList [VarString (Var [("a", propA), ("b", notBDD propA)])], VarList [VarString (Var [("a", propA), ("b", notBDD propA)])])) (VarList [VarString (Var [("a", propA), ("b", notBDD propA)])]) 
 
-deepMemoRdTestSuite :: Test
-deepMemoRdTestSuite = TestList [    
-                               TestLabel "is pair" testIsPair
+vMemoRdTestSuite :: Test
+vMemoRdTestSuite = TestList [    
+                            TestLabel "is pair" testIsPair
                         ,   TestLabel "Count Asgns ex1" testCountEx1
-                        -- ,   TestLabel "Count Asgns ex2" testCountEx2
+                        ,   TestLabel "Count Asgns ex2" testCountEx2
                         ,   TestLabel "Count Asgns ex2_1" testCountEx2_1
                         ,   TestLabel "Count Asgns ex2_2" testCountEx2_2
                         ,   TestLabel "Count Asgns ex2_3" testCountEx2_3
@@ -1164,12 +1165,12 @@ deepMemoRdTestSuite = TestList [
                         ,   TestLabel "testInsertInto 1" testInsertInto1
                         ,   TestLabel "testInsertInto 2" testInsertInto2
                         ,   TestLabel "testInsertInto Empty" testInsertIntoEmpty
-                        --    TestLabel "testReachingDefinitionsEx2" testReachingDefinitionsEx2
-                        --    TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
-                            -- TestLabel "testFlowSimple1" testFlowSimple1
-                        --     TestLabel "testReachingDefinitionsSimple1" testReachingDefinitionsSimple1
-                        -- ,   TestLabel "testReachingDefinitionsSimple2" testReachingDefinitionsSimple2
-                        -- ,   TestLabel "testReachingDefinitionsSimple3" testReachingDefinitionsSimple3
+                        ,   TestLabel "testReachingDefinitionsEx2" testReachingDefinitionsEx2
+                        ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
+                        ,   TestLabel "testFlowSimple1" testFlowSimple1
+                        ,   TestLabel "testReachingDefinitionsSimple1" testReachingDefinitionsSimple1
+                        ,   TestLabel "testReachingDefinitionsSimple2" testReachingDefinitionsSimple2
+                        ,   TestLabel "testReachingDefinitionsSimple3" testReachingDefinitionsSimple3
                         ,   TestLabel "union 1" testUnion1
                         ,   TestLabel "union 2" testUnion2
                         ,   TestLabel "union 2_2" testUnion2_2
