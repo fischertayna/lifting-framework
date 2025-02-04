@@ -38,7 +38,7 @@ import Prelude hiding (lookup)
 import Debug.Trace
 import Data.List (sortBy)
 import Language.MInterpreter.Interpreter (Valor(ValorList, ValorInt))
-import Language.VInterpreter.Functions
+import Variability.Functions
   (
     applyBinaryOperator,
     applyUnaryOperator,
@@ -47,6 +47,7 @@ import Language.VInterpreter.Functions
     applySortList,
     applyUnion,
     applyDifference,
+    applyIsMember,
     partition,
     lookup,
     update,
@@ -153,6 +154,7 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) = do
               _ -> return $ VarInteger (Var [(0, ttPC)])
           Ident "isEqual" -> applyEqualOperatorWithState context (pExps !! 0) (pExps !! 1)
           Ident "sortList" -> applySortListWithState context (pExps !! 0)
+          Ident "isMember" -> applyIsMemberWithState context (pExps !! 0) (pExps !! 1)
           Ident "lt" -> applyLtOperatorWithState context (pExps !! 0) (pExps !! 1)
           Ident "union" -> applyUnionWithState context (pExps !! 0) (pExps !! 1)
           Ident "difference" -> applyDifferenceWithState context (pExps !! 0) (pExps !! 1)
@@ -217,6 +219,13 @@ applyDifferenceWithState context exp0 exp1 = do
   v0 <- (eval context <.> return exp0)
   v1 <- (eval context <.> return exp1)
   let result = applyDifference v0 v1
+  return $ result
+
+applyIsMemberWithState :: RContext Mem -> Exp -> Exp -> State Mem VarValor
+applyIsMemberWithState context exp0 exp1 = do
+  v0 <- (eval context <.> return exp0)
+  v1 <- (eval context <.> return exp1)
+  let result = applyIsMember v0 v1
   return $ result
 
 regularCall :: RContext Mem -> Ident -> [Exp] -> State Mem VarValor

@@ -32,7 +32,7 @@ import Variability.VarTypes
     union
   )
 import Prelude hiding (lookup)
-import Language.VInterpreter.Functions
+import Variability.Functions
   (
     applyBinaryOperator,
     applyUnaryOperator,
@@ -41,6 +41,7 @@ import Language.VInterpreter.Functions
     applySortList,
     applyUnion,
     applyDifference,
+    applyIsMember,
     partition,
     lookup,
     update,
@@ -137,6 +138,10 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
     Ident "sortList" -> 
       let (v1, mem1) = eval context (pExps !! 0) mem
       in (applySortList v1, mem1)
+    Ident "isMember" -> 
+      let (v, mem1) = eval context (pExps !! 0) mem
+          (lst, mem2) = eval context (pExps !! 1) mem1
+      in (applyIsMember v lst, mem2)
     Ident "lt" -> 
       let (v1, mem1) = eval context (pExps !! 0) mem
           (v2, mem2) = eval context (pExps !! 1) mem1

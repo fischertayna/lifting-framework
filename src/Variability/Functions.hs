@@ -1,12 +1,6 @@
-module Language.VInterpreter.Functions where
+module Variability.Functions where
 
 import Data.Maybe (fromJust)
-import Language.Frontend.AbsLanguage
-  ( Exp (..),
-    Function (..),
-    Ident (..),
-    Program (..),
-  )
 import Variability.VarTypes
   ( PresenceCondition,
     Prop,
@@ -223,6 +217,26 @@ isEmptyVarValor (VarString (Var vals)) = null vals
 isEmptyVarValor (VarList vals) = all isEmptyVarValor vals
 isEmptyVarValor (VarPair (k, v)) = isEmptyVarValor k || isEmptyVarValor v
 isEmptyVarValor _ = False
+
+applyIsMember :: VarValor -> VarValor -> VarValor
+applyIsMember element (VarList lst) =
+  let result = VarInteger $ Var
+        [ (boolToInt (sat (pc /\ disj (map (checkElem (val, pc)) lst))), pc)
+        | (val, pc) <- valList (wrapAsVar element)
+        ]
+  in doTraceOrResult False "isMember: " element (VarList lst) result
+applyIsMember _ _ = error "isMember should be used with a VarList as the second argument"
+
+checkElem :: (VarValor, PresenceCondition) -> VarValor -> PresenceCondition
+checkElem (v, pc) item =
+  disj [pc /\ pc' | (vi, pc') <- valList (wrapAsVar item), areEqualIgnoringPresence v vi]
+
+wrapAsVar :: VarValor -> Var VarValor
+wrapAsVar (VarInteger v) = Var [(VarInteger v, ttPC)]
+wrapAsVar (VarBool v)    = Var [(VarBool v, ttPC)]
+wrapAsVar (VarString v)  = Var [(VarString v, ttPC)]
+wrapAsVar (VarList v)    = Var [(VarList v, ttPC)]
+wrapAsVar (VarPair (v1, v2)) = Var [(VarPair (v1, v2), ttPC)]
 
 applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> VarValor -> VarValor -> (a -> a -> a) -> VarValor
 applyBinaryOperator cons f vv1 vv2 op =

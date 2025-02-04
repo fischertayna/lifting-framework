@@ -1,16 +1,16 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    rdExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
+    lvEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExit (l, prog, entry) {
-    rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
+lvEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvEntry (l, prog, exit) {
+    lvEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
 }
 
-rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
+lvEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvEntryWithBlock (l, prog, exit, block) {
+    union(difference(findOrDefault(l, exit), killLV(block, assignments(prog))), genLV(block))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -36,6 +36,7 @@ findBlock (l, prog) {
                         else []
 }
 
+
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, mapping) {
     if (isNil(mapping))
@@ -45,10 +46,10 @@ findOrDefault (l, mapping) {
             else findOrDefault(l, tail(mapping))
 }
 
-killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assignments) {
+killLV :: Any -> [String]
+killLV (block) {
     if (checkType(block, "ASGN"))
-        then union([((varFromAsgn(getStmt(block))), "?")], filterRD(varFromAsgn(getStmt(block)), labelFromAsgn(getStmt(block)), assignments))
+        then [varFromAsgn(getStmt(block))]
         else []
 }
 
@@ -76,12 +77,26 @@ filterRD (var, l, assigns) {
             else filterRD(var, l, tail(assigns))
 }
 
-genRD :: Any -> [(String, String)]
-genRD (prog) {
+genLV :: Any -> [String]
+genLV (prog) {
     if (checkType(prog, "ASGN"))
-        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
-        else []
+        then getVarFromValue(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "WHILE"))
+            then getVarFromValue(getCondFromWhile(getStmt(prog)))
+            else if (checkType(prog, "IF"))
+                then getVarFromValue(getCondFromIf(getStmt(prog)))
+                else []
 }
+
+getVarFromValue :: Any -> [String]
+getVarFromValue (aexp) {
+    if (isPair(snd(aexp)))
+        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
+        else if (checkType(aexp, "VAR"))
+            then [snd (aexp)]
+            else []
+}
+
 
 typeStmt :: Any -> String
 typeStmt (prog) {

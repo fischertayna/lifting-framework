@@ -833,20 +833,20 @@ testUnion = TestCase $ do
 
 testFlowEx1 :: Test
 testFlowEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex1
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" ex1
     let expectedOutput = (ValorList[ValorPair(ValorStr "1", ValorStr "2"), ValorPair(ValorStr "2", ValorStr "3")])
     assertEqual "Flow ex1" expectedOutput output
 
 testFlowEx2 :: Test
 testFlowEx2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex2
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" ex2
     let expectedOutput = (ValorList[])
     assertEqual "Flow ex2" expectedOutput output
 
 
 testFlowEx3 :: Test
 testFlowEx3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex3
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" ex3
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
@@ -858,7 +858,7 @@ testFlowEx3 = TestCase $ do
 
 testFlowEx4 :: Test
 testFlowEx4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" ex4
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" ex4
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
@@ -869,7 +869,7 @@ testFlowEx4 = TestCase $ do
 
 testFlowFactorial :: Test
 testFlowFactorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" factorialProg
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" factorialProg
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),

@@ -5,10 +5,10 @@ main (prog) {
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
-findOrDefault (l, exit) {
-    if (isNil(exit))
+findOrDefault (l, mapping) {
+    if (isNil(mapping))
         then []
-        else if (isEqual(fst (head (exit)), l))
-            then snd (head (exit))
-            else findOrDefault(l, tail(exit))
+        else if (isEqual(fst (head (mapping)), l))
+            then snd (head (mapping))
+            else findOrDefault(l, tail(mapping))
 }

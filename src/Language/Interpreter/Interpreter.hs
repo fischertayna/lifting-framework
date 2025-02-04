@@ -87,6 +87,7 @@ eval context@(vcontext, fcontext) x = case x of
         val2 = eval context (pExps !! 1)
       in ValorInt (boolToInt (val1 < val2))
     Ident "sortList" -> applySortList context (pExps !! 0)
+    Ident "isMember" -> applyIsMember context (pExps !! 0) (pExps !! 1)
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
     Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> eval (paramBindings, fcontext) fExp
@@ -96,6 +97,14 @@ eval context@(vcontext, fcontext) x = case x of
       (f,s) = p arg
       (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (eval context) pExps)
+
+applyIsMember :: RContext -> Exp -> Exp -> Valor
+applyIsMember context exp expL =
+  let v0 = eval context exp
+      ls = eval context expL
+  in case ls of
+      ValorList vals -> ValorInt (boolToInt (elem v0 vals))
+      _ -> error "isMember expects a VarList as second argument"
 
 applySortList :: RContext -> Exp -> Valor
 applySortList context exp =

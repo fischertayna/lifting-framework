@@ -497,7 +497,7 @@ testFinalExPPA = testFinal "PPA" exPPA (VarList [VarString (Var [("3", ttPC)])])
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
-    output <- processFile (executeProg ["flow"]) "src/Language/Examples/taint/cfg.lng" input
+    output <- processFile (executeProg ["flow"]) "src/Language/Examples/taint/flow.lng" input
     -- putStrLn ("\n Flow out " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("flow " ++ name) expectedOutput (fst output)
 

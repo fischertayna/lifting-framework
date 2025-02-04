@@ -18,7 +18,7 @@ import Variability.VarTypes
     (++++), (||||),
   )
 import Prelude hiding (lookup)
-import Language.VInterpreter.Functions
+import Variability.Functions
   (
     applyBinaryOperator,
     applyUnaryOperator,
@@ -27,6 +27,7 @@ import Language.VInterpreter.Functions
     applySortList,
     applyUnion,
     applyDifference,
+    applyIsMember,
     partition,
     lookup,
     update,
@@ -79,6 +80,7 @@ eval context@(vcontext, fcontext) x = case x of
         _ -> VarInteger (Var [(0, ttPC)])
     Ident "isEqual" -> applyEqualOperator (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "sortList" -> applySortList (eval context (pExps !! 0))
+    Ident "isMember" -> applyIsMember (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "lt" -> applyLtOperator (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "union" -> applyUnion (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "difference" -> applyDifference (eval context (pExps !! 0)) (eval context (pExps !! 1))

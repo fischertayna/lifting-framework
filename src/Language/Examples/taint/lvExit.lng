@@ -1,13 +1,13 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    rdEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
+    lvExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdEntry (l, prog, exit) {
-    if (isEqual (l, init(prog)))
-        then makeSetOfFV(fv(prog))
-        else findIn(filterFlow(l, flow(prog)), exit)
+lvExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvExit (l, prog, entry) {
+    if (isMember (l, final(prog)))
+        then []
+        else findIn(filterFlow(l, flowR(prog)), entry)
 }
 
 makeSetOfFV :: [String] -> [(String, String)]
@@ -41,6 +41,7 @@ getVarFromValue (aexp) {
             else []
 }
 
+
 findIn :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findIn (fl, mapping) {
     if (isNil(fl))
@@ -66,6 +67,18 @@ filterFlow (l, fl) {
             else filterFlow(l, tail(fl))
 }
 
+flowR :: Any -> [(String, String)]
+flowR (prog) {
+    reverse(flow(prog))
+}
+
+reverse :: [(String, String)] -> [(String, String)]
+reverse (l) {
+    if (isNil(l))
+        then []
+        else [(snd(head(l)), fst(head(l)))] ++ reverse(tail(l))
+}
+
 flow :: Any -> [(String, String)]
 flow (prog) {
     if (isEqual (fst (prog), "ASGN"))
@@ -87,7 +100,6 @@ makeSetOfLabels (init, finals) {
         then []
         else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
 }
-
 
 init :: Any -> String
 init (prog) {

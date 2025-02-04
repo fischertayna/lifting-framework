@@ -1,10 +1,10 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    reachingDefinitions (fst(input), snd(input))
+    liveVariables (fst(input), snd(input))
 }
 
-reachingDefinitions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
-reachingDefinitions(tries, prog) {
+liveVariables :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
+liveVariables(tries, prog) {
     chaoticIteration(tries, prog, ([], []))
 }
 
@@ -23,8 +23,8 @@ chaoticRecursion (tries, prog, y, x) {
 }
 
 f :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
-f (prog, rd) {
-    updateMappings(prog, labels(prog), rd)
+f (prog, lv) {
+    updateMappings(prog, labels(prog), lv)
 }
 
 updateMappings :: Any -> [String] -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
@@ -36,7 +36,7 @@ updateMappings(prog, labels, mappings) {
 
 updateMappingsForLabel :: Any -> String -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
 updateMappingsForLabel(prog, l, old) {
-    (insertIntoMap(l, rdEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, rdExit(l, prog, fst(old)), snd(old)))
+    (insertIntoMap(l, lvEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, lvExit(l, prog, fst(old)), snd(old)))
 }
 
 insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
@@ -48,11 +48,14 @@ insertIntoMap (key, value, map) {
             else union(insertIntoMap(key, value, tail(map)), [head(map)])
 }
 
-rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdEntry (l, prog, exit) {
-    if (isEqual (l, init(prog)))
-        then makeSetOfFV(fv(prog))
-        else findIn(filterFlow(l, flow(prog)), exit)
+lvEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvEntry (l, prog, exit) {
+    lvEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
+}
+
+lvEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvEntryWithBlock (l, prog, exit, block) {
+    union(difference(findOrDefault(l, exit), killLV(block)), genLV(block))
 }
 
 makeSetOfFV :: [String] -> [(String, String)]
@@ -163,14 +166,23 @@ final (prog) {
                     else ["error"]
 }
 
-rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExit (l, prog, entry) {
-    rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
+lvExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+lvExit (l, prog, entry) {
+    if (isMember (l, final(prog)))
+        then []
+        else findIn(filterFlow(l, flowR(prog)), entry)
 }
 
-rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
+flowR :: Any -> [(String, String)]
+flowR (prog) {
+    reverse(flow(prog))
+}
+
+reverse :: [(String, String)] -> [(String, String)]
+reverse (l) {
+    if (isNil(l))
+        then []
+        else [(snd(head(l)), fst(head(l)))] ++ reverse(tail(l))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -196,42 +208,22 @@ findBlock (l, prog) {
                         else []
 }
 
-killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assignments) {
+killLV :: Any -> [String]
+killLV (block) {
     if (checkType(block, "ASGN"))
-        then union([((varFromAsgn(getStmt(block))), "?")], filterRD(varFromAsgn(getStmt(block)), labelFromAsgn(getStmt(block)), assignments))
+        then [varFromAsgn(getStmt(block))]
         else []
 }
 
-assignments :: Any -> [(String, String)]
-assignments (prog) {
+genLV :: Any -> [String]
+genLV (prog) {
     if (checkType(prog, "ASGN"))
-        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
-        else if (checkType(prog, "SEQ"))
-            then union(assignments(fstStmtOfSeq(getStmt(prog))), assignments(sndStmtOfSeq(getStmt(prog))))
+        then getVarFromValue(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "WHILE"))
+            then getVarFromValue(getCondFromWhile(getStmt(prog)))
             else if (checkType(prog, "IF"))
-                then union(assignments(thenFromIf(getStmt(prog))), assignments(elseFromIf(getStmt(prog))))
-                else if (checkType(prog, "WHILE"))
-                    then assignments(blockFromWhile(getStmt(prog)))
-                    else if (checkType(prog, "SKIP"))
-                        then []
-                        else ["error " ++ typeStmt(prog)]
-}
-
-filterRD :: String -> String -> [(String, String)] -> [(String, String)]
-filterRD (var, l, assigns) {
-    if (isNil(assigns))
-        then []
-        else if (isEqual(fst(head(assigns)), var))
-            then union([head (assigns)], filterRD(var, l, tail(assigns)))
-            else filterRD(var, l, tail(assigns))
-}
-
-genRD :: Any -> [(String, String)]
-genRD (prog) {
-    if (checkType(prog, "ASGN"))
-        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
-        else []
+                then getVarFromValue(getCondFromIf(getStmt(prog)))
+                else []
 }
 
 labels :: Any -> [String]

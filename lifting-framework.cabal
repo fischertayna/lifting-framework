@@ -14,7 +14,7 @@ version:            0.1.0.0
 -- The license under which the package is released.
 -- license:
 author:             BrunoMWorm
-maintainer:         brunomatissek.worm@gmail.com
+maintainer:         taynafischer
 
 -- A copyright notice.
 -- copyright:
@@ -27,6 +27,7 @@ library
     exposed-modules:
         Memoization.Core.State
         Memoization.Core.Memory
+        Variability.Functions
         Variability.VarTypes
         Language.Frontend.TestLanguage
         Language.Frontend.ErrM
@@ -43,13 +44,13 @@ library
         Language.VInterpreter.Driver
         Language.VInterpreter.Interpreter
         Language.VInterpreter.Composition
-        Language.VInterpreter.Functions
         Language.VMemoInterpreter.Driver
         Language.VMemoInterpreter.Interpreter
         Language.Typechecker.Driver
         Language.Typechecker.Typechecker
         Language.DeepMemo.Interpreter
         Language.DeepMemo.Driver
+        WhileLang.WhileEncoder
 
     -- Modules included in this library but not exported.
     -- other-modules:

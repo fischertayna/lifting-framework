@@ -571,7 +571,7 @@ testFinalExPPA = testFinal "PPA" exPPA (VarList [VarString (Var [("3", ttPC)])])
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/taint/cfg.lng" input
+    output <- processFile executeProg "src/Language/Examples/taint/flow.lng" input
     -- putStrLn ("\n Flow out " ++ name ++ " : " ++ (substitute (show output) substitutions))
     assertEqual ("flow " ++ name) expectedOutput output
 
@@ -593,6 +593,32 @@ testFlowExPPA = testFlow "PPA" exPPA (VarList[VarPair(VarString (Var [("1", ttPC
                                 VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
                                 VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)]))
+                            ])
+
+testFlowR :: String -> VarValor -> VarValor -> Test
+testFlowR name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/taint/flowR.lng" input
+    -- putStrLn ("\n Flow out " ++ name ++ " : " ++ (substitute (show output) substitutions))
+    assertEqual ("flowR " ++ name) expectedOutput output
+
+testFlowREx1 :: Test
+testFlowREx1 = testFlowR "ex1" ex1 (VarList[VarPair(VarString (Var [("2", ttPC)]),VarString (Var [("1", ttPC)])),
+                                VarPair(VarString (Var [("3", ttPC)]),VarString (Var [("2", ttPC)])),
+                                VarPair(VarString (Var [("4", ttPC)]),VarString (Var [("3", ttPC)]))])
+
+flow2R = VarList[VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarString (Var [("1", ttPC)])),
+                VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarString (Var [("2", propA), ("21", notBDD propA)])),
+                VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("3", notBDD propA), ("31", propA)]))]
+
+testFlowREx2 :: Test
+testFlowREx2 = testFlowR "ex2" ex2 (flow2R)
+
+testFlowRExPPA :: Test
+testFlowRExPPA = testFlowR "PPA" exPPA (VarList[VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("1", ttPC)])),
+                                VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("2", ttPC)])),
+                                VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("5", ttPC)])),
+                                VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("3", ttPC)])),
+                                VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("4", ttPC)]))
                             ])
 
 testChaoticIteration1 :: Test
@@ -1046,6 +1072,9 @@ varRdTestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Flow ex1" testFlowEx1
                         ,   TestLabel "Flow ex2" testFlowEx2
                         ,   TestLabel "Flow exPPA" testFlowExPPA
+                        ,   TestLabel "FlowR ex1" testFlowREx1
+                        ,   TestLabel "FlowR ex2" testFlowREx2
+                        ,   TestLabel "FlowR exPPA" testFlowRExPPA
                         ,   TestLabel "Chaotic Iteration 1" testChaoticIteration1
                         ,   TestLabel "Chaotic Iteration 2" testChaoticIteration2
                         ,   TestLabel "Asgns ex1" testAssignmentsEx1

@@ -1,0 +1,128 @@
+main :: Any -> [Any]
+main (prog) {
+    flowR (prog)
+}
+
+flowR :: Any -> [(String, String)]
+flowR (prog) {
+    reverse(flow(prog))
+}
+
+reverse :: [(String, String)] -> [(String, String)]
+reverse (l) {
+    if (isNil(l))
+        then []
+        else [(snd(head(l)), fst(head(l)))] ++ reverse(tail(l))
+}
+
+flow :: Any -> [(String, String)]
+flow (prog) {
+    if (checkType(prog, "ASGN"))
+        then []
+        else if (checkType(prog, "SEQ"))
+            then union(flow(fstStmtOfSeq(getStmt(prog))), union(flow(sndStmtOfSeq(getStmt(prog))), makeSetOfLabels(init(sndStmtOfSeq(getStmt(prog))), final(fstStmtOfSeq(getStmt(prog))))))
+            else if (checkType(prog, "IF"))
+                then union([(labelFromIf(getStmt(prog)), init(thenFromIf(getStmt(prog))))], union(flow(thenFromIf(getStmt(prog))), union([(labelFromIf(getStmt(prog)), init(elseFromIf(getStmt(prog))))], flow(elseFromIf(getStmt(prog))))))
+                else if (checkType(prog, "WHILE"))
+                    then union(flow(blockFromWhile(getStmt(prog))), union([(labelFromWhile(getStmt(prog)), init(blockFromWhile(getStmt(prog))))], makeSetOfLabels(labelFromWhile(getStmt(prog)), final(blockFromWhile(getStmt(prog))))))
+                    else if (checkType(prog, "SKIP"))
+                        then []
+                        else ["error " ++ typeStmt(prog)]
+}
+
+makeSetOfLabels :: String -> [String] -> [(String, String)]
+makeSetOfLabels (init, finals) {
+    if (isNil(finals))
+        then []
+        else [(head (finals), init)] ++ makeSetOfLabels(init, tail(finals))
+}
+
+init :: Any -> String
+init (prog) {
+    if (checkType(prog, "ASGN"))
+    then labelFromAsgn(getStmt(prog))
+    else if (checkType(prog, "SEQ"))
+        then init (fstStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then labelFromIf(getStmt(prog))
+            else if (checkType(prog, "WHILE"))
+                then labelFromWhile(getStmt(prog))
+                else if (checkType(prog, "SKIP"))
+                    then labelFromSkip(getStmt(prog))
+                    else ("error " ++ typeStmt(prog))
+}
+
+final :: Any -> [String]
+final (prog) {
+    if (checkType(prog, "ASGN"))
+    then [labelFromAsgn(getStmt(prog))]
+    else if (checkType(prog, "SEQ"))
+        then final(sndStmtOfSeq(getStmt(prog)))
+        else if (checkType(prog, "IF"))
+            then final(thenFromIf(getStmt(prog))) ++ final(elseFromIf(getStmt(prog)))
+            else if (checkType(prog, "WHILE"))
+                then [labelFromWhile(getStmt(prog))]
+                else if (checkType(prog, "SKIP"))
+                    then [labelFromSkip(getStmt(prog))]
+                    else ["error"]
+}
+
+typeStmt :: Any -> String
+typeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(typeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
+    fst(skip)
+}
+
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+labelFromIf :: Any -> String
+labelFromIf (stm) {
+    snd(fst(stm))
+}
+
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
+    fst(snd(stm))
+}
+
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
+    snd(snd(stm))
+}
+
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
+    snd(fst(stm))
+}
+
+blockFromWhile :: Any -> Any
+blockFromWhile (stm) {
+    snd(stm)
+}
