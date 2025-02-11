@@ -50,11 +50,11 @@ fstStmtOfSeq (seq) {
 
 labelFromIf :: Any -> String
 labelFromIf (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 
 labelFromWhile :: Any -> String
 labelFromWhile (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 

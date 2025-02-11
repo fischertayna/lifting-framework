@@ -2,6 +2,8 @@ module WhileLang.WhileEncoder where
 
 import Variability.VarTypes
 
+import Debug.Trace (trace)
+
 type Id = String 
 type Label = Integer
 type Program = Stmt
@@ -62,38 +64,82 @@ instance Show Stmt where
     show (While (test, l) s) = "while " <> "[" <> show test <> "] " <> show l <> " do " <> show s
     show (Variant pc s1 s2) = "#IFDEF " <> show pc <> " \n " <> show s1 <> "\n #ELSE \n" <> show s2 <> " #ENDIF "
 
--- Encoder to convert AST into VarValor
-encodeAExp :: AExp -> VarValor
-encodeAExp (Variable v) = VarPair (VarString (Var [("VAR", ttPC)]), VarString (Var [(v, ttPC)]))
-encodeAExp (Const i) = VarPair (VarString (Var [("CONST", ttPC)]), VarString (Var [(show i, ttPC)]))
-encodeAExp (Add e1 e2) = VarPair (VarString (Var [("ADD", ttPC)]), VarPair (encodeAExp e1, encodeAExp e2))
-encodeAExp (Sub e1 e2) = VarPair (VarString (Var [("SUB", ttPC)]), VarPair (encodeAExp e1, encodeAExp e2))
-encodeAExp (Mult e1 e2) = VarPair (VarString (Var [("MULT", ttPC)]), VarPair (encodeAExp e1, encodeAExp e2))
-encodeAExp (Div e1 e2) = VarPair (VarString (Var [("DIV", ttPC)]), VarPair (encodeAExp e1, encodeAExp e2))
+data StmtPC = AssignmentPC Id AExp Label PresenceCondition
+            | SkipPC Label PresenceCondition
+            | SeqPC StmtPC StmtPC
+            | IfThenElsePC TestExp StmtPC StmtPC PresenceCondition
+            | WhilePC TestExp StmtPC PresenceCondition
+ deriving (Eq, Ord, Show)
 
-encodeBExp :: BExp -> VarValor
-encodeBExp CTrue = VarString (Var [("TRUE", ttPC)])
-encodeBExp CFalse = VarString (Var [("FALSE", ttPC)])
-encodeBExp (Not b) = VarPair (VarString (Var [("NOT", ttPC)]), encodeBExp b)
-encodeBExp (And b1 b2) = VarPair (VarString (Var [("AND", ttPC)]), VarPair (encodeBExp b1, encodeBExp b2))
-encodeBExp (Or b1 b2) = VarPair (VarString (Var [("OR", ttPC)]), VarPair (encodeBExp b1, encodeBExp b2))
-encodeBExp (EQExp a1 a2) = VarPair (VarString (Var [("EQ", ttPC)]), VarPair (encodeAExp a1, encodeAExp a2))
-encodeBExp (GTExp a1 a2) = VarPair (VarString (Var [("GT", ttPC)]), VarPair (encodeAExp a1, encodeAExp a2))
-encodeBExp (LTExp a1 a2) = VarPair (VarString (Var [("LT", ttPC)]), VarPair (encodeAExp a1, encodeAExp a2))
+-- Encoder to convert AST into VarValor
+encodeAExp :: AExp -> PresenceCondition -> VarValor
+encodeAExp (Variable v) pc = VarPair (VarString (Var [("VAR", pc)]), VarString (Var [(v, pc)]))
+encodeAExp (Const i) pc = VarPair (VarString (Var [("CONST", pc)]), VarString (Var [(show i, pc)]))
+encodeAExp (Add e1 e2) pc = VarPair (VarString (Var [("ADD", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
+encodeAExp (Sub e1 e2) pc = VarPair (VarString (Var [("SUB", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
+encodeAExp (Mult e1 e2) pc = VarPair (VarString (Var [("MULT", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
+encodeAExp (Div e1 e2) pc = VarPair (VarString (Var [("DIV", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
+
+encodeBExp :: BExp -> PresenceCondition -> VarValor
+encodeBExp CTrue pc = VarString (Var [("TRUE", pc)])
+encodeBExp CFalse pc = VarString (Var [("FALSE", pc)])
+encodeBExp (Not b) pc = VarPair (VarString (Var [("NOT", pc)]), encodeBExp b pc)
+encodeBExp (And b1 b2) pc = VarPair (VarString (Var [("AND", pc)]), VarPair (encodeBExp b1 pc, encodeBExp b2 pc))
+encodeBExp (Or b1 b2) pc = VarPair (VarString (Var [("OR", pc)]), VarPair (encodeBExp b1 pc, encodeBExp b2 pc))
+encodeBExp (EQExp a1 a2) pc = VarPair (VarString (Var [("EQ", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
+encodeBExp (GTExp a1 a2) pc = VarPair (VarString (Var [("GT", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
+encodeBExp (LTExp a1 a2) pc = VarPair (VarString (Var [("LT", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
+
+stmtToStmtPC :: PresenceCondition -> Stmt -> StmtPC
+stmtToStmtPC pc (Assignment v e l) = AssignmentPC v e l pc
+stmtToStmtPC pc (Skip l) = SkipPC l pc
+stmtToStmtPC pc (Seq s1 s2) = SeqPC (stmtToStmtPC pc s1) (stmtToStmtPC pc s2)
+stmtToStmtPC pc (IfThenElse test s1 s2) = 
+    IfThenElsePC test (stmtToStmtPC pc s1) (stmtToStmtPC pc s2) pc
+stmtToStmtPC pc (While test body) = WhilePC test (stmtToStmtPC pc body) pc
+stmtToStmtPC pc (Variant pc' s1 s2) =
+    SeqPC (stmtToStmtPC (andBDD pc pc') s1) (stmtToStmtPC (andBDD pc (notBDD pc')) s2)
+
+isCompletePC :: PresenceCondition -> Bool
+isCompletePC pc = pc == ttPC || pc == ffPC
+
+presencePairs :: String ->  String -> PresenceCondition -> [(String, PresenceCondition)]
+presencePairs tag alternativeTag pc
+    | isCompletePC pc = [(tag, pc)]
+    | otherwise       = [(tag, pc), (alternativeTag, notBDD pc)]
+
+presencePairsStmt :: String -> PresenceCondition -> [(String, PresenceCondition)]
+presencePairsStmt tag pc = presencePairs tag "SKIP" pc
+
+presencePairsLabel :: String -> PresenceCondition -> [(String, PresenceCondition)]
+presencePairsLabel tag pc = presencePairs tag ("-" ++ tag) pc
 
 encodeStmt :: Stmt -> VarValor
-encodeStmt (Assignment v e l) = 
-    VarPair (VarString (Var [("ASGN", ttPC)]),
-             VarPair (VarString (Var [(show l, ttPC)]),
-                      VarPair (VarString (Var [(v, ttPC)]), encodeAExp e)))
-encodeStmt (Seq s1 s2) = VarPair (VarString (Var [("SEQ", ttPC)]), VarPair (encodeStmt s1, encodeStmt s2))
-encodeStmt (IfThenElse (cond, l) s1 s2) = 
-    VarPair (VarString (Var [("IF", ttPC)]),
-             VarPair (VarPair (encodeBExp cond, VarString (Var [(show l, ttPC)])),
-                      VarPair (encodeStmt s1, encodeStmt s2)))
-encodeStmt (While (cond, l) body) = 
-    VarPair (VarString (Var [("WHILE", ttPC)]),
-             VarPair (VarPair (encodeBExp cond, VarString (Var [(show l, ttPC)])), encodeStmt body))
-encodeStmt (Skip l) = VarString (Var [("SKIP", ttPC)])
-encodeStmt (Variant pc s1 s2) = 
-    VarPair (encodeStmt s1 |||| pc, encodeStmt s2 |||| notBDD pc)
+encodeStmt stmt = encodeStmtPC' (stmtToStmtPC ttPC stmt)
+    -- let stmtPC = stmtToStmtPC ttPC stmt
+    --     tracedStmtPC = trace ("\n stmtToStmtPC result: " ++ substitute (show stmtPC)) stmtPC
+    --     result = encodeStmtPC' tracedStmtPC
+    -- in trace ("\n encodeStmt final result: " ++ substitute (show result)) result
+  where
+    encodeStmtPC' :: StmtPC -> VarValor
+    encodeStmtPC' (AssignmentPC v e l pc) = 
+        VarPair (VarString (Var (presencePairsStmt "ASGN" pc)), 
+                 VarPair (VarString (Var (presencePairsLabel (show l) pc)),
+                          VarPair (VarString (Var [(v, pc)]), encodeAExp e pc)))
+
+    encodeStmtPC' (SkipPC l pc) = VarString (Var [("SKIP", pc)])
+
+    encodeStmtPC' (SeqPC s1 s2) = 
+        VarPair (VarString (Var (presencePairsStmt "SEQ" ttPC)), 
+                 VarPair (encodeStmtPC' s1, encodeStmtPC' s2))
+
+    encodeStmtPC' (IfThenElsePC (cond, l) s1 s2 pc) =
+        VarPair (VarString (Var (presencePairsStmt "IF" pc)),
+                 VarPair (VarString (Var (presencePairsLabel (show l) pc)),
+                          VarPair (encodeBExp cond pc,
+                                   VarPair (encodeStmtPC' s1, encodeStmtPC' s2))))
+
+    encodeStmtPC' (WhilePC (cond, l) body pc) =
+        VarPair (VarString (Var (presencePairsStmt "WHILE" pc)),
+                 VarPair (VarString (Var (presencePairsLabel (show l) pc)),
+                          VarPair (encodeBExp cond pc, encodeStmtPC' body)))

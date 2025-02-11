@@ -12,17 +12,17 @@ killRD (block, assignments) {
 
 assignments :: Any -> [(String, String)]
 assignments (prog) {
-    if (isEqual (fst (prog), "ASGN"))
-        then [((fst (snd (snd (prog)))), (fst (snd (prog))))]
-        else if (isEqual (fst (prog), "SEQ"))
-            then union(assignments(fst(snd (prog))), assignments(snd (snd (prog))))
-            else if (isEqual (fst (prog), "IF"))
-                then union(assignments (fst (snd (snd (prog)))), assignments (snd (snd (snd (prog)))))
-                else if (isEqual (fst (prog), "WHILE"))
-                    then assignments(snd(snd (prog)))
-                    else if (isEqual (fst (prog), "SKIP"))
+    if (checkType(prog, "ASGN"))
+        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
+        else if (checkType(prog, "SEQ"))
+            then union(assignments(fstStmtOfSeq(getStmt(prog))), assignments(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(assignments(thenFromIf(getStmt(prog))), assignments(elseFromIf(getStmt(prog))))
+                else if (checkType(prog, "WHILE"))
+                    then assignments(blockFromWhile(getStmt(prog)))
+                    else if (checkType(prog, "SKIP"))
                         then []
-                        else ["error " ++ fst (prog)]
+                        else ["error " ++ typeStmt(prog)]
 }
 
 filterRD :: String -> String -> [(String, String)] -> [(String, String)]
@@ -44,4 +44,94 @@ filterRDv2 (var, l, assigns) {
                 then filterRDv2(var, l, tail(assigns))
                 else [head (assigns)] ++ filterRDv2(var, l, tail(assigns)) 
             else filterRDv2(var, l, tail(assigns))
+}
+
+typeStmt :: Any -> String
+typeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(typeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+varFromAsgn :: Any -> String
+varFromAsgn (asgn) {
+    fst(snd(asgn))
+}
+
+valueFromAsgn :: Any -> String
+valueFromAsgn (asgn) {
+    snd(snd(asgn))
+}
+
+getFstOpValue :: Any -> String
+getFstOpValue (aexp) {
+    fst(snd(aexp))
+}
+
+getSndOpValue :: Any -> String
+getSndOpValue (aexp) {
+    snd(snd(aexp))
+}
+
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
+    fst(skip)
+}
+
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+labelFromIf :: Any -> String
+labelFromIf (stm) {
+    fst(stm)
+}
+
+getCondFromIf :: Any -> String
+getCondFromIf (stm) {
+    fst(snd(stm))
+}
+
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
+    fst(snd(snd(stm)))
+}
+
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
+    snd(snd(snd(stm)))
+}
+
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
+    fst(stm)
+}
+
+getCondFromWhile :: Any -> String
+getCondFromWhile (stm) {
+    fst(snd(stm))
+}
+
+blockFromWhile :: Any -> Any
+blockFromWhile (stm) {
+    snd(snd(stm))
 }

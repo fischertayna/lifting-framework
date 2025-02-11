@@ -148,54 +148,54 @@ ex3 = ValorPair(
                             ValorPair(
                                 ValorStr "WHILE",
                                 ValorPair (
+                                    ValorStr "4",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "VAR", 
                                             ValorStr "c"
-                                        ), 
-                                        ValorStr "4"
-                                    ),
-                                    ValorPair(
-                                        ValorStr "SEQ",
-                                        ValorPair (
-                                            ValorPair(
-                                                ValorStr "ASGN",
-                                                ValorPair (
-                                                    ValorStr "5", 
+                                        ),
+                                        ValorPair(
+                                            ValorStr "SEQ",
+                                            ValorPair (
+                                                ValorPair(
+                                                    ValorStr "ASGN",
                                                     ValorPair (
-                                                        ValorStr "soma", 
+                                                        ValorStr "5", 
                                                         ValorPair (
-                                                            ValorStr "ADD", 
+                                                            ValorStr "soma", 
                                                             ValorPair (
+                                                                ValorStr "ADD", 
                                                                 ValorPair (
-                                                                    ValorStr "VAR", 
-                                                                    ValorStr "soma"
-                                                                ),
-                                                                ValorPair (
-                                                                    ValorStr "VAR",
-                                                                    ValorStr "c"
+                                                                    ValorPair (
+                                                                        ValorStr "VAR", 
+                                                                        ValorStr "soma"
+                                                                    ),
+                                                                    ValorPair (
+                                                                        ValorStr "VAR",
+                                                                        ValorStr "c"
+                                                                    )
                                                                 )
                                                             )
                                                         )
                                                     )
-                                                )
-                                            ),
-                                            ValorPair(
-                                                ValorStr "ASGN",
-                                                ValorPair (
-                                                    ValorStr "6", 
+                                                ),
+                                                ValorPair(
+                                                    ValorStr "ASGN",
                                                     ValorPair (
-                                                        ValorStr "c", 
+                                                        ValorStr "6", 
                                                         ValorPair (
-                                                            ValorStr "SUB", 
+                                                            ValorStr "c", 
                                                             ValorPair (
+                                                                ValorStr "SUB", 
                                                                 ValorPair (
-                                                                    ValorStr "VAR",
-                                                                    ValorStr "c"
-                                                                ),
-                                                                ValorPair(
-                                                                    ValorStr "CONST", 
-                                                                    ValorStr "1"
+                                                                    ValorPair (
+                                                                        ValorStr "VAR",
+                                                                        ValorStr "c"
+                                                                    ),
+                                                                    ValorPair(
+                                                                        ValorStr "CONST", 
+                                                                        ValorStr "1"
+                                                                    )
                                                                 )
                                                             )
                                                         )
@@ -273,6 +273,7 @@ ex4 = ValorPair (
                             ValorPair(
                                 ValorStr "IF",
                                 ValorPair ( 
+                                    ValorStr "4",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "NOT",
@@ -281,40 +282,39 @@ ex4 = ValorPair (
                                                 ValorStr "soma"
                                             )
                                         ),
-                                        ValorStr "4"
-                                    ),
-                                    ValorPair (
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "5", 
+                                        ValorPair (
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "soma", 
+                                                    ValorStr "5", 
                                                     ValorPair (
-                                                        ValorStr "ADD", 
+                                                        ValorStr "soma", 
                                                         ValorPair (
+                                                            ValorStr "ADD", 
                                                             ValorPair (
-                                                                ValorStr "VAR", 
-                                                                ValorStr "c"
-                                                            ),
-                                                            ValorPair (
-                                                                ValorStr "VAR", 
-                                                                ValorStr "x"
+                                                                ValorPair (
+                                                                    ValorStr "VAR", 
+                                                                    ValorStr "c"
+                                                                ),
+                                                                ValorPair (
+                                                                    ValorStr "VAR", 
+                                                                    ValorStr "x"
+                                                                )
                                                             )
                                                         )
                                                     )
                                                 )
-                                            )
-                                        ),
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "6", 
+                                            ),
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "soma", 
-                                                    ValorPair(
-                                                        ValorStr "CONST", 
-                                                        ValorInt 0
+                                                    ValorStr "6", 
+                                                    ValorPair (
+                                                        ValorStr "soma", 
+                                                        ValorPair(
+                                                            ValorStr "CONST", 
+                                                            ValorInt 0
+                                                        )
                                                     )
                                                 )
                                             )
@@ -376,54 +376,54 @@ factorialProg =  ValorPair (
                                         ValorPair (
                                             ValorStr "WHILE", 
                                             ValorPair ( 
+                                                ValorStr "3",
                                                 ValorPair(
                                                     ValorPair (
                                                         ValorStr "VAR", 
                                                         ValorStr "y"
                                                     ),
-                                                    ValorStr "3"
-                                                ),
-                                                ValorPair (
-                                                    ValorStr "SEQ",
-                                                    ValorPair(
+                                                    ValorPair (
+                                                        ValorStr "SEQ",
                                                         ValorPair(
-                                                            ValorStr "ASGN",
-                                                            ValorPair (
-                                                                ValorStr "4", 
+                                                            ValorPair(
+                                                                ValorStr "ASGN",
                                                                 ValorPair (
-                                                                    ValorStr "z", 
+                                                                    ValorStr "4", 
                                                                     ValorPair (
-                                                                        ValorStr "MULT", 
+                                                                        ValorStr "z", 
                                                                         ValorPair (
+                                                                            ValorStr "MULT", 
                                                                             ValorPair (
-                                                                                ValorStr "VAR", 
-                                                                                ValorStr "z"
-                                                                            ),
-                                                                            ValorPair (
-                                                                                ValorStr "VAR",
-                                                                                ValorStr "y"
+                                                                                ValorPair (
+                                                                                    ValorStr "VAR", 
+                                                                                    ValorStr "z"
+                                                                                ),
+                                                                                ValorPair (
+                                                                                    ValorStr "VAR",
+                                                                                    ValorStr "y"
+                                                                                )
                                                                             )
                                                                         )
                                                                     )
                                                                 )
-                                                            )
-                                                        ),
-                                                        ValorPair(
-                                                            ValorStr "ASGN",
-                                                            ValorPair (
-                                                                ValorStr "5", 
+                                                            ),
+                                                            ValorPair(
+                                                                ValorStr "ASGN",
                                                                 ValorPair (
-                                                                    ValorStr "y", 
+                                                                    ValorStr "5", 
                                                                     ValorPair (
-                                                                        ValorStr "SUB", 
+                                                                        ValorStr "y", 
                                                                         ValorPair (
+                                                                            ValorStr "SUB", 
                                                                             ValorPair (
-                                                                                ValorStr "VAR",
-                                                                                ValorStr "y"
-                                                                            ),
-                                                                            ValorPair(
-                                                                                ValorStr "CONST", 
-                                                                                ValorStr "1"
+                                                                                ValorPair (
+                                                                                    ValorStr "VAR",
+                                                                                    ValorStr "y"
+                                                                                ),
+                                                                                ValorPair(
+                                                                                    ValorStr "CONST", 
+                                                                                    ValorStr "1"
+                                                                                )
                                                                             )
                                                                         )
                                                                     )
@@ -552,15 +552,15 @@ exPPA =  ValorPair (
                                 ValorPair (
                                     ValorStr "WHILE", 
                                     ValorPair ( 
+                                        ValorStr "3",
                                         ValorPair(
                                             whileTeste,
-                                            ValorStr "3"
-                                        ),
-                                        ValorPair (
-                                            ValorStr "SEQ",
-                                            ValorPair(
-                                                whileS1,
-                                                whileS2
+                                            ValorPair (
+                                                ValorStr "SEQ",
+                                                ValorPair(
+                                                    whileS1,
+                                                    whileS2
+                                                )
                                             )
                                         )
                                     )
@@ -629,22 +629,22 @@ testInitExWhile = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/init.lng" (ValorPair (
                                 ValorStr "WHILE", 
                                 ValorPair ( 
+                                    ValorStr "3",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "VAR", 
                                             ValorStr "y"
                                         ),
-                                        ValorStr "3"
-                                    ),
-                                    ValorPair(
-                                        ValorStr "4",
-                                        ValorPair (
-                                            ValorStr "ASGN", 
+                                        ValorPair(
+                                            ValorStr "4",
                                             ValorPair (
-                                                ValorStr "c", 
-                                                ValorPair(
-                                                    ValorStr "CONST",
-                                                    ValorStr "1"
+                                                ValorStr "ASGN", 
+                                                ValorPair (
+                                                    ValorStr "c", 
+                                                    ValorPair(
+                                                        ValorStr "CONST",
+                                                        ValorStr "1"
+                                                    )
                                                 )
                                             )
                                         )
@@ -659,6 +659,7 @@ testInitExIF = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/init.lng" (ValorPair(
                                 ValorStr "IF",
                                 ValorPair ( 
+                                    ValorStr "4",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "NOT",
@@ -667,31 +668,30 @@ testInitExIF = TestCase $ do
                                                 ValorStr "SOMA"
                                             )
                                         ),
-                                        ValorStr "4"
-                                    ),
-                                    ValorPair (
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "5", 
+                                        ValorPair (
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "x", 
+                                                    ValorStr "5", 
                                                     ValorPair (
-                                                        ValorStr "CONST",
-                                                        ValorStr "3"
+                                                        ValorStr "x", 
+                                                        ValorPair (
+                                                            ValorStr "CONST",
+                                                            ValorStr "3"
+                                                        )
                                                     )
                                                 )
-                                            )
-                                        ),
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "6", 
+                                            ),
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "SOMA", 
-                                                    ValorPair(
-                                                        ValorStr "CONST", 
-                                                        ValorInt 0
+                                                    ValorStr "6", 
+                                                    ValorPair (
+                                                        ValorStr "SOMA", 
+                                                        ValorPair(
+                                                            ValorStr "CONST", 
+                                                            ValorInt 0
+                                                        )
                                                     )
                                                 )
                                             )
@@ -713,22 +713,22 @@ testFinalExWhile = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/final.lng" (ValorPair (
                                 ValorStr "WHILE", 
                                 ValorPair ( 
+                                    ValorStr "3",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "VAR", 
                                             ValorStr "y"
                                         ),
-                                        ValorStr "3"
-                                    ),
-                                    ValorPair(
-                                        ValorStr "ASGN",
-                                        ValorPair (
-                                            ValorStr "4", 
+                                        ValorPair(
+                                            ValorStr "ASGN",
                                             ValorPair (
-                                                ValorStr "c", 
-                                                ValorPair(
-                                                    ValorStr "CONST",
-                                                    ValorStr "1"
+                                                ValorStr "4", 
+                                                ValorPair (
+                                                    ValorStr "c", 
+                                                    ValorPair(
+                                                        ValorStr "CONST",
+                                                        ValorStr "1"
+                                                    )
                                                 )
                                             )
                                         )
@@ -743,6 +743,7 @@ testFinalExIF = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/taint/final.lng" (ValorPair(
                                 ValorStr "IF",
                                 ValorPair ( 
+                                    ValorStr "4",
                                     ValorPair(
                                         ValorPair (
                                             ValorStr "NOT",
@@ -751,31 +752,30 @@ testFinalExIF = TestCase $ do
                                                 ValorStr "SOMA"
                                             )
                                         ),
-                                        ValorStr "4"
-                                    ),
-                                    ValorPair (
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "5", 
+                                        ValorPair (
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "x", 
+                                                    ValorStr "5", 
                                                     ValorPair (
-                                                        ValorStr "CONST",
-                                                        ValorStr "3"
+                                                        ValorStr "x", 
+                                                        ValorPair (
+                                                            ValorStr "CONST",
+                                                            ValorStr "3"
+                                                        )
                                                     )
                                                 )
-                                            )
-                                        ),
-                                        ValorPair(
-                                            ValorStr "ASGN",
-                                            ValorPair (
-                                                ValorStr "6", 
+                                            ),
+                                            ValorPair(
+                                                ValorStr "ASGN",
                                                 ValorPair (
-                                                    ValorStr "SOMA", 
-                                                    ValorPair(
-                                                        ValorStr "CONST", 
-                                                        ValorInt 0
+                                                    ValorStr "6", 
+                                                    ValorPair (
+                                                        ValorStr "SOMA", 
+                                                        ValorPair(
+                                                            ValorStr "CONST", 
+                                                            ValorInt 0
+                                                        )
                                                     )
                                                 )
                                             )

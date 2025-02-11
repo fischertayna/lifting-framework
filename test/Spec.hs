@@ -14,13 +14,13 @@ import EncodingTest
 main :: IO ()
 main = do
     putStrLn "Running tests..."
-    -- runTestTT baseTestSuite
-    -- runTestTT varTestSuite
-    -- runTestTT memoTestSuite
-    -- runTestTT slMemoTestSuite
-    -- runTestTT rdTestSuite
-    -- runTestTT varRdTestSuite
-    -- runTestTT vMemoRdTestSuite
-    -- runTestTT deepMemoRdTestSuite
+    runTestTT baseTestSuite
+    runTestTT varTestSuite
+    runTestTT memoTestSuite
+    runTestTT slMemoTestSuite
+    runTestTT rdTestSuite
+    runTestTT varRdTestSuite
+    runTestTT vMemoRdTestSuite
+    runTestTT deepMemoRdTestSuite
     runTestTT encodingTestSuite
     putStrLn "Done."

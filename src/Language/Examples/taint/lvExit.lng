@@ -189,35 +189,35 @@ sndStmtOfSeq (seq) {
 
 labelFromIf :: Any -> String
 labelFromIf (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 
 getCondFromIf :: Any -> String
 getCondFromIf (stm) {
-    fst(fst(stm))
+    fst(snd(stm))
 }
 
 thenFromIf :: Any -> Any
 thenFromIf (stm) {
-    fst(snd(stm))
+    fst(snd(snd(stm)))
 }
 
 elseFromIf :: Any -> Any
 elseFromIf (stm) {
-    snd(snd(stm))
+    snd(snd(snd(stm)))
 }
 
 labelFromWhile :: Any -> String
 labelFromWhile (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 
 getCondFromWhile :: Any -> String
 getCondFromWhile (stm) {
-    fst(fst(stm))
+    fst(snd(stm))
 }
 
 blockFromWhile :: Any -> Any
 blockFromWhile (stm) {
-    snd(stm)
+    snd(snd(stm))
 }

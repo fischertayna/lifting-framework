@@ -7,6 +7,26 @@ import WhileLang.WhileEncoder
       Label )
 import Variability.VarTypes(Prop, VarValor(..), Var (Var), propA, propB, atbt, atbf, afbt, afbf)
 
+rdS01, rdS02, rdWhileS1, rdWhileS2, rdS03 :: Stmt
+rdWhileTest :: (BExp, Label)
+
+-- s01 = Assignment "x" (Const 5) 1
+-- s02 = Assignment "y" (Const 1) 2
+
+-- whileTeste = (GTExp (Var "x") (Const 1), 3)
+-- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
+-- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
+-- s03 = While whileTeste (Seq whileS1 whileS2)
+rdS01 = Assignment "x" (Const 5) 1
+rdS02 = Assignment "y" (Const 1) 2
+rdWhileTest = (GTExp (Variable "x") (Const 1), 3)
+rdWhileS1 = Assignment "y" (Mult (Variable "x") (Variable "y")) 4
+rdWhileS2 = Assignment "x" (Sub (Variable "x") (Const 1)) 5
+rdS03 = While rdWhileTest (Seq rdWhileS1 rdWhileS2)
+
+rdExample :: Program
+rdExample = Seq rdS01 (Seq rdS02 rdS03)
+
 lvS01, lvS02, lvS03, lvS04, lvThenS1, lvThenS2, lvS05 :: Stmt
 lvIfTest :: (BExp, Label)
 

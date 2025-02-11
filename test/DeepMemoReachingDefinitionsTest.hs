@@ -10,397 +10,17 @@ import Helper (processFile)
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
+import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
+import WhileLang.WhileEncoder (encodeStmt)
+import VarExamples (ex1, ex2_1, ex2_2, ex2_3, ex2_4, ex2Entry, ex2Exit, rdExampleEntry, rdExampleExit)
 
--- ex1, ex2, exPPA, ex4, factorialProg :: VarValor
-ex1 :: VarValor
+ex2 = encodeStmt ex2While
 
--- x = 1;      1
--- y = 2;      2
--- y = 4;      3
--- z = x + y;  4
-
--- x = 1;  tt    1
--- y = 2;  tt    2
--- y = 4;  tt    3
--- z = x + y;  tt 4
-ex1 = VarPair(
-        VarString (Var [("SEQ", ttPC)]),
-        VarPair ( 
-            VarPair (
-                VarString (Var [("ASGN", ttPC)]),
-                VarPair (
-                    VarString (Var [("1", ttPC)]),
-                    VarPair (
-                        VarString (Var [("x", ttPC)]),
-                        VarPair(
-                            VarString (Var [("INT", ttPC)]),
-                            VarString (Var [("1", ttPC)])
-                        )
-                    )
-                )
-            ), -- x = 1;  tt    1
-            VarPair(
-                VarString (Var [("SEQ", ttPC)]), -- Should it be A??
-                VarPair ( 
-                    VarPair (
-                        VarString (Var [("ASGN", ttPC)]),
-                        VarPair (
-                            VarString (Var [("2", ttPC)]),
-                            VarPair (
-                                VarString (Var [("y", ttPC)]),
-                                VarPair(
-                                    VarString (Var [("INT", ttPC)]),
-                                    VarString (Var [("1", ttPC)])
-                                )
-                            )
-                        )
-                    ), -- y = 2;    2
-                    VarPair(
-                        VarString (Var [("SEQ", ttPC)]), 
-                        VarPair(
-                            VarPair (
-                                VarString (Var [("ASGN", ttPC)]),
-                                VarPair (
-                                    VarString (Var [("3", ttPC)]),
-                                    VarPair (
-                                        VarString (Var [("y", ttPC)]),
-                                        VarPair(
-                                            VarString (Var [("INT", ttPC)]),
-                                            VarString (Var [("4", ttPC)])
-                                        )
-                                    )
-                                )
-                            ), -- y = 4;    3
-                            VarPair(
-                                VarString (Var [("ASGN", ttPC)]),
-                                VarPair (
-                                    VarString (Var [("4", ttPC)]),
-                                    VarPair (
-                                        VarString (Var [("z", ttPC)]),
-                                        VarPair (
-                                            VarString (Var [("ADD", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("x", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("y", ttPC)])
-                                                )
-                                            )   
-                                        )
-                                    )
-                                )
-                            ) -- z = x + y;  tt 4
-                        )
-                    )
-                )
-            )
-        )
-    )
+exPPA = encodeStmt rdExample
     
-ex2_1 = VarPair (
-            VarString (Var [("ASGN", ttPC)]),
-            VarPair (
-                VarString (Var [("1", ttPC)]),
-                VarPair (
-                    VarString (Var [("x", ttPC)]),
-                    VarPair(
-                        VarString (Var [("INT", ttPC)]),
-                        VarString (Var [("1", ttPC)])
-                    )
-                )
-            )
-        ) -- x = 1;  tt    1
+exPPAEntry = rdExampleEntry
 
-ex2_2 = VarPair (
-            VarString (Var [("ASGN", propA), ("SKIP", notBDD propA)]),
-            VarPair (
-                VarString (Var [("2", propA), ("21", notBDD propA)]),
-                VarPair (
-                    VarString (Var [("y", propA), ("DUMMY", notBDD propA)]),
-                    VarPair(
-                        VarString (Var [("INT", propA), ("DUMMY", notBDD propA)]),
-                        VarString (Var [("1", propA), ("DUMMY", notBDD propA)])
-                    )
-                )
-            )
-        ) -- y = 2;  A 2 / skip; ~A 21
-
-ex2_3 = VarPair (
-            VarString (Var [("ASGN", notBDD propA), ("SKIP", propA)]),
-            VarPair (
-                VarString (Var [("3", notBDD propA), ("31", propA)]),
-                VarPair (
-                    VarString (Var [("y", notBDD propA), ("DUMMY", propA)]),
-                    VarPair(
-                        VarString (Var [("INT", notBDD propA), ("DUMMY", propA)]),
-                        VarString (Var [("4", notBDD  propA), ("DUMMY", propA)])
-                    )
-                )
-            )
-        ) -- y = 4;  ~A 3 / skip; A 31
-
-ex2_4 = VarPair(
-            VarString (Var [("ASGN", ttPC)]),
-            VarPair (
-                VarString (Var [("4", ttPC)]),
-                VarPair (
-                    VarString (Var [("z", ttPC)]),
-                    VarPair (
-                        VarString (Var [("ADD", ttPC)]),
-                        VarPair (
-                            VarPair (
-                                VarString (Var [("VAR", ttPC)]),
-                                VarString (Var [("x", ttPC)])
-                            ),
-                            VarPair (
-                                VarString (Var [("VAR", ttPC)]),
-                                VarString (Var [("y", ttPC)])
-                            )
-                        )   
-                    )
-                )
-            )
-        ) -- z = x + y;  tt 4
-
-ex2_s1 = VarPair(
-            VarString (Var [("SEQ", ttPC)]), -- Should it be ~A??
-            VarPair(
-                ex2_3,
-                ex2_4
-            )
-        )
-
-ex2_s2 = VarPair(
-                VarString (Var [("SEQ", ttPC)]), -- Should it be A??
-                VarPair ( 
-                    ex2_2,
-                    ex2_s1
-                )
-            )
-
--- x = 1;      1
--- #IFDEF A
--- y = 2;      2 
--- #ELSE
--- y = 4;      3
--- #ENDIF
--- z = x + y;  4
-
--- x = 1;  tt    1
--- y = 2;  A 2   / skip ~A   21
--- y = 4;  ~A 3  / skip A   31
--- z = x + y;  tt 4
-ex2 = VarPair(
-        VarString (Var [("SEQ", ttPC)]),
-        VarPair ( 
-            ex2_1,
-            ex2_s2
-        )
-    )
-
-ex2Entry = VarList[
-    VarPair(VarString (Var [("1", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
-                            VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("?", notBDD propA)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("4", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
-                            VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]) ]
-
-ex2Exit = VarList[
-    VarPair(VarString (Var [("1", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
-                            VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("?", notBDD propA)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
-                            VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("4", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
-                            VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
-                            VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])),
-                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("4", ttPC)])) ]) ]
-
-
--- s01 = Assignment "x" (Const 5) 1
--- s02 = Assignment "y" (Const 1) 2
-
--- whileTeste = (GTExp (Var "x") (Const 1), 3)
--- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
--- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
--- s03 = While whileTeste (Seq whileS1 whileS2)
-
-s01 = VarPair(
-        VarString (Var [("ASGN", ttPC)]),
-        VarPair (
-            VarString (Var [("1", ttPC)]), 
-            VarPair (
-                VarString (Var [("x", ttPC)]), 
-                VarPair (
-                    VarString (Var [("CONST", ttPC)]), 
-                    VarString (Var [("5", ttPC)])
-                )
-            )
-        )
-    )
-
-s02 = VarPair(
-        VarString (Var [("ASGN", ttPC)]),
-        VarPair (
-            VarString (Var [("2", ttPC)]), 
-            VarPair (
-                VarString (Var [("y", ttPC)]), 
-                VarPair(
-                    VarString (Var [("CONST", ttPC)]), 
-                    VarString (Var [("1", ttPC)])
-                )
-            )
-        )
-    )
-
-whileTeste = VarPair (
-                VarString (Var [("VAR", ttPC)]), 
-                VarString (Var [("x", ttPC)])
-            )
-
-whileS1 = VarPair(
-            VarString (Var [("ASGN", ttPC)]),
-            VarPair (
-                VarString (Var [("4", ttPC)]), 
-                VarPair (
-                    VarString (Var [("y", ttPC)]), 
-                    VarPair (
-                        VarString (Var [("MULT", ttPC)]), 
-                        VarPair (
-                            VarPair (
-                                VarString (Var [("VAR", ttPC)]), 
-                                VarString (Var [("x", ttPC)])
-                            ),
-                            VarPair (
-                                VarString (Var [("VAR", ttPC)]),
-                                VarString (Var [("y", ttPC)])
-                            )
-                        )
-                    )
-                )
-            )
-        )
-
-whileS2 = VarPair(
-        VarString (Var [("ASGN", ttPC)]),
-        VarPair (
-            VarString (Var [("5", ttPC)]), 
-            VarPair (
-                VarString (Var [("x", ttPC)]), 
-                VarPair (
-                    VarString (Var [("SUB", ttPC)]), 
-                    VarPair (
-                        VarPair (
-                            VarString (Var [("VAR", ttPC)]),
-                            VarString (Var [("x", ttPC)])
-                        ),
-                        VarPair(
-                            VarString (Var [("CONST", ttPC)]), 
-                            VarString (Var [("1", ttPC)])
-                        )
-                    )
-                )
-            )
-        )
-    )
-
-exPPA =  VarPair (
-                    VarString (Var [("SEQ", ttPC)]),
-                    VarPair(
-                        s01,
-                        VarPair(
-                            VarString (Var [("SEQ", ttPC)]),
-                            VarPair (
-                                s02,
-                                VarPair (
-                                    VarString (Var [("WHILE", ttPC)]), 
-                                    VarPair ( 
-                                        VarPair(
-                                            whileTeste,
-                                            VarString (Var [("3", ttPC)])
-                                        ),
-                                        VarPair (
-                                            VarString (Var [("SEQ", ttPC)]),
-                                            VarPair(
-                                                whileS1,
-                                                whileS2
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-    
-exPPAEntry = VarList[
-    VarPair(VarString (Var [("1", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("2", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("3", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ]),
-    VarPair(VarString (Var [("4", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ]),
-    VarPair(VarString (Var [("5", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ])]
-
-exPPAExit = VarList[
-    VarPair(VarString (Var [("1", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ]),
-    VarPair(VarString (Var [("2", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])) ]),
-    VarPair(VarString (Var [("3", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ]),
-    VarPair(VarString (Var [("4", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ]),
-    VarPair(VarString (Var [("5", ttPC)]), VarList[
-                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
-                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ])]
-
+exPPAExit = rdExampleExit
 
 testIsPair :: Test
 testIsPair = TestCase $ do
@@ -434,9 +54,6 @@ testCountEx2_3 = testCount "ex2_3" ex2_3 (VarInteger (Var [(1, notBDD propA), (0
 testCountEx2_4 :: Test
 testCountEx2_4 = testCount "ex2_4" ex2_4 (VarInteger (Var [(1, ttPC)]))
 
-testCountEx2_s1 :: Test
-testCountEx2_s1 = testCount "ex2_s1" ex2_s1 (VarInteger (Var [(2, notBDD propA), (1, propA)]))
-
 testCountExPPA :: Test
 testCountExPPA = testCount "PPA" exPPA (VarInteger (Var [(4, ttPC)]))
 
@@ -455,10 +72,10 @@ testInitEx2_1 :: Test
 testInitEx2_1 = testInit "Ex2_1" ex2_1 (VarString (Var [("1", ttPC)]))
 
 testInitEx2_2 :: Test
-testInitEx2_2 = testInit "Ex2_2" ex2_2 (VarString (Var [("2", propA), ("21", notBDD propA)]))
+testInitEx2_2 = testInit "Ex2_2" ex2_2 (VarString (Var [("2", propA), ("-2", notBDD propA)]))
 
 testInitEx2_3 :: Test
-testInitEx2_3 = testInit "Ex2_3" ex2_3 (VarString (Var [("3", notBDD propA), ("31", propA)]))
+testInitEx2_3 = testInit "Ex2_3" ex2_3 (VarString (Var [("3", notBDD propA), ("-3", propA)]))
 
 testInitEx2_4 :: Test
 testInitEx2_4 = testInit "Ex2_4" ex2_4 (VarString (Var [("4", ttPC)]))
@@ -482,10 +99,10 @@ testFinalEx2_1 :: Test
 testFinalEx2_1 = testFinal "ex2_1" ex2_1 (VarList [VarString (Var [("1", ttPC)])])
 
 testFinalEx2_2 :: Test
-testFinalEx2_2 = testFinal "ex2_2" ex2_2 (VarList [VarString (Var [("2", propA), ("21", notBDD propA)])])
+testFinalEx2_2 = testFinal "ex2_2" ex2_2 (VarList [VarString (Var [("2", propA), ("-2", notBDD propA)])])
 
 testFinalEx2_3 :: Test
-testFinalEx2_3 = testFinal "ex2_3" ex2_3 (VarList [VarString (Var [("3", notBDD propA), ("31", propA)])])
+testFinalEx2_3 = testFinal "ex2_3" ex2_3 (VarList [VarString (Var [("3", notBDD propA), ("-3", propA)])])
 
 testFinalEx2_4 :: Test
 testFinalEx2_4 = testFinal "ex2_4" ex2_4 (VarList [VarString (Var [("4", ttPC)])])
@@ -504,9 +121,9 @@ testFlowEx1 = testFlow "ex1" ex1 (VarList[VarPair(VarString (Var [("1", ttPC)]),
                                 VarPair(VarString (Var [("2", ttPC)]),VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]),VarString (Var [("4", ttPC)]))])
 
-flow2 = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", propA), ("21", notBDD propA)])),
-                VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarString (Var [("3", notBDD propA), ("31", propA)])),
-                VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarString (Var [("4", ttPC)]))]
+flow2 = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", propA), ("-2", notBDD propA)])),
+                VarPair(VarString (Var [("3", notBDD propA), ("-3", propA)]), VarString (Var [("4", ttPC)])),
+                VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), VarString (Var [("3", notBDD propA), ("-3", propA)]))]
 
 testFlowEx2 :: Test
 testFlowEx2 = testFlow "ex2" ex2 (flow2)
@@ -582,12 +199,6 @@ testfvEx2_3 = testfv "ex2_3" ex2_3 (VarList[VarString (Var [("y", notBDD propA)]
 testfvEx2_4 :: Test
 testfvEx2_4 = testfv "ex2_4" ex2_4 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
 
-testfvEx2_s1 :: Test
-testfvEx2_s1 = testfv "ex2_s1" ex2_s1 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
-
-testfvEx2_s2 :: Test
-testfvEx2_s2 = testfv "ex2_s2" ex2_s2 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
-
 testfvEx2 :: Test
 testfvEx2 = testfv "ex2" ex2 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
 
@@ -633,15 +244,15 @@ testFilterFlowEx2_2 = testFilterFlowBase "ex 2: 2" (VarPair(VarString (Var [("2"
 
 testFilterFlowEx2_3 :: Test
 testFilterFlowEx2_3 = testFilterFlowBase "ex 2: 3" (VarPair(VarString (Var [("3", ttPC)]), flow2)) (VarList[ 
-            VarPair(VarString (Var [("21", notBDD propA)]), VarString (Var [("3", notBDD propA)])) ])
+            VarPair(VarString (Var [("-2", notBDD propA)]), VarString (Var [("3", notBDD propA)])) ])
 
 testFilterFlowEx2_31 :: Test
-testFilterFlowEx2_31 = testFilterFlowBase "ex 2: 31" (VarPair(VarString (Var [("31", ttPC)]), flow2)) (VarList[ 
-            VarPair(VarString (Var [("2", propA)]), VarString (Var [("31", propA)])) ])
+testFilterFlowEx2_31 = testFilterFlowBase "ex 2: 31" (VarPair(VarString (Var [("-3", ttPC)]), flow2)) (VarList[ 
+            VarPair(VarString (Var [("2", propA)]), VarString (Var [("-3", propA)])) ])
 
 testFilterFlowEx2_4 :: Test
 testFilterFlowEx2_4 = testFilterFlowBase "ex 2: 4" (VarPair(VarString (Var [("4", ttPC)]), flow2)) (VarList[ 
-            VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarString (Var [("4", ttPC)])) ])
+            VarPair(VarString (Var [("3", notBDD propA), ("-3", propA)]), VarString (Var [("4", ttPC)])) ])
 
 testRDEntry :: String -> VarValor -> VarValor -> Test
 testRDEntry name input expectedOutput = TestCase $ do
@@ -656,13 +267,13 @@ testRDEntry2_1 = testRDEntry "Ex2_1" (VarPair(VarString (Var [("1", ttPC)]), Var
             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDEntry2_2 :: Test
-testRDEntry2_2 = testRDEntry "Ex2_2" (VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarPair(ex2, ex2Exit)))  (
+testRDEntry2_2 = testRDEntry "Ex2_2" (VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), VarPair(ex2, ex2Exit)))  (
     VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDEntry2_3 :: Test
-testRDEntry2_3 = testRDEntry "Ex2_3" (VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarPair(ex2, ex2Exit)))  (
+testRDEntry2_3 = testRDEntry "Ex2_3" (VarPair(VarString (Var [("3", notBDD propA), ("-3", propA)]), VarPair(ex2, ex2Exit)))  (
     VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
                     VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
                     VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("?", notBDD propA)])),
@@ -700,22 +311,19 @@ testfindBlock name input expectedOutput = TestCase $ do
     assertEqual ("findBlock " ++ name) (expectedOutput) (fst output)
 
 testfindBlock1 :: Test
-testfindBlock1 = testfindBlock "PPA 1" (VarPair(VarString (Var [("1", ttPC)]), exPPA)) (s01)
+testfindBlock1 = testfindBlock "PPA 1" (VarPair(VarString (Var [("1", ttPC)]), exPPA)) (encodeStmt rdS01)
 
 testfindBlock2 :: Test
-testfindBlock2 = testfindBlock "PPA 1" (VarPair(VarString (Var [("2", ttPC)]), exPPA)) (s02)
-
-testfindBlock3 :: Test
-testfindBlock3 = testfindBlock "PPA 3" (VarPair(VarString (Var [("3", ttPC)]), exPPA)) (whileTeste)
+testfindBlock2 = testfindBlock "PPA 1" (VarPair(VarString (Var [("2", ttPC)]), exPPA)) (encodeStmt rdS02)
 
 testfindBlock4 :: Test
-testfindBlock4 = testfindBlock "PPA 4" (VarPair(VarString (Var [("4", ttPC)]), exPPA)) (whileS1)
+testfindBlock4 = testfindBlock "PPA 4" (VarPair(VarString (Var [("4", ttPC)]), exPPA)) (encodeStmt rdWhileS1)
 
 testfindBlock5 :: Test
-testfindBlock5 = testfindBlock "PPA 5" (VarPair(VarString (Var [("5", ttPC)]), exPPA)) (whileS2)
+testfindBlock5 = testfindBlock "PPA 5" (VarPair(VarString (Var [("5", ttPC)]), exPPA)) (encodeStmt rdWhileS2)
 
-testfindBlock2_21 :: Test
-testfindBlock2_21 = testfindBlock "Ex2 2 21" (VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), ex2)) (ex2_2)
+testfindBlock2_v :: Test
+testfindBlock2_v = testfindBlock "Ex2 2 21" (VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), ex2)) (ex2_2)
 
 testFindOrDefault :: String -> VarValor -> VarValor -> Test
 testFindOrDefault name input expectedOutput = TestCase $ do
@@ -737,15 +345,15 @@ testFindOrDefaultEntryEx2_1 = testFindOrDefault "Entry Ex2 1" (VarPair(VarString
     VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
     VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
-testFindOrDefaultEntryEx2_2_21 :: Test
-testFindOrDefaultEntryEx2_2_21 = testFindOrDefault "Entry Ex2 2 A  21 ~A" (VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), ex2Entry)) (VarList[
+testFindOrDefaultEntryEx2_2_v :: Test
+testFindOrDefaultEntryEx2_2_v = testFindOrDefault "Entry Ex2 2 A  21 ~A" (VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), ex2Entry)) (VarList[
     VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
     VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
     VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testGenRD1 :: Test
 testGenRD1 = TestCase $ do
-    output <- processFile (executeProg ["genRD"]) "src/Language/Examples/taint/genRD.lng" (s01)
+    output <- processFile (executeProg ["genRD"]) "src/Language/Examples/taint/genRD.lng" (encodeStmt rdS01)
     let expectedOutput = VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])) ]
     assertEqual "test genRD 1" expectedOutput (fst output)
@@ -771,13 +379,13 @@ testKillRD name input expectedOutput = TestCase $ do
     assertEqual ("killRD " ++ name) (expectedOutput) (fst output)
 
 testKillRDs01 :: Test
-testKillRDs01 = testKillRD "s01" (VarPair(s01, exPPA)) (VarList[
+testKillRDs01 = testKillRD "s01" (VarPair(encodeStmt rdS01, exPPA)) (VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
-testKillRDEx2_21 :: Test
-testKillRDEx2_21 = testKillRD "Ex2 21" (VarPair(ex2_2, ex2)) (VarList[
+testKillRDEx2_v :: Test
+testKillRDEx2_v = testKillRD "Ex2 21" (VarPair(ex2_2, ex2)) (VarList[
     VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
     VarPair(VarString (Var [("y", propA)]), VarString (Var [("?", propA)])) ])
 
@@ -794,14 +402,14 @@ testRDExit2_1 = testRDExit "Ex2_1" (VarPair(VarString (Var [("1", ttPC)]), VarPa
             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDExit2_2 :: Test
-testRDExit2_2 = testRDExit "Ex2_2" (VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), VarPair(ex2, ex2Entry)))  (
+testRDExit2_2 = testRDExit "Ex2_2" (VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), VarPair(ex2, ex2Entry)))  (
     VarList[VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
             VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("?", notBDD propA)])),
             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDExit2_3 :: Test
-testRDExit2_3 = testRDExit "Ex2_3" (VarPair(VarString (Var [("3", notBDD propA), ("31", propA)]), VarPair(ex2, ex2Entry)))  (
+testRDExit2_3 = testRDExit "Ex2_3" (VarPair(VarString (Var [("3", notBDD propA), ("-3", propA)]), VarPair(ex2, ex2Entry)))  (
     VarList[VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])),
             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
             VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
@@ -833,7 +441,7 @@ testRDExit4 = testRDExit "Ex4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(e
 testLabels :: Test
 testLabels = TestCase $ do
     output <- processFile (executeProg ["labels"]) "src/Language/Examples/taint/labels.lng" (ex2)
-    let expectedOutput = VarList[VarString (Var [("1", ttPC)]), VarString (Var [("2", propA), ("21", notBDD propA)]), VarString (Var [("3", notBDD propA), ("31", propA)]), VarString (Var [("4", ttPC)])]
+    let expectedOutput = VarList[VarString (Var [("1", ttPC)]), VarString (Var [("2", propA), ("-2", notBDD propA)]), VarString (Var [("3", notBDD propA), ("-3", propA)]), VarString (Var [("4", ttPC)])]
     assertEqual "labels" expectedOutput (fst output)
 
 testInsertInto :: String -> VarValor -> VarValor -> Test
@@ -876,7 +484,7 @@ testInsertInto1 = testInsertInto "Ex1" (VarPair(
 
 testInsertInto2 :: Test
 testInsertInto2 = testInsertInto "Ex2" (VarPair(
-                        VarString (Var [("2", propA), ("21", notBDD propA)]),
+                        VarString (Var [("2", propA), ("-2", notBDD propA)]),
                         VarPair(
                             VarList[VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
                                     VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
@@ -887,7 +495,7 @@ testInsertInto2 = testInsertInto "Ex2" (VarPair(
 
 testInsertIntoEmpty :: Test
 testInsertIntoEmpty = testInsertInto "Empty" (VarPair(
-                        VarString (Var [("2", propA), ("21", notBDD propA)]),
+                        VarString (Var [("2", propA), ("-2", notBDD propA)]),
                         VarPair(
                             VarList[VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
                                     VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
@@ -895,7 +503,7 @@ testInsertIntoEmpty = testInsertInto "Empty" (VarPair(
                                     VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ],
                             VarList[]
                         ))) (VarList[
-                                VarPair(VarString (Var [("2", propA), ("21", notBDD propA)]), 
+                                VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), 
                                         VarList[
                                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
                                             VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
@@ -1089,7 +697,6 @@ deepMemoRdTestSuite = TestList [
                         ,   TestLabel "Count Asgns ex2_2" testCountEx2_2
                         ,   TestLabel "Count Asgns ex2_3" testCountEx2_3
                         ,   TestLabel "Count Asgns ex2_4" testCountEx2_4
-                        ,   TestLabel "Count Asgns ex2_s1" testCountEx2_s1
                         ,   TestLabel "Count Asgns exPPA" testCountExPPA
                         ,   TestLabel "Init Ex2_1" testInitEx2_1
                         ,   TestLabel "Init Ex2_2" testInitEx2_2
@@ -1120,8 +727,6 @@ deepMemoRdTestSuite = TestList [
                         ,   TestLabel "fv ex2_2" testfvEx2_2
                         ,   TestLabel "fv ex2_3" testfvEx2_3
                         ,   TestLabel "fv ex2_4" testfvEx2_4
-                        ,   TestLabel "fv ex2_s1" testfvEx2_s1
-                        ,   TestLabel "fv ex2_s2" testfvEx2_s2
                         ,   TestLabel "fv ex2" testfvEx2
                         ,   TestLabel "fv exPPA" testfvExPPA
                         ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
@@ -1140,19 +745,18 @@ deepMemoRdTestSuite = TestList [
                         ,   TestLabel "rdEntry 4" testRDEntry4
                         ,   TestLabel "testfindBlock 1" testfindBlock1
                         ,   TestLabel "testfindBlock 2" testfindBlock2
-                        ,   TestLabel "testfindBlock 3" testfindBlock3
                         ,   TestLabel "testfindBlock 4" testfindBlock4
                         ,   TestLabel "testfindBlock 5" testfindBlock5
-                        ,   TestLabel "testfindBlock 21" testfindBlock2_21
+                        ,   TestLabel "testfindBlock 21" testfindBlock2_v
                         ,   TestLabel "testFindOrDefault Exit PPA 2" testFindOrDefaultExitPPA2
                         ,   TestLabel "testFindOrDefault Exit PPA 6" testFindOrDefaultExitPPA6
                         ,   TestLabel "testFindOrDefault Entry Ex2 1" testFindOrDefaultEntryEx2_1
-                        ,   TestLabel "testFindOrDefault Entry Ex2 2 A 21 ~A" testFindOrDefaultEntryEx2_2_21
+                        ,   TestLabel "testFindOrDefault Entry Ex2 2 A 21 ~A" testFindOrDefaultEntryEx2_2_v
                         ,   TestLabel "testGenRD 1" testGenRD1
                         ,   TestLabel "testGenRD 2" testGenRD2
                         ,   TestLabel "testGenRD Ex2 2" testGenRDEx2_2
                         ,   TestLabel "testKillRD s01" testKillRDs01
-                        ,   TestLabel "testKillRD Ex2 2" testKillRDEx2_21
+                        ,   TestLabel "testKillRD Ex2 2" testKillRDEx2_v
                         ,   TestLabel "rdExit 2 - 1" testRDExit2_1
                         ,   TestLabel "rdExit 2 - 2" testRDExit2_2
                         ,   TestLabel "rdExit 2 - 3" testRDExit2_3

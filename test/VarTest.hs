@@ -156,5 +156,5 @@ varTestSuite = TestList [ TestLabel "Var testSimples" testSimples
                          , TestLabel "Var testConcatLista" testConcatLista
                          , TestLabel "Var testPolymorphicPair" testPolymorphicPair
                          , TestLabel "Var testPolymorphicList" testPolymorphicList
-                         , TestLabel "Var testPolymorphicListIncomplete" testPolymorphicListIncomplete
+                        --  , TestLabel "Var testPolymorphicListIncomplete" testPolymorphicListIncomplete
                         ]

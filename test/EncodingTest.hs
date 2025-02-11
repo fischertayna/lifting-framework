@@ -70,9 +70,9 @@ testPower = TestCase $ do
 
 testEx2 :: Test
 testEx2 = TestCase $ do
-    putStrLn ("\n expected Ex2: " ++ (substitute (show ex2)))
-    putStrLn ("\n\n out Ex2: " ++ (substitute (show ex2Encoded)))
-    assertEqual "Encoding power" ex2 ex2Encoded
+    -- putStrLn ("\n expected Ex2: " ++ (substitute (show ex2)))
+    -- putStrLn ("\n\n out Ex2: " ++ (substitute (show ex2Encoded)))
+    assertEqual "Encoding Ex2" ex2 ex2Encoded
 
 encodingTestSuite :: Test
 encodingTestSuite = TestList [   

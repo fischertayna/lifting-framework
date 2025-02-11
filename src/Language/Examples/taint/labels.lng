@@ -75,25 +75,25 @@ sndStmtOfSeq (seq) {
 
 labelFromIf :: Any -> String
 labelFromIf (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 
 thenFromIf :: Any -> Any
 thenFromIf (stm) {
-    fst(snd(stm))
+    fst(snd(snd(stm)))
 }
 
 elseFromIf :: Any -> Any
 elseFromIf (stm) {
-    snd(snd(stm))
+    snd(snd(snd(stm)))
 }
 
 labelFromWhile :: Any -> String
 labelFromWhile (stm) {
-    snd(fst(stm))
+    fst(stm)
 }
 
 blockFromWhile :: Any -> Any
 blockFromWhile (stm) {
-    snd(stm)
+    snd(snd(stm))
 }
