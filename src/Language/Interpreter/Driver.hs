@@ -6,6 +6,7 @@ import Language.Frontend.AbsLanguage
 import Language.Interpreter.Interpreter
 
 import Language.Frontend.ErrM
+import Valor (Valor(..))
 
 main :: IO ()
 main = do

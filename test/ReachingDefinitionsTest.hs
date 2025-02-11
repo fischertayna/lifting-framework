@@ -9,6 +9,7 @@ import Helper
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
+import Valor (Valor(..))
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor
 

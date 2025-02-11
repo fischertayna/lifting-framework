@@ -3,6 +3,7 @@ module WhileLang.WhileEncoder where
 import Variability.VarTypes
 
 import Debug.Trace (trace)
+import Valor (Valor(..))
 
 type Id = String 
 type Label = Integer
@@ -72,23 +73,23 @@ data StmtPC = AssignmentPC Id AExp Label PresenceCondition
  deriving (Eq, Ord, Show)
 
 -- Encoder to convert AST into VarValor
-encodeAExp :: AExp -> PresenceCondition -> VarValor
-encodeAExp (Variable v) pc = VarPair (VarString (Var [("VAR", pc)]), VarString (Var [(v, pc)]))
-encodeAExp (Const i) pc = VarPair (VarString (Var [("CONST", pc)]), VarString (Var [(show i, pc)]))
-encodeAExp (Add e1 e2) pc = VarPair (VarString (Var [("ADD", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
-encodeAExp (Sub e1 e2) pc = VarPair (VarString (Var [("SUB", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
-encodeAExp (Mult e1 e2) pc = VarPair (VarString (Var [("MULT", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
-encodeAExp (Div e1 e2) pc = VarPair (VarString (Var [("DIV", pc)]), VarPair (encodeAExp e1 pc, encodeAExp e2 pc))
+encodeAExpToVarValor :: AExp -> PresenceCondition -> VarValor
+encodeAExpToVarValor (Variable v) pc = VarPair (VarString (Var [("VAR", pc)]), VarString (Var [(v, pc)]))
+encodeAExpToVarValor (Const i) pc = VarPair (VarString (Var [("CONST", pc)]), VarString (Var [(show i, pc)]))
+encodeAExpToVarValor (Add e1 e2) pc = VarPair (VarString (Var [("ADD", pc)]), VarPair (encodeAExpToVarValor e1 pc, encodeAExpToVarValor e2 pc))
+encodeAExpToVarValor (Sub e1 e2) pc = VarPair (VarString (Var [("SUB", pc)]), VarPair (encodeAExpToVarValor e1 pc, encodeAExpToVarValor e2 pc))
+encodeAExpToVarValor (Mult e1 e2) pc = VarPair (VarString (Var [("MULT", pc)]), VarPair (encodeAExpToVarValor e1 pc, encodeAExpToVarValor e2 pc))
+encodeAExpToVarValor (Div e1 e2) pc = VarPair (VarString (Var [("DIV", pc)]), VarPair (encodeAExpToVarValor e1 pc, encodeAExpToVarValor e2 pc))
 
-encodeBExp :: BExp -> PresenceCondition -> VarValor
-encodeBExp CTrue pc = VarString (Var [("TRUE", pc)])
-encodeBExp CFalse pc = VarString (Var [("FALSE", pc)])
-encodeBExp (Not b) pc = VarPair (VarString (Var [("NOT", pc)]), encodeBExp b pc)
-encodeBExp (And b1 b2) pc = VarPair (VarString (Var [("AND", pc)]), VarPair (encodeBExp b1 pc, encodeBExp b2 pc))
-encodeBExp (Or b1 b2) pc = VarPair (VarString (Var [("OR", pc)]), VarPair (encodeBExp b1 pc, encodeBExp b2 pc))
-encodeBExp (EQExp a1 a2) pc = VarPair (VarString (Var [("EQ", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
-encodeBExp (GTExp a1 a2) pc = VarPair (VarString (Var [("GT", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
-encodeBExp (LTExp a1 a2) pc = VarPair (VarString (Var [("LT", pc)]), VarPair (encodeAExp a1 pc, encodeAExp a2 pc))
+encodeBExpToVarValor :: BExp -> PresenceCondition -> VarValor
+encodeBExpToVarValor CTrue pc = VarString (Var [("TRUE", pc)])
+encodeBExpToVarValor CFalse pc = VarString (Var [("FALSE", pc)])
+encodeBExpToVarValor (Not b) pc = VarPair (VarString (Var [("NOT", pc)]), encodeBExpToVarValor b pc)
+encodeBExpToVarValor (And b1 b2) pc = VarPair (VarString (Var [("AND", pc)]), VarPair (encodeBExpToVarValor b1 pc, encodeBExpToVarValor b2 pc))
+encodeBExpToVarValor (Or b1 b2) pc = VarPair (VarString (Var [("OR", pc)]), VarPair (encodeBExpToVarValor b1 pc, encodeBExpToVarValor b2 pc))
+encodeBExpToVarValor (EQExp a1 a2) pc = VarPair (VarString (Var [("EQ", pc)]), VarPair (encodeAExpToVarValor a1 pc, encodeAExpToVarValor a2 pc))
+encodeBExpToVarValor (GTExp a1 a2) pc = VarPair (VarString (Var [("GT", pc)]), VarPair (encodeAExpToVarValor a1 pc, encodeAExpToVarValor a2 pc))
+encodeBExpToVarValor (LTExp a1 a2) pc = VarPair (VarString (Var [("LT", pc)]), VarPair (encodeAExpToVarValor a1 pc, encodeAExpToVarValor a2 pc))
 
 stmtToStmtPC :: PresenceCondition -> Stmt -> StmtPC
 stmtToStmtPC pc (Assignment v e l) = AssignmentPC v e l pc
@@ -125,7 +126,7 @@ encodeStmt stmt = encodeStmtPC' (stmtToStmtPC ttPC stmt)
     encodeStmtPC' (AssignmentPC v e l pc) = 
         VarPair (VarString (Var (presencePairsStmt "ASGN" pc)), 
                  VarPair (VarString (Var (presencePairsLabel (show l) pc)),
-                          VarPair (VarString (Var [(v, pc)]), encodeAExp e pc)))
+                          VarPair (VarString (Var [(v, pc)]), encodeAExpToVarValor e pc)))
 
     encodeStmtPC' (SkipPC l pc) = VarString (Var [("SKIP", pc)])
 
@@ -136,10 +137,49 @@ encodeStmt stmt = encodeStmtPC' (stmtToStmtPC ttPC stmt)
     encodeStmtPC' (IfThenElsePC (cond, l) s1 s2 pc) =
         VarPair (VarString (Var (presencePairsStmt "IF" pc)),
                  VarPair (VarString (Var (presencePairsLabel (show l) pc)),
-                          VarPair (encodeBExp cond pc,
+                          VarPair (encodeBExpToVarValor cond pc,
                                    VarPair (encodeStmtPC' s1, encodeStmtPC' s2))))
 
     encodeStmtPC' (WhilePC (cond, l) body pc) =
         VarPair (VarString (Var (presencePairsStmt "WHILE" pc)),
                  VarPair (VarString (Var (presencePairsLabel (show l) pc)),
-                          VarPair (encodeBExp cond pc, encodeStmtPC' body)))
+                          VarPair (encodeBExpToVarValor cond pc, encodeStmtPC' body)))
+
+--- Encoder to Valor
+
+encodeAExpToValor :: AExp -> Valor
+encodeAExpToValor (Variable v) = ValorPair (ValorStr "VAR", ValorStr v)
+encodeAExpToValor (Const i) = ValorPair (ValorStr "CONST", ValorStr (show i))
+encodeAExpToValor (Add e1 e2) = ValorPair (ValorStr "ADD", ValorPair (encodeAExpToValor e1, encodeAExpToValor e2))
+encodeAExpToValor (Sub e1 e2) = ValorPair (ValorStr "SUB", ValorPair (encodeAExpToValor e1, encodeAExpToValor e2))
+encodeAExpToValor (Mult e1 e2) = ValorPair (ValorStr "MULT", ValorPair (encodeAExpToValor e1, encodeAExpToValor e2))
+encodeAExpToValor (Div e1 e2) = ValorPair (ValorStr "DIV", ValorPair (encodeAExpToValor e1, encodeAExpToValor e2))
+
+encodeBExpToValor :: BExp -> Valor
+encodeBExpToValor CTrue = ValorStr "TRUE"
+encodeBExpToValor CFalse = ValorStr "FALSE"
+encodeBExpToValor (Not b) = ValorPair (ValorStr "NOT", encodeBExpToValor b)
+encodeBExpToValor (And b1 b2) = ValorPair (ValorStr "AND", ValorPair (encodeBExpToValor b1, encodeBExpToValor b2))
+encodeBExpToValor (Or b1 b2) = ValorPair (ValorStr "OR", ValorPair (encodeBExpToValor b1, encodeBExpToValor b2))
+encodeBExpToValor (EQExp a1 a2) = ValorPair (ValorStr "EQ", ValorPair (encodeAExpToValor a1, encodeAExpToValor a2))
+encodeBExpToValor (GTExp a1 a2) = ValorPair (ValorStr "GT", ValorPair (encodeAExpToValor a1, encodeAExpToValor a2))
+encodeBExpToValor (LTExp a1 a2) = ValorPair (ValorStr "LT", ValorPair (encodeAExpToValor a1, encodeAExpToValor a2))
+
+encodeStmtToValor :: Stmt -> Valor
+encodeStmtToValor (Assignment v e l) = 
+        ValorPair (ValorStr "ASGN", 
+                 ValorPair (ValorStr (show l),
+                          ValorPair (ValorStr v, encodeAExpToValor e)))
+encodeStmtToValor (Skip l) = ValorStr "SKIP"
+encodeStmtToValor (Seq s1 s2) = 
+        ValorPair (ValorStr "SEQ", 
+                 ValorPair (encodeStmtToValor s1, encodeStmtToValor s2))
+encodeStmtToValor (IfThenElse (cond, l) s1 s2) =
+        ValorPair (ValorStr "IF",
+                 ValorPair (ValorStr (show l),
+                          ValorPair (encodeBExpToValor cond,
+                                   ValorPair (encodeStmtToValor s1, encodeStmtToValor s2))))
+encodeStmtToValor (While (cond, l) body) =
+        ValorPair (ValorStr "WHILE",
+                 ValorPair (ValorStr (show l),
+                          ValorPair (encodeBExpToValor cond, encodeStmtToValor body)))

@@ -9,6 +9,7 @@ import Language.Frontend.AbsLanguage
   )
 import Prelude hiding (lookup)
 import Data.List (sortBy)
+import Valor (Valor(..))
 
 type Context k v = [(k, v)]
 
@@ -17,24 +18,6 @@ type RContext = (VContext, FContext)
 type VContext = Context Ident Valor
 
 type FContext = Context Ident Function
-
-data Valor
-    = ValorInt
-        { i :: Integer
-        }
-    | ValorBool
-        { b :: Bool
-        }
-    | ValorStr
-        { s :: String
-        }
-    | ValorList
-        { l :: [Valor]
-        }
-    | ValorPair
-        { p :: (Valor, Valor)
-        }
-    deriving (Show, Eq, Ord)
 
 evalP :: Program -> Valor -> Valor
 evalP (Prog fs) input = eval context (Call (Ident "main") [EVar (Ident "n")])
