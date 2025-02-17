@@ -1,16 +1,16 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    lvEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
+    vbEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-lvEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-lvEntry (l, prog, exit) {
-    lvEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
+vbEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbEntry (l, prog, exit) {
+    vbEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
 }
 
-lvEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-lvEntryWithBlock (l, prog, exit, block) {
-    union(difference(findOrDefault(l, exit), killLV(block)), genLV(block))
+vbEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbEntryWithBlock (l, prog, exit, block) {
+    union(difference(findOrDefault(l, exit), killVB(block, nonTrivialExpression(prog))), genVB(block))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -46,22 +46,69 @@ findOrDefault (l, mapping) {
             else findOrDefault(l, tail(mapping))
 }
 
-killLV :: Any -> [String]
-killLV (block) {
+killVB :: Any -> [Any] -> [String]
+killVB (block, exps) {
     if (checkType(block, "ASGN"))
-        then [varFromAsgn(getStmt(block))]
+        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
         else []
 }
 
-genLV :: Any -> [String]
-genLV (prog) {
+filterNonTrivialExpressions :: String -> [Any] -> [Any]
+filterNonTrivialExpressions (var, exps) {
+    if (isNil(exps))
+        then []
+        else if (isMember(var, fvAexp(head(exps))))
+            then union([head (exps)], filterNonTrivialExpressions(var, tail(exps)))
+            else filterNonTrivialExpressions(var, tail(exps))
+}
+
+genVB :: Any -> [Any]
+genVB (prog) {
     if (checkType(prog, "ASGN"))
-        then getVarFromValue(valueFromAsgn(getStmt(prog)))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
         else if (checkType(prog, "WHILE"))
-            then getVarFromValue(getCondFromWhile(getStmt(prog)))
+            then nonTrivialBExpression(getCondFromWhile(getStmt(prog)))
             else if (checkType(prog, "IF"))
-                then getVarFromValue(getCondFromIf(getStmt(prog)))
+                then nonTrivialBExpression(getCondFromIf(getStmt(prog)))
                 else []
+}
+
+fvAexp :: Any -> [Any]
+fvAexp (aexp) {
+    if (checkType(aexp, "VAR"))
+        then [snd(aexp)]
+        else if (isPair(snd(aexp)))
+            then union(fvAexp(getFstOpValue(aexp)), fvAexp(getSndOpValue(aexp)))
+            else []
+}
+
+nonTrivialExpression :: Any -> [Any]
+nonTrivialExpression (prog) {
+    if (checkType(prog, "ASGN"))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "SEQ"))
+            then union(nonTrivialExpression(fstStmtOfSeq(getStmt(prog))), nonTrivialExpression(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(nonTrivialBExpression(getCondFromIf(getStmt(prog))), union(nonTrivialExpression(thenFromIf(getStmt(prog))), nonTrivialExpression(elseFromIf(getStmt(prog)))))
+                else if (checkType(prog, "WHILE"))
+                    then union(nonTrivialBExpression(getCondFromWhile(getStmt(prog))), nonTrivialExpression(blockFromWhile(getStmt(prog))))
+                    else if (checkType(prog, "SKIP"))
+                        then []
+                        else ["error " ++ typeStmt(prog)]
+}
+
+nonTrivialAExpression :: Any -> [Any]
+nonTrivialAExpression (aexp) {
+    if (isPair(snd(aexp)))
+        then union ([aexp], union(nonTrivialAExpression(getFstOpValue(aexp)), nonTrivialAExpression(getSndOpValue(aexp))))
+        else []
+}
+
+nonTrivialBExpression :: Any -> [Any]
+nonTrivialBExpression (bexp) {
+    if (isPair(snd(bexp)))
+        then union(nonTrivialAExpression(getFstOpValue(bexp)), nonTrivialAExpression(getSndOpValue(bexp)))
+        else []
 }
 
 getVarFromValue :: Any -> [String]
@@ -72,6 +119,7 @@ getVarFromValue (aexp) {
             then [snd (aexp)]
             else []
 }
+
 
 typeStmt :: Any -> String
 typeStmt (prog) {

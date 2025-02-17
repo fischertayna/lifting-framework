@@ -1,16 +1,16 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    lvEntry (fst(prog), fst(snd(prog)), snd(snd(prog)))
+    aeExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-lvEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-lvEntry (l, prog, exit) {
-    lvEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
+aeExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+aeExit (l, prog, entry) {
+    aeExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
 }
 
-lvEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-lvEntryWithBlock (l, prog, exit, block) {
-    union(difference(findOrDefault(l, exit), killLV(block)), genLV(block))
+aeExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+aeExitWithBlock (l, prog, entry, block) {
+    union(difference(findOrDefault(l, entry), killAE(block, nonTrivialExpression(prog))), genAE(block, nonTrivialExpression(prog)))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -36,7 +36,6 @@ findBlock (l, prog) {
                         else []
 }
 
-
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, mapping) {
     if (isNil(mapping))
@@ -46,31 +45,69 @@ findOrDefault (l, mapping) {
             else findOrDefault(l, tail(mapping))
 }
 
-killLV :: Any -> [String]
-killLV (block) {
+killAE :: Any -> [Any] -> [String]
+killAE (block, exps) {
     if (checkType(block, "ASGN"))
-        then [varFromAsgn(getStmt(block))]
+        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
         else []
 }
 
-genLV :: Any -> [String]
-genLV (prog) {
-    if (checkType(prog, "ASGN"))
-        then getVarFromValue(valueFromAsgn(getStmt(prog)))
-        else if (checkType(prog, "WHILE"))
-            then getVarFromValue(getCondFromWhile(getStmt(prog)))
-            else if (checkType(prog, "IF"))
-                then getVarFromValue(getCondFromIf(getStmt(prog)))
+genAE :: Any -> [Any] -> [String]
+genAE (block, exps) {
+    if (checkType(block, "ASGN"))
+        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
+        else if (checkType(block, "WHILE"))
+            then nonTrivialBExpression(getCondFromWhile(getStmt(block)))
+            else if (checkType(block, "IF"))
+                then nonTrivialBExpression(getCondFromIf(getStmt(block)))
                 else []
 }
 
-getVarFromValue :: Any -> [String]
-getVarFromValue (aexp) {
-    if (isPair(snd(aexp)))
-        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
-        else if (checkType(aexp, "VAR"))
-            then [snd (aexp)]
+filterNonTrivialExpressions :: String -> [Any] -> [Any]
+filterNonTrivialExpressions (var, exps) {
+    if (isNil(exps))
+        then []
+        else if (isMember(var, fvAexp(head(exps))))
+            then union([head (exps)], filterNonTrivialExpressions(var, tail(exps)))
+            else filterNonTrivialExpressions(var, tail(exps))
+}
+
+fvAexp :: Any -> [Any]
+fvAexp (aexp) {
+    if (checkType(aexp, "VAR"))
+        then [snd(aexp)]
+        else if (isPair(snd(aexp)))
+            then union(fvAexp(getFstOpValue(aexp)), fvAexp(getSndOpValue(aexp)))
             else []
+}
+
+nonTrivialExpression :: Any -> [Any]
+nonTrivialExpression (prog) {
+    if (checkType(prog, "ASGN"))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "SEQ"))
+            then union(nonTrivialExpression(fstStmtOfSeq(getStmt(prog))), nonTrivialExpression(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(nonTrivialBExpression(getCondFromIf(getStmt(prog))), union(nonTrivialExpression(thenFromIf(getStmt(prog))), nonTrivialExpression(elseFromIf(getStmt(prog)))))
+                else if (checkType(prog, "WHILE"))
+                    then union(nonTrivialBExpression(getCondFromWhile(getStmt(prog))), nonTrivialExpression(blockFromWhile(getStmt(prog))))
+                    else if (checkType(prog, "SKIP"))
+                        then []
+                        else ["error " ++ typeStmt(prog)]
+}
+
+nonTrivialAExpression :: Any -> [Any]
+nonTrivialAExpression (aexp) {
+    if (isPair(snd(aexp)))
+        then union ([aexp], union(nonTrivialAExpression(getFstOpValue(aexp)), nonTrivialAExpression(getSndOpValue(aexp))))
+        else []
+}
+
+nonTrivialBExpression :: Any -> [Any]
+nonTrivialBExpression (bexp) {
+    if (isPair(snd(bexp)))
+        then union(nonTrivialAExpression(getFstOpValue(bexp)), nonTrivialAExpression(getSndOpValue(bexp)))
+        else []
 }
 
 typeStmt :: Any -> String

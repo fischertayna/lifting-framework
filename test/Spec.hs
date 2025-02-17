@@ -5,10 +5,10 @@ import VarTest
 import MemoTest
 import SLMemoTest
 import DeepMemoTest
-import ReachingDefinitionsTest
-import DeepMemoReachingDefinitionsTest
-import VarReachingDefinitionsTest
-import VMemoReachingDefinitionsTest
+import BaseDFATest
+import DeepMemoDFATest
+import VarDFATest
+import VMemoDFATest
 import EncodingTest
 
 main :: IO ()
@@ -18,9 +18,9 @@ main = do
     runTestTT varTestSuite
     runTestTT memoTestSuite
     runTestTT slMemoTestSuite
-    runTestTT rdTestSuite
-    runTestTT varRdTestSuite
-    runTestTT vMemoRdTestSuite
-    runTestTT deepMemoRdTestSuite
+    runTestTT baseDFATestSuite
+    runTestTT varDFATestSuite
+    runTestTT vMemoDFATestSuite
+    runTestTT deepMemoDFATestSuite
     runTestTT encodingTestSuite
     putStrLn "Done."

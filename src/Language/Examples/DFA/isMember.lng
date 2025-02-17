@@ -1,0 +1,4 @@
+main :: (Any, [Any]) -> [Any]
+main (prog) {
+    isMember (fst (prog), snd (prog))
+}

@@ -1,0 +1,123 @@
+main :: Any -> [String]
+main (prog) {
+    nonTrivialExpression (prog)
+}
+
+nonTrivialExpression :: Any -> [Any]
+nonTrivialExpression (prog) {
+    if (checkType(prog, "ASGN"))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "SEQ"))
+            then union(nonTrivialExpression(fstStmtOfSeq(getStmt(prog))), nonTrivialExpression(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(nonTrivialBExpression(getCondFromIf(getStmt(prog))), union(nonTrivialExpression(thenFromIf(getStmt(prog))), nonTrivialExpression(elseFromIf(getStmt(prog)))))
+                else if (checkType(prog, "WHILE"))
+                    then union(nonTrivialBExpression(getCondFromWhile(getStmt(prog))), nonTrivialExpression(blockFromWhile(getStmt(prog))))
+                    else if (checkType(prog, "SKIP"))
+                        then []
+                        else ["error " ++ typeStmt(prog)]
+}
+
+nonTrivialAExpression :: Any -> [Any]
+nonTrivialAExpression (aexp) {
+    if (isPair(snd(aexp)))
+        then union ([aexp], union(nonTrivialAExpression(getFstOpValue(aexp)), nonTrivialAExpression(getSndOpValue(aexp))))
+        else []
+}
+
+nonTrivialBExpression :: Any -> [Any]
+nonTrivialBExpression (bexp) {
+    if (isPair(snd(bexp)))
+        then union(nonTrivialAExpression(getFstOpValue(bexp)), nonTrivialAExpression(getSndOpValue(bexp)))
+        else []
+}
+
+typeStmt :: Any -> String
+typeStmt (prog) {
+    fst(prog)
+}
+
+checkType :: Any -> String -> int
+checkType (prog, stmtType) {
+    isEqual(typeStmt(prog), stmtType)
+}
+
+getStmt :: Any -> Any 
+getStmt (prog) {
+    snd(prog)
+}
+
+labelFromAsgn :: Any -> String
+labelFromAsgn (asgn) {
+    fst(asgn)
+}
+
+varFromAsgn :: Any -> String
+varFromAsgn (asgn) {
+    fst(snd(asgn))
+}
+
+valueFromAsgn :: Any -> String
+valueFromAsgn (asgn) {
+    snd(snd(asgn))
+}
+
+getFstOpValue :: Any -> String
+getFstOpValue (aexp) {
+    fst(snd(aexp))
+}
+
+getSndOpValue :: Any -> String
+getSndOpValue (aexp) {
+    snd(snd(aexp))
+}
+
+labelFromSkip :: Any -> String
+labelFromSkip (skip) {
+    fst(skip)
+}
+
+fstStmtOfSeq :: Any -> Any
+fstStmtOfSeq (seq) {
+    fst(seq)
+}
+
+sndStmtOfSeq :: Any -> Any
+sndStmtOfSeq (seq) {
+    snd(seq)
+}
+
+labelFromIf :: Any -> String
+labelFromIf (stm) {
+    fst(stm)
+}
+
+getCondFromIf :: Any -> String
+getCondFromIf (stm) {
+    fst(snd(stm))
+}
+
+thenFromIf :: Any -> Any
+thenFromIf (stm) {
+    fst(snd(snd(stm)))
+}
+
+elseFromIf :: Any -> Any
+elseFromIf (stm) {
+    snd(snd(snd(stm)))
+}
+
+labelFromWhile :: Any -> String
+labelFromWhile (stm) {
+    fst(stm)
+}
+
+getCondFromWhile :: Any -> String
+getCondFromWhile (stm) {
+    fst(snd(stm))
+}
+
+blockFromWhile :: Any -> Any
+blockFromWhile (stm) {
+    snd(snd(stm))
+}

@@ -1,0 +1,4 @@
+main :: ([Any], [Any]) -> [Any]
+main (prog) {
+    intersection (fst (prog), snd (prog))
+}

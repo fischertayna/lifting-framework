@@ -1,10 +1,10 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    reachingDefinitions (fst(input), snd(input))
+    veryBusyExpressions(fst(input), snd(input))
 }
 
-reachingDefinitions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
-reachingDefinitions(tries, prog) {
+veryBusyExpressions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
+veryBusyExpressions(tries, prog) {
     chaoticIteration(tries, prog, ([], []))
 }
 
@@ -23,8 +23,8 @@ chaoticRecursion (tries, prog, y, x) {
 }
 
 f :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
-f (prog, rd) {
-    updateMappings(prog, labels(prog), rd)
+f (prog, lv) {
+    updateMappings(prog, labels(prog), lv)
 }
 
 updateMappings :: Any -> [String] -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
@@ -36,7 +36,7 @@ updateMappings(prog, labels, mappings) {
 
 updateMappingsForLabel :: Any -> String -> ([(String, [(String, String)])], [(String, [(String, String)])]) -> ([(String, [(String, String)])], [(String, [(String, String)])])
 updateMappingsForLabel(prog, l, old) {
-    (insertIntoMap(l, rdEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, rdExit(l, prog, fst(old)), snd(old)))
+    (insertIntoMap(l, vbEntry(l, prog, snd(old)), fst(old)), insertIntoMap(l, vbExit(l, prog, fst(old)), snd(old)))
 }
 
 insertIntoMap :: String -> [(String, String)] -> [(String, [(String, String)])] -> [(String, [(String, String)])]
@@ -48,26 +48,39 @@ insertIntoMap (key, value, map) {
             else union(insertIntoMap(key, value, tail(map)), [head(map)])
 }
 
-rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdEntry (l, prog, exit) {
-    if (isEqual (l, init(prog)))
-        then makeSetOfFV(fv(prog))
-        else findWithUnion(filterFlow(l, flow(prog)), exit)
+vbEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbEntry (l, prog, exit) {
+    vbEntryWithBlock(l, prog, exit, head(findBlock(l, prog)))
 }
 
-makeSetOfFV :: [String] -> [(String, String)]
-makeSetOfFV (fvs) {
-    if (isNil(fvs))
-        then []
-        else union([(head (fvs), "?")], makeSetOfFV(tail(fvs)))
+vbEntryWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbEntryWithBlock (l, prog, exit, block) {
+    union(difference(findOrDefault(l, exit), killVB(block, nonTrivialExpression(prog))), genVB(block))
 }
 
-findWithUnion :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
-findWithUnion (fl, mapping) {
-    if (isNil(fl))
-        then []
-        else union(findOrDefault(fst(head (fl)), mapping), findWithUnion(tail(fl), mapping))
+findBlock :: String -> Any -> [Any]
+findBlock (l, prog) {
+    if (checkType(prog, "ASGN"))
+        then if (isEqual(labelFromAsgn(getStmt(prog)), l))
+            then [prog]
+            else []
+        else if (checkType(prog, "SKIP"))
+            then if (isEqual(labelFromSkip(getStmt(prog)), l))
+                then [prog]
+                else []
+            else if (checkType(prog, "SEQ"))
+                then union(findBlock(l, fstStmtOfSeq(getStmt(prog))), findBlock(l, sndStmtOfSeq(getStmt(prog))))
+                else if (checkType(prog, "IF"))
+                    then if (isEqual(labelFromIf(getStmt(prog)), l))
+                        then [getCondFromIf(getStmt(prog))]
+                        else union(findBlock(l, thenFromIf(getStmt(prog))), findBlock(l, elseFromIf(getStmt(prog))))
+                    else if (checkType(prog, "WHILE"))
+                        then if (isEqual(labelFromWhile(getStmt(prog)), l))
+                            then [getCondFromWhile(getStmt(prog))] 
+                            else findBlock(l, blockFromWhile(getStmt(prog)))
+                        else []
 }
+
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
 findOrDefault (l, mapping) {
@@ -87,19 +100,69 @@ filterFlow (l, fl) {
             else filterFlow(l, tail(fl))
 }
 
-fv :: Any -> [String]
-fv (prog) {
+killVB :: Any -> [Any] -> [String]
+killVB (block, exps) {
+    if (checkType(block, "ASGN"))
+        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
+        else []
+}
+
+filterNonTrivialExpressions :: String -> [Any] -> [Any]
+filterNonTrivialExpressions (var, exps) {
+    if (isNil(exps))
+        then []
+        else if (isMember(var, fvAexp(head(exps))))
+            then union([head (exps)], filterNonTrivialExpressions(var, tail(exps)))
+            else filterNonTrivialExpressions(var, tail(exps))
+}
+
+genVB :: Any -> [Any]
+genVB (prog) {
     if (checkType(prog, "ASGN"))
-        then union ([varFromAsgn(getStmt(prog))], getVarFromValue(valueFromAsgn(getStmt(prog))))
-        else if (checkType(prog, "SEQ"))
-            then union(fv(fstStmtOfSeq(getStmt(prog))), fv(sndStmtOfSeq(getStmt(prog))))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "WHILE"))
+            then nonTrivialBExpression(getCondFromWhile(getStmt(prog)))
             else if (checkType(prog, "IF"))
-                then union(fv(thenFromIf(getStmt(prog))), fv(elseFromIf(getStmt(prog))))
+                then nonTrivialBExpression(getCondFromIf(getStmt(prog)))
+                else []
+}
+
+fvAexp :: Any -> [Any]
+fvAexp (aexp) {
+    if (checkType(aexp, "VAR"))
+        then [snd(aexp)]
+        else if (isPair(snd(aexp)))
+            then union(fvAexp(getFstOpValue(aexp)), fvAexp(getSndOpValue(aexp)))
+            else []
+}
+
+nonTrivialExpression :: Any -> [Any]
+nonTrivialExpression (prog) {
+    if (checkType(prog, "ASGN"))
+        then nonTrivialAExpression(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "SEQ"))
+            then union(nonTrivialExpression(fstStmtOfSeq(getStmt(prog))), nonTrivialExpression(sndStmtOfSeq(getStmt(prog))))
+            else if (checkType(prog, "IF"))
+                then union(nonTrivialBExpression(getCondFromIf(getStmt(prog))), union(nonTrivialExpression(thenFromIf(getStmt(prog))), nonTrivialExpression(elseFromIf(getStmt(prog)))))
                 else if (checkType(prog, "WHILE"))
-                    then fv(blockFromWhile(getStmt(prog)))
+                    then union(nonTrivialBExpression(getCondFromWhile(getStmt(prog))), nonTrivialExpression(blockFromWhile(getStmt(prog))))
                     else if (checkType(prog, "SKIP"))
                         then []
                         else ["error " ++ typeStmt(prog)]
+}
+
+nonTrivialAExpression :: Any -> [Any]
+nonTrivialAExpression (aexp) {
+    if (isPair(snd(aexp)))
+        then union ([aexp], union(nonTrivialAExpression(getFstOpValue(aexp)), nonTrivialAExpression(getSndOpValue(aexp))))
+        else []
+}
+
+nonTrivialBExpression :: Any -> [Any]
+nonTrivialBExpression (bexp) {
+    if (isPair(snd(bexp)))
+        then union(nonTrivialAExpression(getFstOpValue(bexp)), nonTrivialAExpression(getSndOpValue(bexp)))
+        else []
 }
 
 getVarFromValue :: Any -> [Any]
@@ -163,14 +226,30 @@ final (prog) {
                     else ["error"]
 }
 
-rdExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExit (l, prog, entry) {
-    rdExitWithBlock(l, prog, entry, head(findBlock(l, prog)))
+vbExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbExit (l, prog, entry) {
+    if (isMember (l, final(prog)))
+        then []
+        else findWithIntersection(filterFlow(l, flowR(prog)), entry)
 }
 
-rdExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-rdExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killRD(block, assignments(prog))), genRD(block))
+findWithIntersection :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findWithIntersection (fl, mapping) {
+    if (isNil(fl))
+        then []
+        else intersection(findOrDefault(fst(head (fl)), mapping), findWithIntersection(tail(fl), mapping))
+}
+
+flowR :: Any -> [(String, String)]
+flowR (prog) {
+    reverse(flow(prog))
+}
+
+reverse :: [(String, String)] -> [(String, String)]
+reverse (l) {
+    if (isNil(l))
+        then []
+        else [(snd(head(l)), fst(head(l)))] ++ reverse(tail(l))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -196,42 +275,22 @@ findBlock (l, prog) {
                         else []
 }
 
-killRD :: Any -> [(String, String)] -> [(String, String)]
-killRD (block, assignments) {
+killLV :: Any -> [String]
+killLV (block) {
     if (checkType(block, "ASGN"))
-        then union([((varFromAsgn(getStmt(block))), "?")], filterRD(varFromAsgn(getStmt(block)), labelFromAsgn(getStmt(block)), assignments))
+        then [varFromAsgn(getStmt(block))]
         else []
 }
 
-assignments :: Any -> [(String, String)]
-assignments (prog) {
+genLV :: Any -> [String]
+genLV (prog) {
     if (checkType(prog, "ASGN"))
-        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
-        else if (checkType(prog, "SEQ"))
-            then union(assignments(fstStmtOfSeq(getStmt(prog))), assignments(sndStmtOfSeq(getStmt(prog))))
+        then getVarFromValue(valueFromAsgn(getStmt(prog)))
+        else if (checkType(prog, "WHILE"))
+            then getVarFromValue(getCondFromWhile(getStmt(prog)))
             else if (checkType(prog, "IF"))
-                then union(assignments(thenFromIf(getStmt(prog))), assignments(elseFromIf(getStmt(prog))))
-                else if (checkType(prog, "WHILE"))
-                    then assignments(blockFromWhile(getStmt(prog)))
-                    else if (checkType(prog, "SKIP"))
-                        then []
-                        else ["error " ++ typeStmt(prog)]
-}
-
-filterRD :: String -> String -> [(String, String)] -> [(String, String)]
-filterRD (var, l, assigns) {
-    if (isNil(assigns))
-        then []
-        else if (isEqual(fst(head(assigns)), var))
-            then union([head (assigns)], filterRD(var, l, tail(assigns)))
-            else filterRD(var, l, tail(assigns))
-}
-
-genRD :: Any -> [(String, String)]
-genRD (prog) {
-    if (checkType(prog, "ASGN"))
-        then [(varFromAsgn(getStmt(prog)), labelFromAsgn(getStmt(prog)))]
-        else []
+                then getVarFromValue(getCondFromIf(getStmt(prog)))
+                else []
 }
 
 labels :: Any -> [String]

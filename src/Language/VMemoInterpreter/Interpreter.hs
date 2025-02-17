@@ -40,6 +40,7 @@ import Variability.Functions
     applyLtOperator,
     applySortList,
     applyUnion,
+    applyIntersection,
     applyDifference,
     applyIsMember,
     partition,
@@ -150,6 +151,10 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
       let (v1, mem1) = eval context (pExps !! 0) mem
           (v2, mem2) = eval context (pExps !! 1) mem1
       in (applyUnion v1 v2, mem2)
+    Ident "intersection" -> 
+      let (v1, mem1) = eval context (pExps !! 0) mem
+          (v2, mem2) = eval context (pExps !! 1) mem1
+      in (applyIntersection v1 v2, mem2)
     Ident "difference" -> 
       let (v1, mem1) = eval context (pExps !! 0) mem
           (v2, mem2) = eval context (pExps !! 1) mem1

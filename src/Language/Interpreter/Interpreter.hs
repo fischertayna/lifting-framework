@@ -72,6 +72,7 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "sortList" -> applySortList context (pExps !! 0)
     Ident "isMember" -> applyIsMember context (pExps !! 0) (pExps !! 1)
     Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
+    Ident "intersection" -> applyIntersection context (pExps !! 0) (pExps !! 1)
     Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
     Ident func -> eval (paramBindings, fcontext) fExp
     where
@@ -129,6 +130,21 @@ elemInList _ [] = False
 elemInList x (y:ys)
   | x == y    = True
   | otherwise = elemInList x ys
+
+applyIntersection :: RContext -> Exp -> Exp -> Valor
+applyIntersection context exp0 exp1 =
+  let v0 = eval context exp0
+      v1 = eval context exp1
+  in case (v0, v1) of
+      (ValorList l0, ValorList l1) ->
+        ValorList (intersectionLists l0 l1)
+      _ -> error "Union should only be used to lists"
+
+intersectionLists :: [Valor] -> [Valor] -> [Valor]
+intersectionLists [] _ = []
+intersectionLists (x:xs) ys
+  | elemInList x ys = x : intersectionLists xs ys
+  | otherwise = intersectionLists xs ys
 
 applyDifference :: RContext -> Exp -> Exp -> Valor
 applyDifference context exp0 exp1 =

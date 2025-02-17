@@ -28,7 +28,7 @@ rdEntry :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 rdEntry (l, prog, exit) {
     if (isEqual (l, init(prog)))
         then makeSetOfFV(fv(prog))
-        else findInExit(filterFlow(l, flow(prog)), exit)
+        else findWithUnionExit(filterFlow(l, flow(prog)), exit)
 }
 
 makeSetOfFV :: [String] -> [(String, String)]
@@ -38,11 +38,11 @@ makeSetOfFV (fvs) {
         else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
 }
 
-findInExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
-findInExit (fl, exit) {
+findWithUnionExit :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findWithUnionExit (fl, exit) {
     if (isNil(fl))
         then []
-        else findOrDefault(fst(head (fl)), exit) ++ findInExit(tail(fl), exit)
+        else findOrDefault(fst(head (fl)), exit) ++ findWithUnionExit(tail(fl), exit)
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]

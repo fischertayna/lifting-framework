@@ -214,9 +214,11 @@ subtractVals (VarString (Var vals1)) vars =
 
 isEmptyVarValor :: VarValor -> Bool
 isEmptyVarValor (VarString (Var vals)) = null vals
+isEmptyVarValor (VarBool (Var vals)) = null vals
+isEmptyVarValor (VarInteger (Var vals)) = null vals
 isEmptyVarValor (VarList vals) = all isEmptyVarValor vals
 isEmptyVarValor (VarPair (k, v)) = isEmptyVarValor k || isEmptyVarValor v
-isEmptyVarValor _ = False
+-- isEmptyVarValor _ = False
 
 applyIsMember :: VarValor -> VarValor -> VarValor
 applyIsMember element (VarList lst) =
@@ -237,6 +239,67 @@ wrapAsVar (VarBool v)    = Var [(VarBool v, ttPC)]
 wrapAsVar (VarString v)  = Var [(VarString v, ttPC)]
 wrapAsVar (VarList v)    = Var [(VarList v, ttPC)]
 wrapAsVar (VarPair (v1, v2)) = Var [(VarPair (v1, v2), ttPC)]
+
+applyIntersection :: VarValor -> VarValor -> VarValor
+applyIntersection v0 v1 =
+  let result = case (v0, v1) of
+                  (VarList l0, VarList l1) ->
+                    VarList (intersectionLists l0 l1)
+                  _ -> error "Intersection should only be used on lists"
+  in doTraceOrResult False "intersection: " v0 v1 result
+
+intersectionLists :: [VarValor] -> [VarValor] -> [VarValor]
+intersectionLists [] _ = []
+intersectionLists (x:xs) ys =
+  case findMatching x ys of
+    Just y ->
+      let merged = mergePresence x y
+      in if isEmptyVarValor merged
+         then intersectionLists xs ys
+         else merged : intersectionLists xs ys
+    Nothing -> intersectionLists xs ys
+
+findMatching :: VarValor -> [VarValor] -> Maybe VarValor
+findMatching x ys =
+  case [ y | y <- ys, areEqualIgnoringPresence x y ] of
+       (y:_) -> Just y
+       [] -> Nothing
+
+-- Merging alternatives for VarString, VarBool, and VarInteger now considers all alternatives.
+mergePresence :: VarValor -> VarValor -> VarValor
+mergePresence (VarString (Var vals1)) (VarString (Var vals2)) =
+  let merged = [ (s, pc1 /\ pc2)
+               | (s, pc1) <- vals1
+               , (s2, pc2) <- vals2
+               , s == s2
+               , sat (pc1 /\ pc2)
+               ]
+  in if null merged then VarList [] else VarString (Var merged)
+mergePresence (VarBool (Var vals1)) (VarBool (Var vals2)) =
+  let merged = [ (b, pc1 /\ pc2)
+               | (b, pc1) <- vals1
+               , (b2, pc2) <- vals2
+               , b == b2
+               , sat (pc1 /\ pc2)
+               ]
+  in if null merged then VarList [] else VarBool (Var merged)
+mergePresence (VarInteger (Var vals1)) (VarInteger (Var vals2)) =
+  let merged = [ (n, pc1 /\ pc2)
+               | (n, pc1) <- vals1
+               , (n2, pc2) <- vals2
+               , n == n2
+               , sat (pc1 /\ pc2)
+               ]
+  in if null merged then VarList [] else VarInteger (Var merged)
+mergePresence (VarPair (p1, p2)) (VarPair (q1, q2)) =
+  let merged1 = mergePresence p1 q1
+      merged2 = mergePresence p2 q2
+  in if isEmptyVarValor merged1 || isEmptyVarValor merged2
+     then VarList [] else VarPair (merged1, merged2)
+mergePresence (VarList l1) (VarList l2) =
+  let mergedList = intersectionLists l1 l2
+  in if null mergedList then VarList [] else VarList mergedList
+mergePresence _ _ = VarList []
 
 applyBinaryOperator :: (Var a -> VarValor) -> (VarValor -> Var a) -> VarValor -> VarValor -> (a -> a -> a) -> VarValor
 applyBinaryOperator cons f vv1 vv2 op =

@@ -26,6 +26,7 @@ import Variability.Functions
     applyLtOperator,
     applySortList,
     applyUnion,
+    applyIntersection,
     applyDifference,
     applyIsMember,
     partition,
@@ -83,6 +84,7 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "isMember" -> applyIsMember (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "lt" -> applyLtOperator (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "union" -> applyUnion (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "intersection" -> applyIntersection (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "difference" -> applyDifference (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident func -> eval (paramBindings, fcontext) fExp
     where

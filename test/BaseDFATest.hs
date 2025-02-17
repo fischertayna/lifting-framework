@@ -1,4 +1,4 @@
-module ReachingDefinitionsTest where
+module BaseDFATest where
 
 import Language.Interpreter.Interpreter
 import Language.Interpreter.Driver
@@ -1249,8 +1249,8 @@ testReachingDefinitionsPPA = TestCase $ do
     let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
-rdTestSuite :: Test
-rdTestSuite = TestList [    TestLabel "is pair" testIsPair
+baseDFATestSuite :: Test
+baseDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "is Equal" testIsEqual
                         ,   TestLabel "Count Asgns ex1" testCountEx1
                         ,   TestLabel "Count Asgns ex2" testCountEx2

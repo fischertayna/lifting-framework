@@ -46,6 +46,7 @@ import Variability.Functions
     applyLtOperator,
     applySortList,
     applyUnion,
+    applyIntersection,
     applyDifference,
     applyIsMember,
     partition,
@@ -157,6 +158,7 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) = do
           Ident "isMember" -> applyIsMemberWithState context (pExps !! 0) (pExps !! 1)
           Ident "lt" -> applyLtOperatorWithState context (pExps !! 0) (pExps !! 1)
           Ident "union" -> applyUnionWithState context (pExps !! 0) (pExps !! 1)
+          Ident "intersection" -> applyIntersectionWithState context (pExps !! 0) (pExps !! 1)
           Ident "difference" -> applyDifferenceWithState context (pExps !! 0) (pExps !! 1)
           _ ->
             if fId `elem` memoizedFunctionNames
@@ -212,6 +214,13 @@ applyUnionWithState context exp0 exp1 = do
   v0 <- (eval context <.> return exp0)
   v1 <- (eval context <.> return exp1)
   let result = applyUnion v0 v1
+  return $ result
+
+applyIntersectionWithState :: RContext Mem -> Exp -> Exp -> State Mem VarValor
+applyIntersectionWithState context exp0 exp1 = do
+  v0 <- (eval context <.> return exp0)
+  v1 <- (eval context <.> return exp1)
+  let result = applyIntersection v0 v1
   return $ result
 
 applyDifferenceWithState :: RContext Mem -> Exp -> Exp -> State Mem VarValor

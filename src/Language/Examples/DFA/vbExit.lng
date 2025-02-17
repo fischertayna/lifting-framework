@@ -1,52 +1,20 @@
 main :: Any -> [(String, String)]
 main (prog) {
-    lvExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
+    vbExit (fst(prog), fst(snd(prog)), snd(snd(prog)))
 }
 
-lvExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
-lvExit (l, prog, entry) {
+vbExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
+vbExit (l, prog, entry) {
     if (isMember (l, final(prog)))
         then []
-        else findWithUnion(filterFlow(l, flowR(prog)), entry)
+        else findWithIntersection(filterFlow(l, flowR(prog)), entry)
 }
 
-makeSetOfFV :: [String] -> [(String, String)]
-makeSetOfFV (fvs) {
-    if (isNil(fvs))
-        then []
-        else [(head (fvs), "?")] ++ makeSetOfFV(tail(fvs))
-}
-
-fv :: Any -> [String]
-fv (prog) {
-    if (checkType(prog, "ASGN"))
-        then union ([varFromAsgn(getStmt(prog))], getVarFromValue(valueFromAsgn(getStmt(prog))))
-        else if (checkType(prog, "SEQ"))
-            then union(fv(fstStmtOfSeq(getStmt(prog))), fv(sndStmtOfSeq(getStmt(prog))))
-            else if (checkType(prog, "IF"))
-                then union(fv(thenFromIf(getStmt(prog))), fv(elseFromIf(getStmt(prog))))
-                else if (checkType(prog, "WHILE"))
-                    then fv(blockFromWhile(getStmt(prog)))
-                    else if (checkType(prog, "SKIP"))
-                        then []
-                        else ["error " ++ typeStmt(prog)]
-}
-
-getVarFromValue :: Any -> [Any]
-getVarFromValue (aexp) {
-    if (isPair(snd(aexp)))
-        then getVarFromValue(getFstOpValue(aexp)) ++ getVarFromValue(getSndOpValue(aexp))
-        else if (checkType(aexp, "VAR"))
-            then [snd (aexp)]
-            else []
-}
-
-
-findWithUnion :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
-findWithUnion (fl, mapping) {
+findWithIntersection :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findWithIntersection (fl, mapping) {
     if (isNil(fl))
         then []
-        else union(findOrDefault(fst(head (fl)), mapping), findWithUnion(tail(fl), mapping))
+        else intersection(findOrDefault(fst(head (fl)), mapping), findWithIntersection(tail(fl), mapping))
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]

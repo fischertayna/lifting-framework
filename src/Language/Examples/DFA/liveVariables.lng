@@ -65,11 +65,11 @@ makeSetOfFV (fvs) {
         else union([(head (fvs), "?")], makeSetOfFV(tail(fvs)))
 }
 
-findIn :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
-findIn (fl, mapping) {
+findWithUnion :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
+findWithUnion (fl, mapping) {
     if (isNil(fl))
         then []
-        else union(findOrDefault(fst(head (fl)), mapping), findIn(tail(fl), mapping))
+        else union(findOrDefault(fst(head (fl)), mapping), findWithUnion(tail(fl), mapping))
 }
 
 findOrDefault :: String -> [(String, [(String, String)])] -> [(String, String)]
@@ -170,7 +170,7 @@ lvExit :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 lvExit (l, prog, entry) {
     if (isMember (l, final(prog)))
         then []
-        else findIn(filterFlow(l, flowR(prog)), entry)
+        else findWithUnion(filterFlow(l, flowR(prog)), entry)
 }
 
 flowR :: Any -> [(String, String)]

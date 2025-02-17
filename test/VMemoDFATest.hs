@@ -1,4 +1,4 @@
-module VMemoReachingDefinitionsTest where
+module VMemoDFATest where
 
 import Language.VMemoInterpreter.Interpreter
 import Language.VMemoInterpreter.Driver
@@ -682,8 +682,8 @@ testUnion7 = testUnion "VarList {list = [VarString {str = {('a', A), ('b', ~A)}}
 testUnion8 :: Test
 testUnion8 = testUnion "VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]} and VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]}" (VarPair(VarList [VarString (Var [("a", propA), ("b", notBDD propA)])], VarList [VarString (Var [("a", propA), ("b", notBDD propA)])])) (VarList [VarString (Var [("a", propA), ("b", notBDD propA)])]) 
 
-vMemoRdTestSuite :: Test
-vMemoRdTestSuite = TestList [    
+vMemoDFATestSuite :: Test
+vMemoDFATestSuite = TestList [    
                             TestLabel "is pair" testIsPair
                         ,   TestLabel "Count Asgns ex1" testCountEx1
                         ,   TestLabel "Count Asgns ex2" testCountEx2
