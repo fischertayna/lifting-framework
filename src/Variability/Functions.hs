@@ -223,7 +223,9 @@ isEmptyVarValor (VarPair (k, v)) = isEmptyVarValor k || isEmptyVarValor v
 applyIsMember :: VarValor -> VarValor -> VarValor
 applyIsMember element (VarList lst) =
   let result = VarInteger $ Var
-        [ (boolToInt (sat (pc /\ disj (map (checkElem (val, pc)) lst))), pc)
+        [ ( boolToInt (sat (pc /\ disj (map (checkElem (val, pc)) lst)) )
+          , pc
+          )
         | (val, pc) <- valList (wrapAsVar element)
         ]
   in doTraceOrResult False "isMember: " element (VarList lst) result
@@ -231,14 +233,17 @@ applyIsMember _ _ = error "isMember should be used with a VarList as the second 
 
 checkElem :: (VarValor, PresenceCondition) -> VarValor -> PresenceCondition
 checkElem (v, pc) item =
-  disj [pc /\ pc' | (vi, pc') <- valList (wrapAsVar item), areEqualIgnoringPresence v vi]
+  disj [ pc /\ pc' | (vi, pc') <- valList (wrapAsVar item)
+                   , areEqualIgnoringPresence v vi
+         ]
 
+-- Updated wrapAsVar: For atomic types, preserve each alternative’s presence condition.
 wrapAsVar :: VarValor -> Var VarValor
-wrapAsVar (VarInteger v) = Var [(VarInteger v, ttPC)]
-wrapAsVar (VarBool v)    = Var [(VarBool v, ttPC)]
-wrapAsVar (VarString v)  = Var [(VarString v, ttPC)]
-wrapAsVar (VarList v)    = Var [(VarList v, ttPC)]
-wrapAsVar (VarPair (v1, v2)) = Var [(VarPair (v1, v2), ttPC)]
+wrapAsVar (VarInteger (Var vs)) = Var [ (VarInteger (Var [(n, pc)]), pc) | (n, pc) <- vs ]
+wrapAsVar (VarBool (Var vs))    = Var [ (VarBool (Var [(b, pc)]), pc) | (b, pc) <- vs ]
+wrapAsVar (VarString (Var vs))  = Var [ (VarString (Var [(s, pc)]), pc) | (s, pc) <- vs ]
+wrapAsVar (VarList v)           = Var [(VarList v, ttPC)]  -- lists & pairs can remain with ttPC
+wrapAsVar (VarPair (v1, v2))    = Var [(VarPair (v1, v2), ttPC)]
 
 applyIntersection :: VarValor -> VarValor -> VarValor
 applyIntersection v0 v1 =

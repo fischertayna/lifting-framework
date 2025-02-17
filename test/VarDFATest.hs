@@ -652,8 +652,8 @@ testIntersection8 = testIntersection "8: VarList {list = [VarString {str = {('a'
 testIsMember :: String -> VarValor -> VarValor -> Test
 testIsMember name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/isMember.lng" input
-    putStrLn ("\n isMember " ++ name ++ ", result: " ++ (substitute (show output)))
-    assertEqual ("isMember " ++ name) expectedOutput output
+    -- putStrLn ("\n isMember " ++ name ++ ", result: " ++ (substitute (show output)))
+    assertEqual ("isMember " ++ name) (show expectedOutput) (show output)
 
 testIsMember1 :: Test
 testIsMember1 = testIsMember "1: VarString {str = {('a', tt)}} and VarList {list = [VarString {str = {('a', tt)}}]}" (VarPair(VarString (Var [("a", ttPC)]), VarList [VarString (Var [("a", ttPC)])])) (VarInteger (Var [(1, ttPC)])) 
@@ -662,19 +662,19 @@ testIsMember2 :: Test
 testIsMember2 = testIsMember "2: VarString {str = {('a', A)}} and VarList {list = [VarString {str = {('a', tt)}}]}" (VarPair(VarString (Var [("a", propA)]), VarList [VarString (Var [("a", ttPC)])])) (VarInteger (Var [(1, propA)]))
 
 testIsMember2_2 :: Test
-testIsMember2_2 = testIsMember "2_2: VarString {str = {('a', tt)}} and VarList {list = [VarString {str = {('a', A)}}]}" (VarPair(VarString (Var [("a", ttPC)]), VarList [VarString (Var [("a", propA)])])) (VarInteger (Var [(1, propA), (0, notBDD propA)])) 
+testIsMember2_2 = testIsMember "2_2: VarString {str = {('a', tt)}} and VarList {list = [VarString {str = {('a', A)}}]}" (VarPair(VarString (Var [("a", ttPC)]), VarList [VarString (Var [("a", propA)])])) (VarInteger (Var [(1, ttPC)])) 
 
 testIsMember3 :: Test
-testIsMember3 = testIsMember "3: VarString {str = {('a', ~A)}} and VarList {list = [VarString {str = {('a', tt)}}]}" (VarPair(VarString (Var [("a", notBDD propA)]), VarList [VarString (Var [("a", ttPC)])])) (VarInteger (Var [(1, notBDD propA), (0, propA)])) 
+testIsMember3 = testIsMember "3: VarString {str = {('a', ~A)}} and VarList {list = [VarString {str = {('a', tt)}}]}" (VarPair(VarString (Var [("a", notBDD propA)]), VarList [VarString (Var [("a", ttPC)])])) (VarInteger (Var [(1, notBDD propA)])) 
 
 testIsMember4 :: Test
-testIsMember4 = testIsMember "4: VarString {str = {('a', A)}} and VarList {list = [VarString {str = {('a', ~A)}}]}" (VarPair(VarString (Var [("a", propA)]), VarList [VarString (Var [("a", notBDD propA)])])) (VarInteger (Var [(0, ttPC)]))  
+testIsMember4 = testIsMember "4: VarString {str = {('a', A)}} and VarList {list = [VarString {str = {('a', ~A)}}]}" (VarPair(VarString (Var [("a", propA)]), VarList [VarString (Var [("a", notBDD propA)])])) (VarInteger (Var [(0, propA)]))  
 
 testIsMember5 :: Test
 testIsMember5 = testIsMember "5: VarString {str = {('a', tt)}} and VarList {list = [VarString {str = {('a', ff)}}]}" (VarPair(VarString (Var [("a", ttPC)]), VarList [VarString (Var [("a", ffPC)])])) (VarInteger (Var [(0, ttPC)])) 
 
 testIsMember6 :: Test
-testIsMember6 = testIsMember "6: VarString {str = {('a', A)}} and VarList {list = [VarString {str = {('a', ff)}}]}" (VarPair(VarString (Var [("a", propA)]), VarList [VarString (Var [("a", ffPC)])])) (VarInteger (Var [(0, ttPC)])) 
+testIsMember6 = testIsMember "6: VarString {str = {('a', A)}} and VarList {list = [VarString {str = {('a', ff)}}]}" (VarPair(VarString (Var [("a", propA)]), VarList [VarString (Var [("a", ffPC)])])) (VarInteger (Var [(0, propA)])) 
 
 testIsMember7 :: Test
 testIsMember7 = testIsMember "7: VarString {str = {('a', A), ('b', ~A)}} and VarList {list = [VarString {str = {('a', A), ('c', ~A)}}]}" (VarPair(VarString (Var [("a", propA), ("b", notBDD propA)]), VarList [VarString (Var [("a", propA), ("c", notBDD propA)])])) (VarInteger (Var [(1, propA), (0, notBDD propA)])) 
