@@ -134,6 +134,66 @@ expectedLvExample = VarPair (
         )
     )
 
+lvExampleEntry = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("6", ttPC)]), VarList[VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("7", ttPC)]), VarList[VarString (Var [("z", ttPC)])])]
+
+lvExampleExit = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[VarString (Var [("y", ttPC)])]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[VarString (Var [("z", ttPC)])]),
+    VarPair(VarString (Var [("6", ttPC)]), VarList[VarString (Var [("z", ttPC)])]),
+    VarPair(VarString (Var [("7", ttPC)]), VarList[])]
+
+a_plus_b = VarPair (
+                VarString (Var [("ADD", ttPC)]),
+                VarPair (
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("a", ttPC)])
+                    ),
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("b", ttPC)])
+                    )
+                )
+            )
+
+a_mult_b = VarPair (
+                VarString (Var [("MULT", ttPC)]),
+                VarPair (
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("a", ttPC)])
+                    ),
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("b", ttPC)])
+                    )
+                )
+            )
+
+a_plus_1 = VarPair (
+                VarString (Var [("ADD", ttPC)]),
+                VarPair (
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("a", ttPC)])
+                    ),
+                    VarPair (
+                        VarString (Var [("CONST", ttPC)]),
+                        VarString (Var [("1", ttPC)])
+                    )
+                )
+            )
+
 expectedAeExample :: VarValor
 expectedAeExample = VarPair (
         VarString (Var [("SEQ", ttPC)]),
@@ -144,19 +204,7 @@ expectedAeExample = VarPair (
                     VarString (Var [("1", ttPC)]),
                     VarPair (
                         VarString (Var [("x", ttPC)]),
-                        VarPair (
-                            VarString (Var [("ADD", ttPC)]),
-                            VarPair (
-                                VarPair (
-                                    VarString (Var [("VAR", ttPC)]),
-                                    VarString (Var [("a", ttPC)])
-                                ),
-                                VarPair (
-                                    VarString (Var [("VAR", ttPC)]),
-                                    VarString (Var [("b", ttPC)])
-                                )
-                            )
-                        )
+                        a_plus_b
                     )
                 )
             ),
@@ -169,19 +217,7 @@ expectedAeExample = VarPair (
                             VarString (Var [("2", ttPC)]),
                             VarPair (
                                 VarString (Var [("y", ttPC)]),
-                                VarPair (
-                                    VarString (Var [("MULT", ttPC)]),
-                                    VarPair (
-                                        VarPair (
-                                            VarString (Var [("VAR", ttPC)]),
-                                            VarString (Var [("a", ttPC)])
-                                        ),
-                                        VarPair (
-                                            VarString (Var [("VAR", ttPC)]),
-                                            VarString (Var [("b", ttPC)])
-                                        )
-                                    )
-                                )
+                                a_mult_b
                             )
                         )
                     ),
@@ -197,19 +233,7 @@ expectedAeExample = VarPair (
                                             VarString (Var [("VAR", ttPC)]),
                                             VarString (Var [("y", ttPC)])
                                         ),
-                                        VarPair (
-                                            VarString (Var [("ADD", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("a", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("b", ttPC)])
-                                                )
-                                            )
-                                        )
+                                        a_plus_b
                                     )
                                 ),
                                 VarPair (
@@ -221,19 +245,7 @@ expectedAeExample = VarPair (
                                                 VarString (Var [("4", ttPC)]),
                                                 VarPair (
                                                     VarString (Var [("a", ttPC)]),
-                                                    VarPair (
-                                                        VarString (Var [("ADD", ttPC)]),
-                                                        VarPair (
-                                                            VarPair (
-                                                                VarString (Var [("VAR", ttPC)]),
-                                                                VarString (Var [("a", ttPC)])
-                                                            ),
-                                                            VarPair (
-                                                                VarString (Var [("CONST", ttPC)]),
-                                                                VarString (Var [("1", ttPC)])
-                                                            )
-                                                        )
-                                                    )
+                                                    a_plus_1
                                                 )
                                             )
                                         ),
@@ -243,19 +255,7 @@ expectedAeExample = VarPair (
                                                 VarString (Var [("5", ttPC)]),
                                                 VarPair (
                                                     VarString (Var [("x", ttPC)]),
-                                                    VarPair (
-                                                        VarString (Var [("ADD", ttPC)]),
-                                                        VarPair (
-                                                            VarPair (
-                                                                VarString (Var [("VAR", ttPC)]),
-                                                                VarString (Var [("a", ttPC)])
-                                                            ),
-                                                            VarPair (
-                                                                VarString (Var [("VAR", ttPC)]),
-                                                                VarString (Var [("b", ttPC)])
-                                                            )
-                                                        )
-                                                    )
+                                                    a_plus_b
                                                 )
                                             )
                                         )
@@ -268,6 +268,48 @@ expectedAeExample = VarPair (
             )
         )
     )
+
+aeExampleEntry = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[a_plus_b]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[a_plus_b]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[a_plus_b]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[])]
+
+aeExampleExit = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[a_plus_b]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[a_plus_b, a_mult_b]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[a_plus_b]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[a_plus_b])]
+
+a_minus_b = VarPair (
+                VarString (Var [("SUB", ttPC)]),
+                VarPair (
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("a", ttPC)])
+                    ),
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("b", ttPC)])
+                    )
+                )
+            )
+
+b_minus_a = VarPair (
+                VarString (Var [("SUB", ttPC)]),
+                VarPair (
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("b", ttPC)])
+                    ),
+                    VarPair (
+                        VarString (Var [("VAR", ttPC)]),
+                        VarString (Var [("a", ttPC)])
+                    )
+                )
+            )
 
 expectedVbExample :: VarValor
 expectedVbExample = VarPair (
@@ -298,19 +340,7 @@ expectedVbExample = VarPair (
                                     VarString (Var [("2", ttPC)]),
                                     VarPair (
                                         VarString (Var [("x", ttPC)]),
-                                        VarPair (
-                                            VarString (Var [("SUB", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("b", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("a", ttPC)])
-                                                )
-                                            )
-                                        )
+                                        b_minus_a
                                     )
                                 )
                             ),
@@ -320,19 +350,7 @@ expectedVbExample = VarPair (
                                     VarString (Var [("3", ttPC)]),
                                     VarPair (
                                         VarString (Var [("y", ttPC)]),
-                                        VarPair (
-                                            VarString (Var [("SUB", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("a", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("b", ttPC)])
-                                                )
-                                            )
-                                        )
+                                        a_minus_b
                                     )
                                 )
                             )
@@ -347,19 +365,7 @@ expectedVbExample = VarPair (
                                     VarString (Var [("4", ttPC)]),
                                     VarPair (
                                         VarString (Var [("y", ttPC)]),
-                                        VarPair (
-                                            VarString (Var [("SUB", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("b", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("a", ttPC)])
-                                                )
-                                            )
-                                        )
+                                        b_minus_a
                                     )
                                 )
                             ),
@@ -369,19 +375,7 @@ expectedVbExample = VarPair (
                                     VarString (Var [("5", ttPC)]),
                                     VarPair (
                                         VarString (Var [("x", ttPC)]),
-                                        VarPair (
-                                            VarString (Var [("SUB", ttPC)]),
-                                            VarPair (
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("a", ttPC)])
-                                                ),
-                                                VarPair (
-                                                    VarString (Var [("VAR", ttPC)]),
-                                                    VarString (Var [("b", ttPC)])
-                                                )
-                                            )
-                                        )
+                                        a_minus_b
                                     )
                                 )
                             )
@@ -391,6 +385,20 @@ expectedVbExample = VarPair (
             )
         )
     )
+
+vbExampleEntry = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[a_minus_b, b_minus_a]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[a_minus_b, b_minus_a]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[a_minus_b]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[a_minus_b, b_minus_a]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[a_minus_b])]
+
+vbExampleExit = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[a_minus_b, b_minus_a]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[a_minus_b]),
+    VarPair(VarString (Var [("3", ttPC)]), VarList[]),
+    VarPair(VarString (Var [("4", ttPC)]), VarList[a_minus_b]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[])]
 
 expectedFactorial :: VarValor
 expectedFactorial = VarPair (
