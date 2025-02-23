@@ -1,4 +1,4 @@
-module Valor where
+module Base.Types where
 
 data Valor
     = ValorInt
@@ -17,3 +17,5 @@ data Valor
         { p :: (Valor, Valor)
         }
     deriving (Show, Eq, Ord)
+
+type Context k v = [(k, v)]

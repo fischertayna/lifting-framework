@@ -9,7 +9,7 @@ import Helper
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
-import Valor (Valor(..))
+import Base.Types (Valor(..))
 import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
 import WhileLang.WhileEncoder (encodeStmtToValor)
 

@@ -9,9 +9,24 @@ import Language.Frontend.AbsLanguage
   )
 import Prelude hiding (lookup)
 import Data.List (sortBy)
-import Valor (Valor(..))
-
-type Context k v = [(k, v)]
+import Base.Types (Valor(..), Context)
+import Base.Functions
+  (
+    applyBinaryOperator,
+    applyUnaryOperator,
+    applyIsPair,
+    applyIsEqual,
+    applyLt,
+    applyIsMember,
+    applyLength,
+    applySortList,
+    applyUnion,
+    applyIntersection,
+    applyDifference,
+    boolToInt,
+    lookup,
+    update
+  )
 
 type RContext = (VContext, FContext)
 
@@ -31,17 +46,17 @@ eval context@(vcontext, fcontext) x = case x of
     let val0 = eval context exp0
         val1 = eval context exp1
     in case (val0, val1) of
-        (ValorStr s0, ValorStr s1) -> ValorStr (s0 ++ s1)
+        (ValorStr s0, ValorStr s1) -> applyBinaryOperator ValorStr s (eval context exp0) (eval context exp1) (++)
         (ValorList l0, ValorList l1) -> ValorList (l0 ++ l1)
         _ -> error "Type error in concatenation"
   -- ECon exp0 exp1  -> ValorStr (s (eval context exp0) ++ s (eval context exp1))
-  EAdd exp0 exp1  -> ValorInt (i (eval context exp0) + i (eval context exp1))
-  ESub exp0 exp1  -> ValorInt (i (eval context exp0) - i (eval context exp1))
-  EMul exp0 exp1  -> ValorInt (i (eval context exp0) * i (eval context exp1))
-  EDiv exp0 exp1  -> ValorInt (i (eval context exp0) `div` i (eval context exp1))
-  EOr exp0 exp1   -> ValorBool (b (eval context exp0) || b (eval context exp1))
-  EAnd exp0 exp1  -> ValorBool (b (eval context exp0)  && b (eval context exp1))
-  ENot exp1        -> ValorBool ( not (b (eval context exp1)))
+  EAdd exp0 exp1  -> applyBinaryOperator ValorInt i (eval context exp0) (eval context exp1) (+)
+  ESub exp0 exp1  -> applyBinaryOperator ValorInt i (eval context exp0) (eval context exp1) (-)
+  EMul exp0 exp1  -> applyBinaryOperator ValorInt i (eval context exp0) (eval context exp1) (*)
+  EDiv exp0 exp1  -> applyBinaryOperator ValorInt i (eval context exp0) (eval context exp1) div
+  EOr exp0 exp1   -> applyBinaryOperator ValorBool b (eval context exp0) (eval context exp1) (||)
+  EAnd exp0 exp1  -> applyBinaryOperator ValorBool b (eval context exp0) (eval context exp1)  (&&)
+  ENot exp1        -> applyUnaryOperator ValorBool b (eval context exp1) not
   EStr s          -> ValorStr s
   ETrue           -> ValorBool True
   EFalse          -> ValorBool False
@@ -58,23 +73,15 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "isNil" -> ValorInt (boolToInt (null list))
     Ident "fst" -> f
     Ident "snd" -> s
-    Ident "isPair" -> case arg of
-      ValorPair _ -> ValorInt 1
-      _ -> ValorInt 0
-    Ident "length" -> applyLength context (pExps !! 0)
-    Ident "isEqual" -> let
-        val1 = eval context (pExps !! 0)
-        val2 = eval context (pExps !! 1)
-      in ValorInt (boolToInt (val1 == val2))
-    Ident "lt" -> let
-        val1 = eval context (pExps !! 0)
-        val2 = eval context (pExps !! 1)
-      in ValorInt (boolToInt (val1 < val2))
-    Ident "sortList" -> applySortList context (pExps !! 0)
-    Ident "isMember" -> applyIsMember context (pExps !! 0) (pExps !! 1)
-    Ident "union" -> applyUnion context (pExps !! 0) (pExps !! 1)
-    Ident "intersection" -> applyIntersection context (pExps !! 0) (pExps !! 1)
-    Ident "difference" -> applyDifference context (pExps !! 0) (pExps !! 1)
+    Ident "isPair" -> applyIsPair arg
+    Ident "length" -> applyLength (eval context (pExps !! 0))
+    Ident "isEqual" -> applyIsEqual (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "lt" -> applyLt (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "sortList" -> applySortList (eval context (pExps !! 0))
+    Ident "isMember" -> applyIsMember (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "union" -> applyUnion (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "intersection" -> applyIntersection (eval context (pExps !! 0)) (eval context (pExps !! 1))
+    Ident "difference" -> applyDifference (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident func -> eval (paramBindings, fcontext) fExp
     where
       arg = eval context (head pExps)
@@ -82,106 +89,6 @@ eval context@(vcontext, fcontext) x = case x of
       (f,s) = p arg
       (Fun _ _ decls fExp) = fromJust $ lookup fcontext id
       paramBindings = zip decls (map (eval context) pExps)
-
-applyIsMember :: RContext -> Exp -> Exp -> Valor
-applyIsMember context exp expL =
-  let v0 = eval context exp
-      ls = eval context expL
-  in case ls of
-      ValorList vals -> ValorInt (boolToInt (elem v0 vals))
-      _ -> error "isMember expects a VarList as second argument"
-
-applyLength :: RContext -> Exp -> Valor
-applyLength context exp =
-  let v0 = eval context exp
-  in case v0 of
-      ValorList vals -> ValorInt (toInteger (length vals))
-      _ -> error "length expects a VarList"
-
-applySortList :: RContext -> Exp -> Valor
-applySortList context exp =
-  let v0 = eval context exp
-  in case v0 of
-      ValorList vals -> ValorList $ sortBy compareVarValor vals
-      _ -> error "sortList expects a VarList"
-
-compareVarValor :: Valor -> Valor -> Ordering
-compareVarValor (ValorPair (k1, v1)) (ValorPair (k2, v2)) =
-  case compareVarValor k1 k2 of
-    EQ -> compareVarValor v1 v2
-    result -> result
-compareVarValor v1 v2 = compare v1 v2
-
-applyUnion :: RContext -> Exp -> Exp -> Valor
-applyUnion context exp0 exp1 =
-  let v0 = eval context exp0
-      v1 = eval context exp1
-  in case (v0, v1) of
-      (ValorList l0, ValorList l1) ->
-        ValorList (unionLists l0 l1)
-      _ -> error "Union should only be used to lists"
-
-unionLists :: [Valor] -> [Valor] -> [Valor]
-unionLists [] ys = ys
-unionLists (x:xs) ys =
-  let updatedYs = replaceOrAdd x ys
-  in unionLists xs updatedYs
-
-replaceOrAdd :: Valor -> [Valor] -> [Valor]
-replaceOrAdd x [] = [x]
-replaceOrAdd x (y:ys)
-  | x == y = (y : ys)      
-  | otherwise = (y : replaceOrAdd x ys)
-
-elemInList :: Valor -> [Valor] -> Bool
-elemInList _ [] = False
-elemInList x (y:ys)
-  | x == y    = True
-  | otherwise = elemInList x ys
-
-applyIntersection :: RContext -> Exp -> Exp -> Valor
-applyIntersection context exp0 exp1 =
-  let v0 = eval context exp0
-      v1 = eval context exp1
-  in case (v0, v1) of
-      (ValorList l0, ValorList l1) ->
-        ValorList (intersectionLists l0 l1)
-      _ -> error "Union should only be used to lists"
-
-intersectionLists :: [Valor] -> [Valor] -> [Valor]
-intersectionLists [] _ = []
-intersectionLists (x:xs) ys
-  | elemInList x ys = x : intersectionLists xs ys
-  | otherwise = intersectionLists xs ys
-
-applyDifference :: RContext -> Exp -> Exp -> Valor
-applyDifference context exp0 exp1 =
-  let v0 = eval context exp0
-      v1 = eval context exp1
-  in case (v0, v1) of
-      (ValorList l0, ValorList l1) ->
-        ValorList (differenceLists l0 l1)
-      _ -> error "Difference should only be used on lists"
-
-differenceLists :: [Valor] -> [Valor] -> [Valor]
-differenceLists xs ys = filter (\x -> not (elemInList x ys)) xs
-
-boolToInt :: Bool -> Integer
-boolToInt b
-  | not b = 0
-  | otherwise = 1
-
-lookup :: Eq k => Context k v -> k -> Maybe v
-lookup [] _ = Nothing
-lookup ((i, v) : cs) s
-  | i == s = Just v
-  | otherwise = lookup cs s
-
-update :: Eq k => Context k v -> k -> v -> Context k v
-update [] s v = [(s, v)]
-update ((i, v) : cs) s nv
-  | i == s = (i, nv) : cs
-  | otherwise = (i, v) : update cs s nv
 
 updatecF :: RContext -> [Function] -> RContext
 updatecF c [] = c

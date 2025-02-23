@@ -9,7 +9,7 @@ import Helper
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
-import Valor (Valor(..))
+import Base.Types (Valor(..))
 
 timeoutP :: Int -> IO a -> IO (Maybe a)
 timeoutP t fun = timeout t $ fun

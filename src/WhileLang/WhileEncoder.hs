@@ -3,7 +3,7 @@ module WhileLang.WhileEncoder where
 import Variability.VarTypes
 
 import Debug.Trace (trace)
-import Valor (Valor(..))
+import Base.Types (Valor(..))
 
 type Id = String 
 type Label = Integer
