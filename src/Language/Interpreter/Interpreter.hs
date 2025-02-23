@@ -61,6 +61,7 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "isPair" -> case arg of
       ValorPair _ -> ValorInt 1
       _ -> ValorInt 0
+    Ident "length" -> applyLength context (pExps !! 0)
     Ident "isEqual" -> let
         val1 = eval context (pExps !! 0)
         val2 = eval context (pExps !! 1)
@@ -89,6 +90,13 @@ applyIsMember context exp expL =
   in case ls of
       ValorList vals -> ValorInt (boolToInt (elem v0 vals))
       _ -> error "isMember expects a VarList as second argument"
+
+applyLength :: RContext -> Exp -> Valor
+applyLength context exp =
+  let v0 = eval context exp
+  in case v0 of
+      ValorList vals -> ValorInt (toInteger (length vals))
+      _ -> error "length expects a VarList"
 
 applySortList :: RContext -> Exp -> Valor
 applySortList context exp =

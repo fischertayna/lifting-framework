@@ -12,8 +12,8 @@ vbExit (l, prog, entry) {
 
 findWithIntersection :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findWithIntersection (fl, mapping) {
-    if (isNil(fl))
-        then []
+    if (isEqual(length(fl), 1))
+        then findOrDefault(fst(head (fl)), mapping)
         else intersection(findOrDefault(fst(head (fl)), mapping), findWithIntersection(tail(fl), mapping))
 }
 

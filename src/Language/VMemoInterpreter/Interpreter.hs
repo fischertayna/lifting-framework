@@ -34,6 +34,7 @@ import Variability.VarTypes
 import Prelude hiding (lookup)
 import Variability.Functions
   (
+    applyLength,
     applyBinaryOperator,
     applyUnaryOperator,
     applyEqualOperator,
@@ -132,6 +133,9 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
     Ident "isPair" -> case arg of
         VarPair _ -> (VarInteger (Var [(1, ttPC)]), mem')
         _ -> (VarInteger (Var [(0, ttPC)]), mem)
+    Ident "length" -> 
+      let (v1, mem1) = eval context (pExps !! 0) mem
+      in (applyLength v1, mem1)
     Ident "isEqual" -> 
       let (v1, mem1) = eval context (pExps !! 0) mem
           (v2, mem2) = eval context (pExps !! 1) mem1

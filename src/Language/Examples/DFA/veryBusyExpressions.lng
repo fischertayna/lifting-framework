@@ -165,10 +165,10 @@ nonTrivialBExpression (bexp) {
         else []
 }
 
-getVarFromValue :: Any -> [Any]
-getVarFromValue (aexp) {
+getVarFromAexp :: Any -> [Any]
+getVarFromAexp (aexp) {
     if (isPair(snd(aexp)))
-        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
+        then union(getVarFromAexp(getFstOpValue(aexp)), getVarFromAexp(getSndOpValue(aexp)))
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []
@@ -235,8 +235,8 @@ vbExit (l, prog, entry) {
 
 findWithIntersection :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findWithIntersection (fl, mapping) {
-    if (isNil(fl))
-        then []
+    if (isEqual(length(fl), 1))
+        then findOrDefault(fst(head (fl)), mapping)
         else intersection(findOrDefault(fst(head (fl)), mapping), findWithIntersection(tail(fl), mapping))
 }
 
@@ -285,11 +285,11 @@ killLV (block) {
 genLV :: Any -> [String]
 genLV (prog) {
     if (checkType(prog, "ASGN"))
-        then getVarFromValue(valueFromAsgn(getStmt(prog)))
+        then getVarFromAexp(valueFromAsgn(getStmt(prog)))
         else if (checkType(prog, "WHILE"))
-            then getVarFromValue(getCondFromWhile(getStmt(prog)))
+            then getVarFromAexp(getCondFromWhile(getStmt(prog)))
             else if (checkType(prog, "IF"))
-                then getVarFromValue(getCondFromIf(getStmt(prog)))
+                then getVarFromAexp(getCondFromIf(getStmt(prog)))
                 else []
 }
 

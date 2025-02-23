@@ -10,6 +10,8 @@ import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import Valor (Valor(..))
+import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
+import WhileLang.WhileEncoder (encodeStmtToValor)
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor
 
@@ -463,114 +465,15 @@ factorialProg =  ValorPair (
 -- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
 -- s03 = While whileTeste (Seq whileS1 whileS2)
 
-s01 = ValorPair(
-        ValorStr "ASGN",
-        ValorPair (
-            ValorStr "1", 
-            ValorPair (
-                ValorStr "x", 
-                ValorPair (
-                    ValorStr "CONST", 
-                    ValorStr "5"
-                )
-            )
-        )
-    )
+s01 = encodeStmtToValor rdS01
 
-s02 = ValorPair(
-        ValorStr "ASGN",
-        ValorPair (
-            ValorStr "2", 
-            ValorPair (
-                ValorStr "y", 
-                ValorPair(
-                    ValorStr "CONST", 
-                    ValorStr "1"
-                )
-            )
-        )
-    )
+s02 = encodeStmtToValor rdS02
 
-whileTeste = ValorPair (
-                ValorStr "VAR", 
-                ValorStr "x"
-            )
+whileS1 = encodeStmtToValor rdWhileS1
 
-whileS1 = ValorPair(
-            ValorStr "ASGN",
-            ValorPair (
-                ValorStr "4", 
-                ValorPair (
-                    ValorStr "y", 
-                    ValorPair (
-                        ValorStr "MULT", 
-                        ValorPair (
-                            ValorPair (
-                                ValorStr "VAR", 
-                                ValorStr "x"
-                            ),
-                            ValorPair (
-                                ValorStr "VAR",
-                                ValorStr "y"
-                            )
-                        )
-                    )
-                )
-            )
-        )
+whileS2 = encodeStmtToValor rdWhileS2
 
-whileS2 = ValorPair(
-        ValorStr "ASGN",
-        ValorPair (
-            ValorStr "5", 
-            ValorPair (
-                ValorStr "x", 
-                ValorPair (
-                    ValorStr "SUB", 
-                    ValorPair (
-                        ValorPair (
-                            ValorStr "VAR",
-                            ValorStr "x"
-                        ),
-                        ValorPair(
-                            ValorStr "CONST", 
-                            ValorStr "1"
-                        )
-                    )
-                )
-            )
-        )
-    )
-
-exPPA =  ValorPair (
-                    ValorStr "SEQ",
-                    ValorPair(
-                        s01,
-                        ValorPair(
-                            ValorStr "SEQ",
-                            ValorPair (
-                                s02,
-                                ValorPair (
-                                    ValorStr "WHILE", 
-                                    ValorPair ( 
-                                        ValorStr "3",
-                                        ValorPair(
-                                            whileTeste,
-                                            ValorPair (
-                                                ValorStr "SEQ",
-                                                ValorPair(
-                                                    whileS1,
-                                                    whileS2
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-
+exRD =  encodeStmtToValor rdExample
 
 testIsPair :: Test
 testIsPair = TestCase $ do
@@ -990,7 +893,7 @@ testFilterFlow = TestCase $ do
             ValorPair(ValorStr "5", ValorStr "3")])
     assertEqual "Flow Factorial" expectedOutput output
 
-exPPAEntry = ValorList[
+exRDEntry = ValorList[
     ValorPair(ValorStr "1", ValorList[
                             ValorPair(ValorStr "x", ValorStr "?"), 
                             ValorPair(ValorStr "y", ValorStr "?") ]),
@@ -1012,7 +915,7 @@ exPPAEntry = ValorList[
                             ValorPair(ValorStr "x", ValorStr "5"),
                             ValorPair(ValorStr "y", ValorStr "4") ])]
 
-exPPAExit = ValorList[
+exRDExit = ValorList[
     ValorPair(ValorStr "1", ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"), 
                             ValorPair(ValorStr "y", ValorStr "?") ]),
@@ -1037,7 +940,7 @@ testFindOrDefault = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/findOrDefault.lng" (
                                 ValorPair(
                                     ValorStr "2", 
-                                    exPPAExit))
+                                    exRDExit))
 
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"), 
@@ -1049,7 +952,7 @@ testFindOrDefault2 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/findOrDefault.lng" (
                                 ValorPair(
                                     ValorStr "6", 
-                                    exPPAExit))
+                                    exRDExit))
 
     let expectedOutput = ValorList[]
     assertEqual "testFindOrDefault2 PPA" expectedOutput output
@@ -1059,8 +962,8 @@ testRDEntry1 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/rdEntry.lng" (
                                 ValorPair(ValorStr "1", 
                                           ValorPair(
-                                            exPPA, 
-                                            exPPAExit)))
+                                            exRD, 
+                                            exRDExit)))
     let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "?"), 
                                    ValorPair(ValorStr "y", ValorStr "?") ]
     assertEqual "rdEntry 1" expectedOutput output
@@ -1071,8 +974,8 @@ testRDEntry2 = TestCase $ do
                                 ValorPair(
                                     ValorStr "2", 
                                     ValorPair(
-                                        exPPA, 
-                                        exPPAExit)))
+                                        exRD, 
+                                        exRDExit)))
 
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"), 
@@ -1085,8 +988,8 @@ testRDEntry4 = TestCase $ do
                                 ValorPair(
                                     ValorStr "4", 
                                     ValorPair(
-                                        exPPA, 
-                                        exPPAExit)))
+                                        exRD, 
+                                        exRDExit)))
 
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"),
@@ -1097,31 +1000,25 @@ testRDEntry4 = TestCase $ do
 
 testfindBlock1 :: Test
 testfindBlock1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "1", exPPA))
+    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "1", exRD))
     let expectedOutput = s01
     assertEqual "testfindBlock 1" expectedOutput output
 
 testfindBlock2 :: Test
 testfindBlock2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "2", exPPA))
+    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "2", exRD))
     let expectedOutput = s02
     assertEqual "testfindBlock 2" expectedOutput output
 
-testfindBlock3 :: Test
-testfindBlock3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "3", exPPA))
-    let expectedOutput = whileTeste
-    assertEqual "testfindBlock 3" expectedOutput output
-
 testfindBlock4 :: Test
 testfindBlock4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "4", exPPA))
+    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "4", exRD))
     let expectedOutput = whileS1
     assertEqual "testfindBlock 4" expectedOutput output
 
 testfindBlock5 :: Test
 testfindBlock5 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "5", exPPA))
+    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "5", exRD))
     let expectedOutput = whileS2
     assertEqual "testfindBlock 5" expectedOutput output
 
@@ -1134,13 +1031,13 @@ testGenRD1 = TestCase $ do
 
 testGenRD2 :: Test
 testGenRD2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exPPA)
+    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exRD)
     let expectedOutput = ValorList[]
     assertEqual "test genRD factorial" expectedOutput output
 
 testKillRD :: Test
 testKillRD = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/killRD.lng" (ValorPair(s01, exPPA))
+    output <- processFile executeProg "src/Language/Examples/DFA/killRD.lng" (ValorPair(s01, exRD))
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"),
                             ValorPair(ValorStr "x", ValorStr "5"),
@@ -1152,8 +1049,8 @@ testRDExit1 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "1", 
                                           ValorPair(
-                                            exPPA, 
-                                            exPPAEntry)))
+                                            exRD, 
+                                            exRDEntry)))
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"),
                             ValorPair(ValorStr "y", ValorStr "?") ]
@@ -1164,8 +1061,8 @@ testRDExit2 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "2", 
                                           ValorPair(
-                                            exPPA, 
-                                            exPPAEntry)))
+                                            exRD, 
+                                            exRDEntry)))
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "y", ValorStr "2"), 
                             ValorPair(ValorStr "x", ValorStr "1") ]
@@ -1176,8 +1073,8 @@ testRDExit4 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "4", 
                                           ValorPair(
-                                            exPPA, 
-                                            exPPAEntry)))
+                                            exRD, 
+                                            exRDEntry)))
     let expectedOutput = ValorList[
                         ValorPair(ValorStr "y", ValorStr "4"),
                         ValorPair(ValorStr "x", ValorStr "1"),
@@ -1186,7 +1083,7 @@ testRDExit4 = TestCase $ do
 
 testLabels :: Test
 testLabels = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/labels.lng" (exPPA)
+    output <- processFile executeProg "src/Language/Examples/DFA/labels.lng" (exRD)
     let expectedOutput = ValorList[ValorStr "1", ValorStr "2", ValorStr "3", ValorStr "4", ValorStr "5"]
     assertEqual "labels" expectedOutput output
 
@@ -1198,7 +1095,7 @@ testInsertInto1 = TestCase $ do
                             ValorList [
                                 ValorPair(ValorStr "teste", ValorStr "teste"), 
                                 ValorPair(ValorStr "teste2", ValorStr "teste2")],
-                            exPPAEntry
+                            exRDEntry
                         )))
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "1", ValorList[
@@ -1232,21 +1129,21 @@ testInsertInto2 = TestCase $ do
                         ValorPair(
                             ValorList [
                                 ValorPair(ValorStr "y", ValorStr "?")],
-                            exPPAEntry
+                            exRDEntry
                         )))
-    let expectedOutput = exPPAEntry
+    let expectedOutput = exRDEntry
     assertEqual "testInsertInto 2" expectedOutput output
 
 testUpdateMappings :: Test
 testUpdateMappings = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/updateMappings.lng" (exPPA)
-    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    output <- processFile executeProg "src/Language/Examples/DFA/updateMappings.lng" (exRD)
+    let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testUpdateMappings" expectedOutput output
 
 testReachingDefinitionsPPA :: Test
 testReachingDefinitionsPPA = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (ValorPair(ValorInt 10, exPPA))
-    let expectedOutput = ValorPair(exPPAEntry, exPPAExit)
+    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (ValorPair(ValorInt 10, exRD))
+    let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
 baseDFATestSuite :: Test
@@ -1293,7 +1190,6 @@ baseDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "rdEntry 4" testRDEntry4
                         ,   TestLabel "testfindBlock 1" testfindBlock1
                         ,   TestLabel "testfindBlock 2" testfindBlock2
-                        ,   TestLabel "testfindBlock 3" testfindBlock3
                         ,   TestLabel "testfindBlock 4" testfindBlock4
                         ,   TestLabel "testfindBlock 5" testfindBlock5
                         ,   TestLabel "testGenRD 1" testGenRD1

@@ -40,6 +40,7 @@ import Data.List (sortBy)
 import Language.MInterpreter.Interpreter (Valor(ValorList, ValorInt))
 import Variability.Functions
   (
+    applyLength,
     applyBinaryOperator,
     applyUnaryOperator,
     applyEqualOperator,
@@ -153,6 +154,7 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) = do
             case arg of
               VarPair _ -> return $ VarInteger (Var [(1, ttPC)])
               _ -> return $ VarInteger (Var [(0, ttPC)])
+          Ident "length" -> applyLengthWithState context (pExps !! 0)
           Ident "isEqual" -> applyEqualOperatorWithState context (pExps !! 0) (pExps !! 1)
           Ident "sortList" -> applySortListWithState context (pExps !! 0)
           Ident "isMember" -> applyIsMemberWithState context (pExps !! 0) (pExps !! 1)
@@ -201,6 +203,12 @@ applyLtOperatorWithState context exp0 exp1 = do
   v0 <- (eval context <.> return exp0)
   v1 <- (eval context <.> return exp1)
   let result = applyLtOperator v0 v1
+  return $ result
+
+applyLengthWithState :: RContext Mem -> Exp -> State Mem VarValor
+applyLengthWithState context exp = do
+  v <- (eval context <.> return exp)
+  let result = applyLength v
   return $ result
 
 applySortListWithState :: RContext Mem -> Exp -> State Mem VarValor

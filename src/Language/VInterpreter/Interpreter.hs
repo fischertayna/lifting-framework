@@ -20,6 +20,7 @@ import Variability.VarTypes
 import Prelude hiding (lookup)
 import Variability.Functions
   (
+    applyLength,
     applyBinaryOperator,
     applyUnaryOperator,
     applyEqualOperator,
@@ -79,6 +80,7 @@ eval context@(vcontext, fcontext) x = case x of
     Ident "isPair" -> case arg of
         VarPair _ -> VarInteger (Var [(1, ttPC)])
         _ -> VarInteger (Var [(0, ttPC)])
+    Ident "length" -> applyLength(eval context (pExps !! 0))
     Ident "isEqual" -> applyEqualOperator (eval context (pExps !! 0)) (eval context (pExps !! 1))
     Ident "sortList" -> applySortList (eval context (pExps !! 0))
     Ident "isMember" -> applyIsMember (eval context (pExps !! 0)) (eval context (pExps !! 1))

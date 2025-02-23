@@ -111,10 +111,10 @@ nonTrivialBExpression (bexp) {
         else []
 }
 
-getVarFromValue :: Any -> [String]
-getVarFromValue (aexp) {
+getVarFromAexp :: Any -> [String]
+getVarFromAexp (aexp) {
     if (isPair(snd(aexp)))
-        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
+        then union(getVarFromAexp(getFstOpValue(aexp)), getVarFromAexp(getSndOpValue(aexp)))
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []

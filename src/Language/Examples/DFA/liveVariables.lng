@@ -58,13 +58,6 @@ lvEntryWithBlock (l, prog, exit, block) {
     union(difference(findOrDefault(l, exit), killLV(block)), genLV(block))
 }
 
-makeSetOfFV :: [String] -> [(String, String)]
-makeSetOfFV (fvs) {
-    if (isNil(fvs))
-        then []
-        else union([(head (fvs), "?")], makeSetOfFV(tail(fvs)))
-}
-
 findWithUnion :: [(String, String)] -> [(String, [(String, String)])] -> [(String, String)]
 findWithUnion (fl, mapping) {
     if (isNil(fl))
@@ -93,7 +86,7 @@ filterFlow (l, fl) {
 fv :: Any -> [String]
 fv (prog) {
     if (checkType(prog, "ASGN"))
-        then union ([varFromAsgn(getStmt(prog))], getVarFromValue(valueFromAsgn(getStmt(prog))))
+        then union ([varFromAsgn(getStmt(prog))], getVarFromAexp(valueFromAsgn(getStmt(prog))))
         else if (checkType(prog, "SEQ"))
             then union(fv(fstStmtOfSeq(getStmt(prog))), fv(sndStmtOfSeq(getStmt(prog))))
             else if (checkType(prog, "IF"))
@@ -105,13 +98,26 @@ fv (prog) {
                         else ["error " ++ typeStmt(prog)]
 }
 
-getVarFromValue :: Any -> [Any]
-getVarFromValue (aexp) {
+getVarFromAexp :: Any -> [Any]
+getVarFromAexp (aexp) {
     if (isPair(snd(aexp)))
-        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
+        then union(getVarFromAexp(getFstOpValue(aexp)), getVarFromAexp(getSndOpValue(aexp)))
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []
+}
+
+getVarFromBexp :: Any -> [String]
+getVarFromBexp (bexp) {
+    if (isPair(bexp))
+        then if (checkType(bexp, "NOT"))
+            then getVarFromBexp(snd(bexp))
+            else if (checkType(bexp, "AND"))
+                then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
+                else if (checkType(bexp, "OR"))
+                    then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
+                    else union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+        else []
 }
 
 flow :: Any -> [(String, String)]
@@ -216,14 +222,18 @@ killLV (block) {
 }
 
 genLV :: Any -> [String]
-genLV (prog) {
-    if (checkType(prog, "ASGN"))
-        then getVarFromValue(valueFromAsgn(getStmt(prog)))
-        else if (checkType(prog, "WHILE"))
-            then getVarFromValue(getCondFromWhile(getStmt(prog)))
-            else if (checkType(prog, "IF"))
-                then getVarFromValue(getCondFromIf(getStmt(prog)))
-                else []
+genLV (block) {
+    if (checkType(block, "ASGN"))
+        then getVarFromAexp(valueFromAsgn(getStmt(block)))
+        else if (checkType(block, "SKIP"))
+            then []
+            else if (checkType(block, "SEQ"))
+                then []
+                else if (checkType(block, "IF"))
+                    then []
+                    else if (checkType(block, "WHILE"))
+                        then []
+                        else getVarFromBexp(block)
 }
 
 labels :: Any -> [String]

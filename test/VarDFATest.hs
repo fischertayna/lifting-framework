@@ -10,17 +10,25 @@ import Helper (processFile)
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
-import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
+import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While, lvExample, aeExample, vbExample)
 import WhileLang.WhileEncoder (encodeStmt)
-import VarExamples (ex1, ex2_1, ex2_2, ex2_3, ex2_4, ex2Entry, ex2Exit, rdExampleEntry, rdExampleExit)
+import VarExamples (
+    ex1, 
+    ex2_1, ex2_2, ex2_3, ex2_4, ex2Entry, ex2Exit, 
+    rdExampleEntry, rdExampleExit,
+    lvExampleEntry, lvExampleExit,
+    a_plus_b, a_mult_b, aeExampleEntry, aeExampleExit,
+    a_minus_b, b_minus_a, vbExampleEntry, vbExampleExit)
 
 ex2 = encodeStmt ex2While
 
-exPPA = encodeStmt rdExample
-    
-exPPAEntry = rdExampleEntry
+exRD = encodeStmt rdExample
 
-exPPAExit = rdExampleExit
+exLV = encodeStmt lvExample
+
+exAE = encodeStmt aeExample
+
+exVB = encodeStmt vbExample
 
 testElem :: Test
 testElem = TestCase $ do
@@ -98,8 +106,8 @@ testCountEx2_3 = testCount "ex2_3" ex2_3 (VarInteger (Var [(1, notBDD propA), (0
 testCountEx2_4 :: Test
 testCountEx2_4 = testCount "ex2_4" ex2_4 (VarInteger (Var [(1, ttPC)]))
 
-testCountExPPA :: Test
-testCountExPPA = testCount "PPA" exPPA (VarInteger (Var [(4, ttPC)]))
+testCountexRD :: Test
+testCountexRD = testCount "PPA" exRD (VarInteger (Var [(4, ttPC)]))
 
 testInit :: String -> VarValor -> VarValor -> Test
 testInit name input expectedOutput = TestCase $ do
@@ -124,8 +132,8 @@ testInitEx2_3 = testInit "Ex2_3" ex2_3 (VarString (Var [("3", notBDD propA), ("-
 testInitEx2_4 :: Test
 testInitEx2_4 = testInit "Ex2_4" ex2_4 (VarString (Var [("4", ttPC)]))
 
-testInitExPPA :: Test
-testInitExPPA = testInit "PPA" exPPA (VarString (Var [("1", ttPC)]))
+testInitexRD :: Test
+testInitexRD = testInit "PPA" exRD (VarString (Var [("1", ttPC)]))
 
 testFinal :: String -> VarValor -> VarValor -> Test
 testFinal name input expectedOutput = TestCase $ do
@@ -151,8 +159,8 @@ testFinalEx2_3 = testFinal "ex2_3" ex2_3 (VarList [VarString (Var [("3", notBDD 
 testFinalEx2_4 :: Test
 testFinalEx2_4 = testFinal "ex2_4" ex2_4 (VarList [VarString (Var [("4", ttPC)])])
 
-testFinalExPPA :: Test
-testFinalExPPA = testFinal "PPA" exPPA (VarList [VarString (Var [("3", ttPC)])])
+testFinalexRD :: Test
+testFinalexRD = testFinal "PPA" exRD (VarList [VarString (Var [("3", ttPC)])])
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
@@ -172,8 +180,8 @@ flow2 = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", prop
 testFlowEx2 :: Test
 testFlowEx2 = testFlow "ex2" ex2 (flow2)
 
-testFlowExPPA :: Test
-testFlowExPPA = testFlow "PPA" exPPA (VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", ttPC)])),
+testFlowexRD :: Test
+testFlowexRD = testFlow "PPA" exRD (VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", ttPC)])),
                                 VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("3", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
@@ -198,8 +206,8 @@ flow2R = VarList[VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), V
 testFlowREx2 :: Test
 testFlowREx2 = testFlowR "ex2" ex2 (flow2R)
 
-testFlowRExPPA :: Test
-testFlowRExPPA = testFlowR "PPA" exPPA (VarList[VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("1", ttPC)])),
+testFlowRexRD :: Test
+testFlowRexRD = testFlowR "PPA" exRD (VarList[VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("1", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("2", ttPC)])),
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("5", ttPC)])),
                                 VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("3", ttPC)])),
@@ -242,8 +250,8 @@ testAssignmentsEx2 = testAssignments "ex2" ex2 (VarList[VarPair(VarString (Var [
                                    VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
                                    VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)]))])
 
-testAssignmentsExPPA :: Test
-testAssignmentsExPPA = testAssignments "PPA" exPPA (VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
+testAssignmentsexRD :: Test
+testAssignmentsexRD = testAssignments "PPA" exRD (VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
                                    VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])),
                                    VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
                                    VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)]))])
@@ -272,8 +280,8 @@ testfvEx2_4 = testfv "ex2_4" ex2_4 (VarList[VarString (Var [("x", ttPC)]), VarSt
 testfvEx2 :: Test
 testfvEx2 = testfv "ex2" ex2 (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)]), VarString (Var [("z", ttPC)])])
 
-testfvExPPA :: Test
-testfvExPPA = testfv "PPA" exPPA (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])])
+testfvexRD :: Test
+testfvexRD = testfv "PPA" exRD (VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])])
 
 testmakeSetOfFV :: String -> VarValor -> VarValor -> Test
 testmakeSetOfFV name input expectedOutput = TestCase $ do
@@ -357,17 +365,17 @@ testRDEntry2_4 = testRDEntry "Ex2_4" (VarPair(VarString (Var [("4", ttPC)]), Var
             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDEntry1 :: Test
-testRDEntry1 = testRDEntry "PPA_1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exPPA, exPPAExit)))  (
+testRDEntry1 = testRDEntry "PPA_1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exRD, rdExampleExit)))  (
     VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])), 
             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDEntry2 :: Test
-testRDEntry2 = testRDEntry "PPA_2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exPPA, exPPAExit))) (VarList[
+testRDEntry2 = testRDEntry "PPA_2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exRD, rdExampleExit))) (VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
                             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDEntry4 :: Test
-testRDEntry4 = testRDEntry "PPA_4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exPPA, exPPAExit))) (
+testRDEntry4 = testRDEntry "PPA_4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exRD, rdExampleExit))) (
     VarList[
         VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
         VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
@@ -381,16 +389,16 @@ testfindBlock name input expectedOutput = TestCase $ do
     assertEqual ("findBlock " ++ name) (expectedOutput) (output)
 
 testfindBlock1 :: Test
-testfindBlock1 = testfindBlock "PPA 1" (VarPair(VarString (Var [("1", ttPC)]), exPPA)) (encodeStmt rdS01)
+testfindBlock1 = testfindBlock "PPA 1" (VarPair(VarString (Var [("1", ttPC)]), exRD)) (encodeStmt rdS01)
 
 testfindBlock2 :: Test
-testfindBlock2 = testfindBlock "PPA 1" (VarPair(VarString (Var [("2", ttPC)]), exPPA)) (encodeStmt rdS02)
+testfindBlock2 = testfindBlock "PPA 1" (VarPair(VarString (Var [("2", ttPC)]), exRD)) (encodeStmt rdS02)
 
 testfindBlock4 :: Test
-testfindBlock4 = testfindBlock "PPA 4" (VarPair(VarString (Var [("4", ttPC)]), exPPA)) (encodeStmt rdWhileS1)
+testfindBlock4 = testfindBlock "PPA 4" (VarPair(VarString (Var [("4", ttPC)]), exRD)) (encodeStmt rdWhileS1)
 
 testfindBlock5 :: Test
-testfindBlock5 = testfindBlock "PPA 5" (VarPair(VarString (Var [("5", ttPC)]), exPPA)) (encodeStmt rdWhileS2)
+testfindBlock5 = testfindBlock "PPA 5" (VarPair(VarString (Var [("5", ttPC)]), exRD)) (encodeStmt rdWhileS2)
 
 testfindBlock2_v :: Test
 testfindBlock2_v = testfindBlock "Ex2 2 21" (VarPair(VarString (Var [("2", propA), ("-2", notBDD propA)]), ex2)) (ex2_2)
@@ -402,12 +410,12 @@ testFindOrDefault name input expectedOutput = TestCase $ do
     assertEqual ("findOrDefault " ++ name) (expectedOutput) (output)
 
 testFindOrDefaultExitPPA2 :: Test
-testFindOrDefaultExitPPA2 = testFindOrDefault "Exit PPA 2" (VarPair(VarString (Var [("2", ttPC)]), exPPAExit)) (VarList[
+testFindOrDefaultExitPPA2 = testFindOrDefault "Exit PPA 2" (VarPair(VarString (Var [("2", ttPC)]), rdExampleExit)) (VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
                             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])) ])
 
 testFindOrDefaultExitPPA6 :: Test
-testFindOrDefaultExitPPA6 = testFindOrDefault "Exit PPA 6" (VarPair(VarString (Var [("6", ttPC)]), exPPAExit)) (VarList[])
+testFindOrDefaultExitPPA6 = testFindOrDefault "Exit PPA 6" (VarPair(VarString (Var [("6", ttPC)]), rdExampleExit)) (VarList[])
 
 testFindOrDefaultEntryEx2_1 :: Test
 testFindOrDefaultEntryEx2_1 = testFindOrDefault "Entry Ex2 1" (VarPair(VarString (Var [("1", ttPC)]), ex2Entry)) (VarList[
@@ -430,7 +438,7 @@ testGenRD1 = TestCase $ do
 
 testGenRD2 :: Test
 testGenRD2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exPPA)
+    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exRD)
     let expectedOutput = VarList[]
     assertEqual "test genRD factorial" expectedOutput output
 
@@ -449,7 +457,7 @@ testKillRD name input expectedOutput = TestCase $ do
     assertEqual ("killRD " ++ name) (expectedOutput) (output)
 
 testKillRDs01 :: Test
-testKillRDs01 = testKillRD "s01" (VarPair(encodeStmt rdS01, exPPA)) (VarList[
+testKillRDs01 = testKillRD "s01" (VarPair(encodeStmt rdS01, exRD)) (VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])) ])
@@ -493,17 +501,17 @@ testRDExit2_4 = testRDExit "Ex2_4" (VarPair(VarString (Var [("4", ttPC)]), VarPa
             VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])) ])
 
 testRDExit1 :: Test
-testRDExit1 = testRDExit "Ex1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exPPA, exPPAEntry))) (
+testRDExit1 = testRDExit "Ex1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exRD, rdExampleEntry))) (
     VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])) ])
 
 testRDExit2 :: Test
-testRDExit2 = testRDExit "Ex2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exPPA, exPPAEntry))) (VarList[
+testRDExit2 = testRDExit "Ex2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exRD, rdExampleEntry))) (VarList[
                             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])), 
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])) ])
 
 testRDExit4 :: Test
-testRDExit4 = testRDExit "Ex4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exPPA, exPPAEntry))) (VarList[
+testRDExit4 = testRDExit "Ex4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exRD, rdExampleEntry))) (VarList[
                         VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])),
                         VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
                         VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])) ])
@@ -522,7 +530,7 @@ testInsertInto1 = TestCase $ do
                             VarList [
                                 VarPair(VarString (Var [("teste", ttPC)]), VarString (Var [("teste", ttPC)])), 
                                 VarPair(VarString (Var [("teste2", ttPC)]), VarString (Var [("teste2", ttPC)]))],
-                            exPPAEntry
+                            rdExampleEntry
                         )))
     let expectedOutput = VarList[
                             VarPair(VarString (Var [("1", ttPC)]), VarList[
@@ -581,7 +589,7 @@ testReachingDefinitionsEx2 :: Test
 testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (VarPair(VarInteger (Var [(10, ttPC)]), ex2)) (VarPair(ex2Entry, ex2Exit))
 
 testReachingDefinitionsPPA :: Test
-testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (VarPair(VarInteger (Var [(10, ttPC)]), exPPA)) (VarPair(exPPAEntry, exPPAExit))
+testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (VarPair(VarInteger (Var [(10, ttPC)]), exRD)) (VarPair(rdExampleEntry, rdExampleExit))
 
 testUnion :: String -> VarValor -> VarValor -> Test
 testUnion name input expectedOutput = TestCase $ do
@@ -682,6 +690,128 @@ testIsMember7 = testIsMember "7: VarString {str = {('a', A), ('b', ~A)}} and Var
 testIsMember8 :: Test
 testIsMember8 = testIsMember "8: VarString {str = {('a', A), ('b', ~A)}} and VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]}" (VarPair(VarString (Var [("a", propA), ("b", notBDD propA)]), VarList [VarString (Var [("a", propA), ("b", notBDD propA)])])) (VarInteger (Var [(1, ttPC)]))
 
+testLVEntry :: String -> VarValor -> VarValor -> Test
+testLVEntry name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/lvEntry.lng" input
+    -- putStrLn ("\n LVEntry " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("LVEntry " ++ name) (show expectedOutput) (show output)
+
+testLVEntry1 :: Test
+testLVEntry1 = testLVEntry "ExPPA 1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[])
+
+testLVEntry2 :: Test
+testLVEntry2 = testLVEntry "ExPPA 2" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[])
+
+testLVEntry3 :: Test
+testLVEntry3 = testLVEntry "ExPPA 3" (VarPair(VarString (Var [("3", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[VarString (Var [("y", ttPC)])])
+
+testLVEntry4 :: Test
+testLVEntry4 = testLVEntry "ExPPA 4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[VarString (Var [("x", ttPC)]), VarString (Var [("y", ttPC)])])
+
+testLVEntry5 :: Test
+testLVEntry5 = testLVEntry "ExPPA 5" (VarPair(VarString (Var [("5", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[VarString (Var [("y", ttPC)])])
+
+testLVEntry6 :: Test
+testLVEntry6 = testLVEntry "ExPPA 6" (VarPair(VarString (Var [("6", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[VarString (Var [("y", ttPC)])])
+
+testLVEntry7 :: Test
+testLVEntry7 = testLVEntry "ExPPA 7" (VarPair(VarString (Var [("7", ttPC)]), VarPair(exLV, lvExampleExit)))  (
+    VarList[VarString (Var [("z", ttPC)])])
+
+testLiveVariables :: String -> VarValor -> VarValor -> Test
+testLiveVariables name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/liveVariables.lng" input
+    -- putStrLn ("\n LiveVariables " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("LiveVariables " ++ name) expectedOutput output
+
+testLiveVariablesExPPA :: Test
+testLiveVariablesExPPA = testLiveVariables "ExPPA LV"  (VarPair(VarInteger (Var [(10, ttPC)]), exLV)) (VarPair(lvExampleEntry, lvExampleExit))
+
+testAEEntry :: String -> VarValor -> VarValor -> Test
+testAEEntry name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/aeEntry.lng" input
+    -- putStrLn ("\n AEEntry " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("AEEntry " ++ name) (show expectedOutput) (show output)
+
+testAEEntry1 :: Test
+testAEEntry1 = testAEEntry "ExPPA 1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exAE, aeExampleExit)))  (
+    VarList[])
+
+testAEEntry2 :: Test
+testAEEntry2 = testAEEntry "ExPPA 2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exAE, aeExampleExit)))  (
+    VarList[a_plus_b])
+
+testAEEntry3 :: Test
+testAEEntry3 = testAEEntry "ExPPA 3" (VarPair(VarString (Var [("3", ttPC)]), VarPair(exAE, aeExampleExit)))  (
+    VarList[a_plus_b])
+
+testAEEntry4 :: Test
+testAEEntry4 = testAEEntry "ExPPA 4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exAE, aeExampleExit)))  (
+    VarList[a_plus_b])
+
+testAEEntry5 :: Test
+testAEEntry5 = testAEEntry "ExPPA 5" (VarPair(VarString (Var [("5", ttPC)]), VarPair(exAE, aeExampleExit)))  (
+    VarList[])
+
+testAEExit :: String -> VarValor -> VarValor -> Test
+testAEExit name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/aeExit.lng" input
+    -- putStrLn ("\n AEExit " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("AEExit " ++ name) (expectedOutput) (output)
+
+testAEExit1 :: Test
+testAEExit1 = testAEExit "ExPPA 1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exAE, aeExampleEntry)))  (
+    VarList[a_plus_b])
+
+testAEExit2 :: Test
+testAEExit2 = testAEExit "ExPPA 2" (VarPair(VarString (Var [("2", ttPC)]), VarPair(exAE, aeExampleEntry)))  (
+    VarList[a_mult_b, a_plus_b])
+
+testAEExit3 :: Test
+testAEExit3 = testAEExit "ExPPA 3" (VarPair(VarString (Var [("3", ttPC)]), VarPair(exAE, aeExampleEntry)))  (
+    VarList[a_plus_b])
+
+testAEExit4 :: Test
+testAEExit4 = testAEExit "ExPPA 4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(exAE, aeExampleEntry)))  (
+    VarList[])
+
+testAEExit5 :: Test
+testAEExit5 = testAEExit "ExPPA 5" (VarPair(VarString (Var [("5", ttPC)]), VarPair(exAE, aeExampleEntry)))  (
+    VarList[a_plus_b])
+
+testAvailableExpressions :: String -> VarValor -> VarValor -> Test
+testAvailableExpressions name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/availableExpressions.lng" input
+    -- putStrLn ("\n AvailableExpressions " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("AvailableExpressions " ++ name) expectedOutput output
+
+testAvailableExpressionsExPPA :: Test
+testAvailableExpressionsExPPA = testAvailableExpressions "ExPPA AE"  (VarPair(VarInteger (Var [(10, ttPC)]), exAE)) (VarPair(aeExampleEntry, aeExampleExit))
+
+testVBExit :: String -> VarValor -> VarValor -> Test
+testVBExit name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/vbExit.lng" input
+    -- putStrLn ("\n VBExit " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("VBExit " ++ name) (expectedOutput) (output)
+
+testVBExit1 :: Test
+testVBExit1 = testVBExit "ExPPA 1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exVB, vbExampleEntry)))  (
+    VarList[a_minus_b, b_minus_a])
+
+testVeryBusyExpressions :: String -> VarValor -> VarValor -> Test
+testVeryBusyExpressions name input expectedOutput = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/veryBusyExpressions.lng" input
+    -- putStrLn ("\n VeryBusyExpressions " ++ name ++ " : " ++ (substitute (show output)))
+    assertEqual ("VeryBusyExpressions " ++ name) expectedOutput output
+
+testVeryBusyExpressionsExPPA :: Test
+testVeryBusyExpressionsExPPA = testVeryBusyExpressions "ExPPA VB"  (VarPair(VarInteger (Var [(10, ttPC)]), exVB)) (VarPair(vbExampleEntry, vbExampleExit))
 
 varDFATestSuite :: Test
 varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
@@ -696,41 +826,41 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "Count Asgns ex2_2" testCountEx2_2
                         ,   TestLabel "Count Asgns ex2_3" testCountEx2_3
                         ,   TestLabel "Count Asgns ex2_4" testCountEx2_4
-                        ,   TestLabel "Count Asgns exPPA" testCountExPPA
+                        ,   TestLabel "Count Asgns exRD" testCountexRD
                         ,   TestLabel "Init Ex2_1" testInitEx2_1
                         ,   TestLabel "Init Ex2_2" testInitEx2_2
                         ,   TestLabel "Init Ex2_3" testInitEx2_3
                         ,   TestLabel "Init Ex2_4" testInitEx2_4
                         ,   TestLabel "Init ex1" testInitEx1
                         ,   TestLabel "Init ex2" testInitEx2
-                        ,   TestLabel "Init exPPA" testInitExPPA
+                        ,   TestLabel "Init exRD" testInitexRD
                         ,   TestLabel "Final ex1" testFinalEx1
                         ,   TestLabel "Final ex2" testFinalEx2
                         ,   TestLabel "Final ex2_1" testFinalEx2_1
                         ,   TestLabel "Final ex2_2" testFinalEx2_2
                         ,   TestLabel "Final ex2_3" testFinalEx2_3
                         ,   TestLabel "Final ex2_4" testFinalEx2_4
-                        ,   TestLabel "Final exPPA" testFinalExPPA
+                        ,   TestLabel "Final exRD" testFinalexRD
                         ,   TestLabel "Flow ex1" testFlowEx1
                         ,   TestLabel "Flow ex2" testFlowEx2
-                        ,   TestLabel "Flow exPPA" testFlowExPPA
+                        ,   TestLabel "Flow exRD" testFlowexRD
                         ,   TestLabel "FlowR ex1" testFlowREx1
                         ,   TestLabel "FlowR ex2" testFlowREx2
-                        ,   TestLabel "FlowR exPPA" testFlowRExPPA
+                        ,   TestLabel "FlowR exRD" testFlowRexRD
                         ,   TestLabel "Chaotic Iteration 1" testChaoticIteration1
                         ,   TestLabel "Chaotic Iteration 2" testChaoticIteration2
                         ,   TestLabel "Asgns ex1" testAssignmentsEx1
                         ,   TestLabel "Asgns ex2_1" testAssignmentsEx2_1
                         ,   TestLabel "Asgns ex2_2" testAssignmentsEx2_2
                         ,   TestLabel "Asgns ex2" testAssignmentsEx2
-                        ,   TestLabel "Asgns exPPA" testAssignmentsExPPA
+                        ,   TestLabel "Asgns exRD" testAssignmentsexRD
                         ,   TestLabel "fv ex1" testfvEx1
                         ,   TestLabel "fv ex2_1" testfvEx2_1
                         ,   TestLabel "fv ex2_2" testfvEx2_2
                         ,   TestLabel "fv ex2_3" testfvEx2_3
                         ,   TestLabel "fv ex2_4" testfvEx2_4
                         ,   TestLabel "fv ex2" testfvEx2
-                        ,   TestLabel "fv exPPA" testfvExPPA
+                        ,   TestLabel "fv exRD" testfvexRD
                         ,   TestLabel "testmakeSetOfFVEx1" testmakeSetOfFVEx1
                         ,   TestLabel "testmakeSetOfFVEx2" testmakeSetOfFVEx2
                         ,   TestLabel "testFilterFlow" testFilterFlow
@@ -798,4 +928,24 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "isMember 6" testIsMember6
                         ,   TestLabel "isMember 7" testIsMember7
                         ,   TestLabel "isMember 8" testIsMember8
+                        ,   TestLabel "testLVEntry1" testLVEntry1
+                        ,   TestLabel "testLVEntry2" testLVEntry2
+                        ,   TestLabel "testLVEntry3" testLVEntry3
+                        ,   TestLabel "testLVEntry4" testLVEntry4
+                        ,   TestLabel "testLVEntry5" testLVEntry5
+                        ,   TestLabel "testLVEntry6" testLVEntry6
+                        ,   TestLabel "testLVEntry7" testLVEntry7
+                        ,   TestLabel "LiveVariablesExPPA" testLiveVariablesExPPA
+                        ,   TestLabel "testAEEntry1" testAEEntry1
+                        ,   TestLabel "testAEEntry2" testAEEntry2
+                        ,   TestLabel "testAEEntry3" testAEEntry3
+                        ,   TestLabel "testAEEntry4" testAEEntry4
+                        ,   TestLabel "testAEEntry5" testAEEntry5
+                        ,   TestLabel "testAEExit1" testAEExit1
+                        ,   TestLabel "testAEExit2" testAEExit2
+                        ,   TestLabel "testAEExit3" testAEExit3
+                        ,   TestLabel "testAEExit4" testAEExit4
+                        ,   TestLabel "testAEExit5" testAEExit5
+                        ,   TestLabel "testAvailableExpressionsExPPA" testAvailableExpressionsExPPA
+                        ,   TestLabel "testVeryBusyExpressionsExPPA" testVeryBusyExpressionsExPPA
                         ]

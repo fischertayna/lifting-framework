@@ -33,6 +33,13 @@ boolToInt b
   | not b = 0
   | otherwise = 1
 
+applyLength :: VarValor -> VarValor
+applyLength (VarList vals) =
+  let lengthWithPC = [(fromIntegral (length vals), disj [pc | (_, pc) <- valList (wrapAsVar v)]) | v <- vals]
+      result = VarInteger (Var lengthWithPC)
+  in doTraceOrResult False "applyLength: " (VarList vals) (VarList vals) result
+applyLength _ = error "applyLength expects a VarList"
+
 applyEqualOperator :: VarValor -> VarValor -> VarValor
 applyEqualOperator v0 v1 =
     let result = case (v0, v1) of
@@ -193,15 +200,21 @@ differenceLists xs ys =
 
 subtractFromList :: VarValor -> [VarValor] -> VarValor
 subtractFromList (VarPair (k1, v1)) ys =
-  case filter (\(VarPair (k2, _)) -> areEqualIgnoringPresence k1 k2) ys of
-    [] -> VarPair (k1, v1)
-    matches ->
-      let newK = subtractVals k1 (map (\(VarPair (k, _)) -> k) matches)
-          newV = subtractVals v1 (map (\(VarPair (_, v)) -> v) matches)
-      in if isEmptyVarValor newK && isEmptyVarValor newV
-         then VarList []
-         else VarPair (newK, newV)
-subtractFromList var _ = var
+  let matchedPairs = filter (\(VarPair (k2, _)) -> areEqualIgnoringPresence k1 k2) ys
+  in case matchedPairs of
+       [] -> VarPair (k1, v1)
+       matches ->
+         let keysToRemove = map (\(VarPair (k, _)) -> k) matches
+             valuesToRemove = map (\(VarPair (_, v)) -> v) matches
+             newK = subtractVals k1 keysToRemove
+             newV = subtractVals v1 valuesToRemove
+             result = if isEmptyVarValor newK && isEmptyVarValor newV
+                      then VarList []
+                      else VarPair (newK, newV)
+         in result
+subtractFromList var ys =
+  let shouldRemove = any (areEqualIgnoringPresence var) ys
+  in if shouldRemove then VarList [] else var
 
 subtractVals :: VarValor -> [VarValor] -> VarValor
 subtractVals (VarString (Var vals1)) vars =
@@ -211,6 +224,32 @@ subtractVals (VarString (Var vals1)) vars =
                       in (v1, adjustedPC)) vals1
       filteredResult = filter (not . unsat . snd) result
    in VarString (Var filteredResult)
+subtractVals (VarInteger (Var vals1)) vars =
+  let vals2 = concatMap (\(VarInteger (Var v)) -> v) vars
+      result = map (\(v1, pc1) -> 
+                      let adjustedPC = pc1 /\ negPC (disj (map snd vals2))
+                      in (v1, adjustedPC)) vals1
+      filteredResult = filter (not . unsat . snd) result
+  in VarInteger (Var filteredResult)
+subtractVals (VarBool (Var vals1)) vars =
+  let vals2 = concatMap (\(VarBool (Var v)) -> v) vars
+      result = map (\(v1, pc1) -> 
+                      let adjustedPC = pc1 /\ negPC (disj (map snd vals2))
+                      in (v1, adjustedPC)) vals1
+      filteredResult = filter (not . unsat . snd) result
+   in VarBool (Var filteredResult)
+subtractVals (VarList vals1) vars =
+  let vals2 = concatMap (\(VarList v) -> v) vars
+      filteredList = filter (\v -> not (any (areEqualIgnoringPresence v) vals2)) vals1
+      result = if null filteredList then VarList [] else VarList filteredList
+  in result
+subtractVals (VarPair (k1, v1)) vars =
+  let (keys, values) = unzip [(k, v) | VarPair (k, v) <- vars]
+      newK = subtractVals k1 keys
+      newV = subtractVals v1 values
+      result = if isEmptyVarValor newK && isEmptyVarValor newV
+               then VarList [] else VarPair (newK, newV)
+  in result
 
 isEmptyVarValor :: VarValor -> Bool
 isEmptyVarValor (VarString (Var vals)) = null vals

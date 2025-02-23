@@ -54,23 +54,40 @@ killLV (block) {
 }
 
 genLV :: Any -> [String]
-genLV (prog) {
-    if (checkType(prog, "ASGN"))
-        then getVarFromValue(valueFromAsgn(getStmt(prog)))
-        else if (checkType(prog, "WHILE"))
-            then getVarFromValue(getCondFromWhile(getStmt(prog)))
-            else if (checkType(prog, "IF"))
-                then getVarFromValue(getCondFromIf(getStmt(prog)))
-                else []
+genLV (block) {
+    if (checkType(block, "ASGN"))
+        then getVarFromAexp(valueFromAsgn(getStmt(block)))
+        else if (checkType(block, "SKIP"))
+            then []
+            else if (checkType(block, "SEQ"))
+                then []
+                else if (checkType(block, "IF"))
+                    then []
+                    else if (checkType(block, "WHILE"))
+                        then []
+                        else getVarFromBexp(block)
 }
 
-getVarFromValue :: Any -> [String]
-getVarFromValue (aexp) {
+getVarFromAexp :: Any -> [String]
+getVarFromAexp (aexp) {
     if (isPair(snd(aexp)))
-        then union(getVarFromValue(getFstOpValue(aexp)), getVarFromValue(getSndOpValue(aexp)))
+        then union(getVarFromAexp(getFstOpValue(aexp)), getVarFromAexp(getSndOpValue(aexp)))
         else if (checkType(aexp, "VAR"))
             then [snd (aexp)]
             else []
+}
+
+getVarFromBexp :: Any -> [String]
+getVarFromBexp (bexp) {
+    if (isPair(bexp))
+        then if (checkType(bexp, "NOT"))
+            then getVarFromBexp(snd(bexp))
+            else if (checkType(bexp, "AND"))
+                then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
+                else if (checkType(bexp, "OR"))
+                    then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
+                    else union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+        else []
 }
 
 typeStmt :: Any -> String

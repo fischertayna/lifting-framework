@@ -10,7 +10,7 @@ aeExit (l, prog, entry) {
 
 aeExitWithBlock :: String -> Any -> [(String, [(String, String)])] -> [(String, String)]
 aeExitWithBlock (l, prog, entry, block) {
-    union(difference(findOrDefault(l, entry), killAE(block, nonTrivialExpression(prog))), genAE(block, nonTrivialExpression(prog)))
+    union(difference(findOrDefault(l, entry), killAE(block, prog)), genAE(block))
 }
 
 findBlock :: String -> Any -> [Any]
@@ -45,17 +45,17 @@ findOrDefault (l, mapping) {
             else findOrDefault(l, tail(mapping))
 }
 
-killAE :: Any -> [Any] -> [String]
-killAE (block, exps) {
+killAE :: Any -> Any -> [String]
+killAE (block, prog) {
     if (checkType(block, "ASGN"))
-        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
+        then filterIsMemberNonTrivialExpressions(varFromAsgn(getStmt(block)), nonTrivialExpression(prog))
         else []
 }
 
-genAE :: Any -> [Any] -> [String]
-genAE (block, exps) {
+genAE :: Any -> [String]
+genAE (block) {
     if (checkType(block, "ASGN"))
-        then filterNonTrivialExpressions(varFromAsgn(getStmt(block)), exps)
+        then filterIsNotMemberNonTrivialExpressions(varFromAsgn(getStmt(block)), nonTrivialAExpression(valueFromAsgn(getStmt(block))))
         else if (checkType(block, "WHILE"))
             then nonTrivialBExpression(getCondFromWhile(getStmt(block)))
             else if (checkType(block, "IF"))
@@ -63,13 +63,22 @@ genAE (block, exps) {
                 else []
 }
 
-filterNonTrivialExpressions :: String -> [Any] -> [Any]
-filterNonTrivialExpressions (var, exps) {
+filterIsMemberNonTrivialExpressions :: String -> [Any] -> [Any]
+filterIsMemberNonTrivialExpressions (var, exps) {
     if (isNil(exps))
         then []
         else if (isMember(var, fvAexp(head(exps))))
-            then union([head (exps)], filterNonTrivialExpressions(var, tail(exps)))
-            else filterNonTrivialExpressions(var, tail(exps))
+            then union([head (exps)], filterIsMemberNonTrivialExpressions(var, tail(exps)))
+            else filterIsMemberNonTrivialExpressions(var, tail(exps))
+}
+
+filterIsNotMemberNonTrivialExpressions :: String -> [Any] -> [Any]
+filterIsNotMemberNonTrivialExpressions (var, exps) {
+    if (isNil(exps))
+        then []
+        else if (isMember(var, fvAexp(head(exps))))
+            then filterIsNotMemberNonTrivialExpressions(var, tail(exps))
+            else union([head (exps)], filterIsNotMemberNonTrivialExpressions(var, tail(exps)))
 }
 
 fvAexp :: Any -> [Any]
