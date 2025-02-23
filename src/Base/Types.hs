@@ -1,5 +1,7 @@
 module Base.Types where
 
+import Data.Hashable (Hashable(hashWithSalt))
+
 data Valor
     = ValorInt
         { i :: Integer
@@ -19,3 +21,10 @@ data Valor
     deriving (Show, Eq, Ord)
 
 type Context k v = [(k, v)]
+
+instance Hashable Valor where
+  hashWithSalt salt (ValorInt i) = hashWithSalt salt i
+  hashWithSalt salt (ValorBool b) = hashWithSalt salt b
+  hashWithSalt salt (ValorStr s)  = hashWithSalt salt s
+  hashWithSalt salt (ValorList vs) = hashWithSalt salt vs
+  hashWithSalt salt (ValorPair (v1, v2)) = salt `hashWithSalt` v1 `hashWithSalt` v2

@@ -13,8 +13,8 @@ version:            0.1.0.0
 
 -- The license under which the package is released.
 -- license:
-author:             BrunoMWorm
-maintainer:         taynafischer
+author:             fischertayna && BrunoMWorm
+maintainer:         fischertayna
 
 -- A copyright notice.
 -- copyright:
@@ -25,11 +25,12 @@ extra-source-files:
 
 library
     exposed-modules:
-        Valor
-        Memoization.Core.State
-        Memoization.Core.Memory
+        Base.Types
+        Base.Functions
         Variability.Functions
         Variability.VarTypes
+        Memoization.Core.State
+        Memoization.Core.Memory
         Language.Frontend.TestLanguage
         Language.Frontend.ErrM
         Language.Frontend.AbsLanguage
@@ -39,7 +40,6 @@ library
         Language.Frontend.SkelLanguage
         Language.Interpreter.Driver
         Language.Interpreter.Interpreter
-        Language.MInterpreter.SLDriver
         Language.MInterpreter.Driver
         Language.MInterpreter.Interpreter
         Language.VInterpreter.Driver
@@ -49,8 +49,6 @@ library
         Language.VMemoInterpreter.Interpreter
         Language.Typechecker.Driver
         Language.Typechecker.Typechecker
-        Language.DeepMemo.Interpreter
-        Language.DeepMemo.Driver
         WhileLang.WhileEncoder
 
     -- Modules included in this library but not exported.

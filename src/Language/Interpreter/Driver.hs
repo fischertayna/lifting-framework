@@ -1,11 +1,11 @@
 module Language.Interpreter.Driver where
 
 import Language.Frontend.LexLanguage
+import Language.Frontend.ErrM
 import Language.Frontend.ParLanguage
 import Language.Frontend.AbsLanguage
-import Language.Interpreter.Interpreter
 
-import Language.Frontend.ErrM
+import Language.Interpreter.Interpreter
 import Base.Types (Valor(..))
 
 main :: IO ()

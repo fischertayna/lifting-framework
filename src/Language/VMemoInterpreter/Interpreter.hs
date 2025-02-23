@@ -7,7 +7,7 @@ import Language.Frontend.AbsLanguage
     Ident (..),
     Program (..),
   )
-import Memoization.Core.Memory (KeyMemory, KeyValueArray, retrieveOrRun)
+import Memoization.Core.Memory (KeyMemory, KeyValueArray, retrieveOrRun, FuncKey(..))
 import Memoization.Core.State (State(..), (<.>), evalState)
 import Variability.VarTypes
   ( PresenceCondition,
@@ -59,11 +59,6 @@ type VContext = Context Ident VarValor
 
 type FContext = Context Ident Function
 
-data FuncKey = FuncKey
-  { funcName :: String   -- Name of the function
-  , funcArgsHash :: Int  -- Hash of the function arguments
-  } deriving (Eq, Show)
-
 createFuncKey :: String -> [VarValor] -> FuncKey
 createFuncKey name args = FuncKey
   { funcName = name
@@ -87,7 +82,6 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
   ETrue  -> (VarBool (Var [(True, ttPC)]), mem)
   EFalse -> (VarBool (Var [(False, ttPC)]), mem)
   EVar vId -> (fromJust $ lookup vcontext vId, mem)
-
   ECon exp0 exp1  ->
     let (val0, mem1) = eval context exp0 mem
         (val1, mem2) = eval context exp1 mem1
@@ -95,7 +89,6 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
         (VarString s0, VarString s1) -> (applyBinaryOperator VarString str val0 val1 (++), mem2)
         (VarList l0, VarList l1) -> (VarList (l0 ++ l1), mem2)
         _ -> error "Type error in concatenation"
-
   EAdd exp0 exp1 -> applyBinaryOp VarInteger int context exp0 exp1 mem (+)
   ESub exp0 exp1 -> applyBinaryOp VarInteger int context exp0 exp1 mem (-)
   EMul exp0 exp1 -> applyBinaryOp VarInteger int context exp0 exp1 mem (*)
@@ -103,16 +96,13 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
   EOr  exp0 exp1 -> applyBinaryOp VarBool bool context exp0 exp1 mem (||)
   EAnd exp0 exp1 -> applyBinaryOp VarBool bool context exp0 exp1 mem (&&)
   ENot exp1      -> applyUnaryOp VarBool bool context exp1 mem not
-
   EPair p1 p2 ->
     let (v1, mem1) = eval context p1 mem
         (v2, mem2) = eval context p2 mem1
     in (VarPair (v1, v2), mem2)
-
   EList ls ->
     let (vals, mem') = foldl (\(acc, m) e -> let (v, m') = eval context e m in (acc ++ [v], m')) ([], mem) ls
     in (VarList vals, mem')
-
   EIf e eT eE ->
     let (cond, mem1) = eval context e mem
         (pct, pcf) = partition cond
@@ -123,7 +113,6 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
             else let (valT, memT) = eval (restrictContext context pct) eT mem1
                      (valE, memE) = eval (restrictContext context pcf) eE memT
                  in ((valT |||| pct) ++++ (valE |||| pcf), memE)
-
   Call fId pExps -> case fId of
     Ident "head" -> (head ls, mem')
     Ident "tail" ->  (VarList (tail ls), mem')
@@ -132,7 +121,7 @@ eval context@(vcontext, fcontext, memoizedFunctionNames) x mem = case x of
     Ident "snd" -> (s, mem')
     Ident "isPair" -> case arg of
         VarPair _ -> (VarInteger (Var [(1, ttPC)]), mem')
-        _ -> (VarInteger (Var [(0, ttPC)]), mem)
+        _ -> (VarInteger (Var [(0, ttPC)]), mem')
     Ident "length" -> 
       let (v1, mem1) = eval context (pExps !! 0) mem
       in (applyLength v1, mem1)

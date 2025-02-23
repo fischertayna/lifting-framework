@@ -8,7 +8,7 @@ import Language.Frontend.ParLanguage (myLexer, pProgram)
 import Language.VMemoInterpreter.Interpreter
 import Memoization.Core.State ((<.>), State (runState))
 import Variability.VarTypes (PresenceCondition, VarValor(..), Var (Var), Val, ttPC, ffPC, Prop, mkBDDVar, (/\), notBDD, (|||))
-import Memoization.Core.Memory (KeyValueArray)
+import Memoization.Core.Memory (KeyValueArray, FuncKey(..))
 
 main :: IO ()
 main = do

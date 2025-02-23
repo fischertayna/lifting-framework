@@ -36,3 +36,8 @@ retrieveOrRun name x t = do
       mupdate x v
       -- trace ("\n retrieveOrRun " ++ show name ++ ": Updated cache with key: " ++ show x ++ " and value: " ++ show v) $ return ()
       return v
+
+data FuncKey = FuncKey
+  { funcName :: String   -- Name of the function
+  , funcArgsHash :: Int  -- Hash of the function arguments
+  } deriving (Eq, Show)
