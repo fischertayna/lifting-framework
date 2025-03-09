@@ -20,6 +20,7 @@ import GHC.Stats (getRTSStats, RTSStats(..))
 import Paths_lifting_framework (getDataFileName)
 import System.Directory (doesFileExist)
 import System.IO.Error (tryIOError)
+import Debug.Trace (trace)
 
 -- Interpreters
 data Interpreter = Base | Variational | Memoized | VMemoized
@@ -138,21 +139,21 @@ loadMemoryState _ = return (MemState [])  -- Base and Variational have no memoiz
 
 
 -- Function to write results
-writeResults :: [(String, [ExecutionResult], [ExecutionResult])] -> IO ()
-writeResults results = do
+writeResults :: [Interpreter] -> [(String, [ExecutionResult], [ExecutionResult])] -> IO ()
+writeResults interpreters results = do
     withFile "benchmark_results.csv" WriteMode $ \h -> do
         hPutStrLn h "Program,Interpreter,Version,Runtime,Memory,CacheHits,CacheReuse,Results,Result vs Base"
         mapM_ (writeEntries h) results
   where
     writeEntries h (name, res1, res2) =
-        let baseResults1 = case lookup Base (zip [Base, Variational, Memoized, VMemoized] res1) of
+        let baseResults1 = case lookup Base (zip interpreters res1) of
                             Just (_, _, _, _, baseRes) -> baseRes
                             Nothing -> []
-            baseResults2 = case lookup Base (zip [Base, Variational, Memoized, VMemoized] res2) of
+            baseResults2 = case lookup Base (zip interpreters res2) of
                             Just (_, _, _, _, baseRes) -> baseRes
                             Nothing -> []
         in mapM_ (\(interpreter, res1Entry, res2Entry) -> writeEntry h name interpreter res1Entry res2Entry baseResults1 baseResults2)
-                 (zip3 [Base, Variational, Memoized, VMemoized] res1 res2)
+                 (zip3 interpreters res1 res2)
 
     writeEntry h name interpreter (runtime1, memory1, cacheHits1, cacheReuse1, results1)
                                (runtime2, memory2, cacheHits2, cacheReuse2, results2) baseResults1 baseResults2 =
@@ -206,15 +207,7 @@ runExperiments = do
         return (name, map fst res1, map fst res2)
         ) programs
     
-    writeResults results
-
--- Define NFData instance for deep evaluation
-instance NFData Valor where
-    rnf (ValorInt i) = rnf i
-    rnf (ValorBool b) = rnf b
-    rnf (ValorStr s) = rnf s
-    rnf (ValorList vs) = rnf vs
-    rnf (ValorPair (v1, v2)) = rnf v1 `seq` rnf v2
+    writeResults interpreters results
 
 expandVar :: Var a -> [(a, PresenceCondition)]
 expandVar (Var vals) = [(v, pc) | (v, pc) <- vals, sat pc]
