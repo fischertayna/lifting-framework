@@ -1,6 +1,6 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    liveVariables (fst(input), snd(input))
+    liveVariables (10, input)
 }
 
 liveVariables :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])

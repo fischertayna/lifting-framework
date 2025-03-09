@@ -1,6 +1,6 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    reachingDefinitions (fst(input), snd(input))
+    reachingDefinitions (10, input)
 }
 
 reachingDefinitions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])

@@ -1,6 +1,6 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    availableExpressions (fst(input), snd(input))
+    availableExpressions (10, input)
 }
 
 availableExpressions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])

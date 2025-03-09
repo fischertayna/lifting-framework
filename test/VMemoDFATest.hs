@@ -527,10 +527,10 @@ testReachingDefinitions name input expectedOutput = TestCase $ do
     assertEqual ("ReachingDefinitions " ++ name) expectedOutput (fst output)
 
 testReachingDefinitionsEx2 :: Test
-testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (VarPair(VarInteger (Var [(10, ttPC)]), ex2)) (VarPair(ex2Entry, ex2Exit))
+testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (ex2) (VarPair(ex2Entry, ex2Exit))
 
 testReachingDefinitionsPPA :: Test
-testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (VarPair(VarInteger (Var [(10, ttPC)]), exRD)) (VarPair(rdExampleEntry, rdExampleExit))
+testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (exRD) (VarPair(rdExampleEntry, rdExampleExit))
 
 -- x = 1;  1
 x1 = VarPair (
@@ -560,7 +560,7 @@ exitSimple1 = VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])) ])]
 
 testReachingDefinitionsSimple1 :: Test
-testReachingDefinitionsSimple1 = testReachingDefinitions "Simple 1"  (VarPair(VarInteger (Var [(5, ttPC)]), simple1)) (VarPair(entrySimple1, exitSimple1))
+testReachingDefinitionsSimple1 = testReachingDefinitions "Simple 1"  (simple1) (VarPair(entrySimple1, exitSimple1))
 
 x2 = VarPair (
         VarString (Var [("ASGN", ttPC)]),
@@ -599,7 +599,7 @@ exitSimple2 = VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("2", ttPC)])) ]) ]
 
 testReachingDefinitionsSimple2 :: Test
-testReachingDefinitionsSimple2 = testReachingDefinitions "Simple 2"  (VarPair(VarInteger (Var [(5, ttPC)]), simple2)) (VarPair(entrySimple2, exitSimple2))
+testReachingDefinitionsSimple2 = testReachingDefinitions "Simple 2"  (simple2) (VarPair(entrySimple2, exitSimple2))
 
 y3 = VarPair (
         VarString (Var [("ASGN", ttPC)]),
@@ -654,7 +654,7 @@ exitSimple3 = VarList[
                             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("3", ttPC)])) ]) ]
 
 testReachingDefinitionsSimple3 :: Test
-testReachingDefinitionsSimple3 = testReachingDefinitions "Simple 3"  (VarPair(VarInteger (Var [(5, ttPC)]), simple3)) (VarPair(entrySimple3, exitSimple3))
+testReachingDefinitionsSimple3 = testReachingDefinitions "Simple 3"  (simple3) (VarPair(entrySimple3, exitSimple3))
 
 
 testUnion :: String -> VarValor -> VarValor -> Test
@@ -731,7 +731,7 @@ testLiveVariables name input expectedOutput = TestCase $ do
     assertEqual ("LiveVariables " ++ name) expectedOutput (fst output)
 
 testLiveVariablesexRD :: Test
-testLiveVariablesexRD = testLiveVariables "exRD LV"  (VarPair(VarInteger (Var [(10, ttPC)]), exLV)) (VarPair(lvExampleEntry, lvExampleExit))
+testLiveVariablesexRD = testLiveVariables "exRD LV"  (exLV) (VarPair(lvExampleEntry, lvExampleExit))
 
 testAEEntry :: String -> VarValor -> VarValor -> Test
 testAEEntry name input expectedOutput = TestCase $ do
@@ -792,7 +792,7 @@ testAvailableExpressions name input expectedOutput = TestCase $ do
     assertEqual ("AvailableExpressions " ++ name) expectedOutput (fst output)
 
 testAvailableExpressionsexRD :: Test
-testAvailableExpressionsexRD = testAvailableExpressions "exRD AE"  (VarPair(VarInteger (Var [(10, ttPC)]), exAE)) (VarPair(aeExampleEntry, aeExampleExit))
+testAvailableExpressionsexRD = testAvailableExpressions "exRD AE"  (exAE) (VarPair(aeExampleEntry, aeExampleExit))
 
 testVBExit :: String -> VarValor -> VarValor -> Test
 testVBExit name input expectedOutput = TestCase $ do
@@ -811,7 +811,7 @@ testVeryBusyExpressions name input expectedOutput = TestCase $ do
     assertEqual ("VeryBusyExpressions " ++ name) expectedOutput (fst output)
 
 testVeryBusyExpressionsexRD :: Test
-testVeryBusyExpressionsexRD = testVeryBusyExpressions "exRD VB"  (VarPair(VarInteger (Var [(10, ttPC)]), exVB)) (VarPair(vbExampleEntry, vbExampleExit))
+testVeryBusyExpressionsexRD = testVeryBusyExpressions "exRD VB"  (exVB) (VarPair(vbExampleEntry, vbExampleExit))
 
 
 vMemoDFATestSuite :: Test

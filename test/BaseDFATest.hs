@@ -11,7 +11,8 @@ import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import Base.Types (Valor(..))
 import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
-import WhileLang.WhileEncoder (encodeStmtToValor)
+import WhileLang.RunningExample (running_example_variability)
+import WhileLang.WhileEncoder (encodeStmtToValor, encodeVariability)
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor
 
@@ -474,6 +475,8 @@ whileS1 = encodeStmtToValor rdWhileS1
 whileS2 = encodeStmtToValor rdWhileS2
 
 exRD =  encodeStmtToValor rdExample
+
+runningExample = encodeVariability running_example_variability
 
 testIsPair :: Test
 testIsPair = TestCase $ do
@@ -1142,7 +1145,7 @@ testUpdateMappings = TestCase $ do
 
 testReachingDefinitionsPPA :: Test
 testReachingDefinitionsPPA = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (ValorPair(ValorInt 10, exRD))
+    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (exRD)
     let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
 

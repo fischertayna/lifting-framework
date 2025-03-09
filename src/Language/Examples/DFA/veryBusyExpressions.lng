@@ -1,6 +1,6 @@
 main :: Any -> ([(String, [(String, String)])], [(String, [(String, String)])])
 main (input) {
-    veryBusyExpressions(fst(input), snd(input))
+    veryBusyExpressions(10, input)
 }
 
 veryBusyExpressions :: int -> Any -> ([(String, [(String, String)])], [(String, [(String, String)])])

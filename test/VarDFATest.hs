@@ -586,10 +586,10 @@ testReachingDefinitions name input expectedOutput = TestCase $ do
     assertEqual ("ReachingDefinitions " ++ name) expectedOutput output
 
 testReachingDefinitionsEx2 :: Test
-testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (VarPair(VarInteger (Var [(10, ttPC)]), ex2)) (VarPair(ex2Entry, ex2Exit))
+testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (ex2) (VarPair(ex2Entry, ex2Exit))
 
 testReachingDefinitionsPPA :: Test
-testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (VarPair(VarInteger (Var [(10, ttPC)]), exRD)) (VarPair(rdExampleEntry, rdExampleExit))
+testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (exRD) (VarPair(rdExampleEntry, rdExampleExit))
 
 testUnion :: String -> VarValor -> VarValor -> Test
 testUnion name input expectedOutput = TestCase $ do
@@ -731,7 +731,7 @@ testLiveVariables name input expectedOutput = TestCase $ do
     assertEqual ("LiveVariables " ++ name) expectedOutput output
 
 testLiveVariablesExPPA :: Test
-testLiveVariablesExPPA = testLiveVariables "ExPPA LV"  (VarPair(VarInteger (Var [(10, ttPC)]), exLV)) (VarPair(lvExampleEntry, lvExampleExit))
+testLiveVariablesExPPA = testLiveVariables "ExPPA LV"  (exLV) (VarPair(lvExampleEntry, lvExampleExit))
 
 testAEEntry :: String -> VarValor -> VarValor -> Test
 testAEEntry name input expectedOutput = TestCase $ do
@@ -792,7 +792,7 @@ testAvailableExpressions name input expectedOutput = TestCase $ do
     assertEqual ("AvailableExpressions " ++ name) expectedOutput output
 
 testAvailableExpressionsExPPA :: Test
-testAvailableExpressionsExPPA = testAvailableExpressions "ExPPA AE"  (VarPair(VarInteger (Var [(10, ttPC)]), exAE)) (VarPair(aeExampleEntry, aeExampleExit))
+testAvailableExpressionsExPPA = testAvailableExpressions "ExPPA AE"  (exAE) (VarPair(aeExampleEntry, aeExampleExit))
 
 testVBExit :: String -> VarValor -> VarValor -> Test
 testVBExit name input expectedOutput = TestCase $ do
@@ -811,7 +811,7 @@ testVeryBusyExpressions name input expectedOutput = TestCase $ do
     assertEqual ("VeryBusyExpressions " ++ name) expectedOutput output
 
 testVeryBusyExpressionsExPPA :: Test
-testVeryBusyExpressionsExPPA = testVeryBusyExpressions "ExPPA VB"  (VarPair(VarInteger (Var [(10, ttPC)]), exVB)) (VarPair(vbExampleEntry, vbExampleExit))
+testVeryBusyExpressionsExPPA = testVeryBusyExpressions "ExPPA VB"  (exVB) (VarPair(vbExampleEntry, vbExampleExit))
 
 varDFATestSuite :: Test
 varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
