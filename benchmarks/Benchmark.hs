@@ -37,12 +37,12 @@ newtype MemState v = MemState (KeyValueArray FuncKey v)
 analyses :: [(String, [String])]
 analyses = [ ("src/Language/Examples/DFA/reachingDefinitions.lng", 
               ["labels", "flow", "fv", "assignments", "init", "final", "findBlock", "makeSetOfFV", "killRD", "genRD", "filterFlow"]),
-            --  ("src/Language/Examples/DFA/liveVariables.lng", 
-            --   ["getVarFromAexp", "getVarFromBexp", "labels", "flowR", "flow", "fv", "init", "final", "findBlock", "killLV", "genLV", "filterFlow"]),
-            --  ("src/Language/Examples/DFA/availableExpressions.lng", 
-            --   ["nonTrivialExpression", "labels", "flow", "fv", "init", "final", "findBlock", "killAE", "genAE", "filterFlow"]),
-            --  ("src/Language/Examples/DFA/veryBusyExpressions.lng", 
-            --   ["labels", "flow", "flowR", "fv", "init", "final", "findBlock", "killVB", "genVB", "filterFlow"])
+             ("src/Language/Examples/DFA/liveVariables.lng", 
+              ["getVarFromAexp", "getVarFromBexp", "labels", "flowR", "flow", "fv", "init", "final", "findBlock", "killLV", "genLV", "filterFlow"]),
+             ("src/Language/Examples/DFA/availableExpressions.lng", 
+              ["nonTrivialExpression", "labels", "flow", "fv", "init", "final", "findBlock", "killAE", "genAE", "filterFlow"]),
+             ("src/Language/Examples/DFA/veryBusyExpressions.lng", 
+              ["labels", "flow", "flowR", "fv", "init", "final", "findBlock", "killVB", "genVB", "filterFlow"])
            ]
 
 -- Run analysis using appropriate interpreter
