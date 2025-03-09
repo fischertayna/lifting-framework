@@ -1,19 +1,17 @@
 module EncodingTest where
 
 import Variability.VarTypes (VarValor(..), substitute)
-import WhileExamples 
+import WhileLang.WhileDFAExamples 
   ( lvExample, 
     aeExample, 
     vbExample, 
-    factorial, 
     power, 
     ex2While
   )
-import VarExamples 
+import VarDFAExamples 
   ( expectedLvExample, 
     expectedAeExample, 
     expectedVbExample, 
-    expectedFactorial, 
     expectedPower, 
     ex2
   )
@@ -28,9 +26,6 @@ aeExampleEncoded = encodeStmt aeExample
 
 vbExampleEncoded :: VarValor
 vbExampleEncoded = encodeStmt vbExample
-
-factorialEncoded :: VarValor
-factorialEncoded = encodeStmt factorial
 
 powerEncoded :: VarValor
 powerEncoded = encodeStmt power
@@ -56,12 +51,6 @@ testVbExample = TestCase $ do
     -- putStrLn ("\n\n out vbExample: " ++ (substitute (show vbExampleEncoded)))
     assertEqual "Encoding vbExample" expectedVbExample vbExampleEncoded
 
-testFactorial :: Test
-testFactorial = TestCase $ do
-    -- putStrLn ("\n expected factorial: " ++ (substitute (show expectedFactorial)))
-    -- putStrLn ("\n\n out factorial: " ++ (substitute (show factorialEncoded)))
-    assertEqual "Encoding factorial" expectedFactorial factorialEncoded
-
 testPower :: Test
 testPower = TestCase $ do
     -- putStrLn ("\n expected power: " ++ (substitute (show expectedPower)))
@@ -79,7 +68,6 @@ encodingTestSuite = TestList [
                             TestLabel "lvExample" testLvExample
                         ,   TestLabel "aeExample" testAeExample
                         ,   TestLabel "vbExample" testVbExample
-                        ,   TestLabel "factorial" testFactorial
                         ,   TestLabel "power" testPower
                         ,   TestLabel "ex2" testEx2
                         ]

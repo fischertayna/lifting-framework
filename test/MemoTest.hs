@@ -24,67 +24,67 @@ inputPair = ValorPair (ValorInt 10, ValorInt 20)
 
 testSimples :: Test
 testSimples = TestCase $ do
-    output <- processFile (executeProg ["conditional"]) "src/Language/Examples/Simple.lng" inputInt
+    output <- processFile (executeProg ["conditional"] []) "src/Language/Examples/Simple.lng" inputInt
     let expectedOutput = (ValorInt 14) 
     assertEqual "Simple Conditional (3 + (if x then x+1 else x-1))" expectedOutput (fst output)
 
 testFibonacci :: Test
 testFibonacci = TestCase $ do
-    output <- processFile (executeProg ["fib"]) "src/Language/Examples/Fibonacci.lng" inputInt
+    output <- processFile (executeProg ["fib"] []) "src/Language/Examples/Fibonacci.lng" inputInt
     let expectedOutput = (ValorInt 55) 
     assertEqual "Fibonacci x" expectedOutput (fst output)
 
 testFatorial :: Test
 testFatorial = TestCase $ do
-    output <- processFile (executeProg ["fat"]) "src/Language/Examples/Fatorial.lng" inputInt
+    output <- processFile (executeProg ["fat"] []) "src/Language/Examples/Fatorial.lng" inputInt
     let expectedOutput = (ValorInt 3628800) 
     assertEqual "Fatorial x" expectedOutput (fst output)
 
 testSomaListaSimples :: Test
 testSomaListaSimples = TestCase $ do
-    output <- processFile (executeProg ["soma"]) "src/Language/Examples/Lista.lng" inputInt
+    output <- processFile (executeProg ["soma"] []) "src/Language/Examples/Lista.lng" inputInt
     let expectedOutput = (ValorInt 46) 
     assertEqual "Soma lista [x, x+1, x+2, x+3]" expectedOutput (fst output)
 
 testSomaLista :: Test
 testSomaLista = TestCase $ do
-    output <- processFile (executeProg ["soma"]) "src/Language/Examples/Lista-inputList.lng" inputList
+    output <- processFile (executeProg ["soma"] []) "src/Language/Examples/Lista-inputList.lng" inputList
     let expectedOutput = (ValorInt 46) 
     assertEqual "Soma lista" expectedOutput (fst output)
 
 testSomaParSimples :: Test
 testSomaParSimples = TestCase $ do
-    output <- processFile (executeProg ["soma"]) "src/Language/Examples/Pares.lng" inputInt
+    output <- processFile (executeProg ["soma"] []) "src/Language/Examples/Pares.lng" inputInt
     let expectedOutput = (ValorInt 30) 
     assertEqual "Soma par (x, 20)" expectedOutput (fst output)
 
 testSomaPar :: Test
 testSomaPar = TestCase $ do
-    output <- processFile (executeProg ["soma"]) "src/Language/Examples/Pares-inputPair.lng" inputPair
+    output <- processFile (executeProg ["soma"] []) "src/Language/Examples/Pares-inputPair.lng" inputPair
     let expectedOutput = (ValorInt 30) 
     assertEqual "Soma par (x, y)" expectedOutput (fst output)
 
 testBool :: Test
 testBool = TestCase $ do
-    output <- processFile (executeProg ["or"]) "src/Language/Examples/Bool.lng" inputBool
+    output <- processFile (executeProg ["or"] []) "src/Language/Examples/Bool.lng" inputBool
     let expectedOutput = (ValorBool True) 
     assertEqual "Bool true" expectedOutput (fst output)
 
 testConcatSimples :: Test
 testConcatSimples = TestCase $ do
-    output <- processFile (executeProg ["concat"]) "src/Language/Examples/Concat.lng" inputString
+    output <- processFile (executeProg ["concat"] []) "src/Language/Examples/Concat.lng" inputString
     let expectedOutput = (ValorStr "test_concatenated") 
     assertEqual "concat x = x_concatenated" expectedOutput (fst output)
 
 testConcatLista :: Test
 testConcatLista = TestCase $ do
-    output <- processFile (executeProg ["concat"]) "src/Language/Examples/Concat-inputList.lng" inputListString
+    output <- processFile (executeProg ["concat"] []) "src/Language/Examples/Concat-inputList.lng" inputListString
     let expectedOutput = (ValorStr "test_concatenated_from_list")
     assertEqual "Concat lista" expectedOutput (fst output)
 
 testPolymorphicPairSameType :: Test
 testPolymorphicPairSameType = TestCase $ do
-    output <- processFile (executeProg ["invert"]) "src/Language/Examples/Polymorphic-pair.lng" (
+    output <- processFile (executeProg ["invert"] []) "src/Language/Examples/Polymorphic-pair.lng" (
                     ValorPair (ValorStr "test", ValorStr "1"))
     let expectedOutput = (ValorPair (ValorStr "1", ValorStr "test"))
     assertEqual "Invert pair same type" expectedOutput (fst output)
@@ -92,7 +92,7 @@ testPolymorphicPairSameType = TestCase $ do
 
 testPolymorphicPair :: Test
 testPolymorphicPair = TestCase $ do
-    output <- processFile (executeProg ["invert"]) "src/Language/Examples/Polymorphic-pair.lng" (
+    output <- processFile (executeProg ["invert"] []) "src/Language/Examples/Polymorphic-pair.lng" (
                     ValorPair (ValorStr "test", ValorBool True))
     let expectedOutput = (ValorPair (ValorBool True, ValorStr "test"))
     assertEqual "Invert pair" expectedOutput (fst output)
@@ -100,7 +100,7 @@ testPolymorphicPair = TestCase $ do
 
 testPolymorphicList :: Test
 testPolymorphicList = TestCase $ do
-    output <- processFile (executeProg ["length"]) "src/Language/Examples/Polymorphic-list.lng" (
+    output <- processFile (executeProg ["length"] []) "src/Language/Examples/Polymorphic-list.lng" (
                     ValorList [
                       ValorStr "test",
                       ValorInt 1,

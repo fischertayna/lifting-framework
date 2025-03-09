@@ -10,9 +10,9 @@ import Helper (processFile)
 import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
-import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While, lvExample, aeExample, vbExample)
+import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While, lvExample, aeExample, vbExample)
 import WhileLang.WhileEncoder (encodeStmt)
-import VarExamples (
+import VarDFAExamples (
     ex1, 
     ex2_1, ex2_2, ex2_3, ex2_4, ex2Entry, ex2Exit, 
     rdExampleEntry, rdExampleExit,
@@ -306,7 +306,7 @@ testFilterFlowBase name input expectedOutput = TestCase $ do
     assertEqual ("FilterFlow " ++ name) expectedOutput output
 
 testFilterFlow :: Test
-testFilterFlow = testFilterFlowBase "ex factorial" (VarPair(VarString (Var [("3", ttPC)]), VarList[
+testFilterFlow = testFilterFlowBase "ex" (VarPair(VarString (Var [("3", ttPC)]), VarList[
             VarPair(VarString (Var [("1", ttPC)]), VarString (Var [("2", ttPC)])), 
             VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", ttPC)])),
             VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
@@ -440,7 +440,7 @@ testGenRD2 :: Test
 testGenRD2 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exRD)
     let expectedOutput = VarList[]
-    assertEqual "test genRD factorial" expectedOutput output
+    assertEqual "test genRD" expectedOutput output
 
 testGenRDEx2_2 :: Test
 testGenRDEx2_2 = TestCase $ do

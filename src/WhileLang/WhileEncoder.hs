@@ -117,10 +117,6 @@ presencePairsLabel tag pc = presencePairs tag ("-" ++ tag) pc
 
 encodeStmt :: Stmt -> VarValor
 encodeStmt stmt = encodeStmtPC' (stmtToStmtPC ttPC stmt)
-    -- let stmtPC = stmtToStmtPC ttPC stmt
-    --     tracedStmtPC = trace ("\n stmtToStmtPC result: " ++ substitute (show stmtPC)) stmtPC
-    --     result = encodeStmtPC' tracedStmtPC
-    -- in trace ("\n encodeStmt final result: " ++ substitute (show result)) result
   where
     encodeStmtPC' :: StmtPC -> VarValor
     encodeStmtPC' (AssignmentPC v e l pc) = 
@@ -183,3 +179,50 @@ encodeStmtToValor (While (cond, l) body) =
         ValorPair (ValorStr "WHILE",
                  ValorPair (ValorStr (show l),
                           ValorPair (encodeBExpToValor cond, encodeStmtToValor body)))
+
+extractPresenceConditions :: Stmt -> [PresenceCondition]
+extractPresenceConditions (Assignment _ _ _) = []
+extractPresenceConditions (Skip _) = []
+extractPresenceConditions (Seq s1 s2) =
+    extractPresenceConditions s1 ++ extractPresenceConditions s2
+extractPresenceConditions (IfThenElse _ s1 s2) =
+    extractPresenceConditions s1 ++ extractPresenceConditions s2
+extractPresenceConditions (While _ s) =
+    extractPresenceConditions s
+extractPresenceConditions (Variant pc s1 s2) =
+    [pc] ++ extractPresenceConditions s1 ++ extractPresenceConditions s2
+
+generateConfigurations :: [PresenceCondition] -> [[(PresenceCondition, Bool)]]
+generateConfigurations [] = [[]]
+generateConfigurations (pc:pcs) =
+    let rest = generateConfigurations pcs
+    in [(pc, True) : cfg | cfg <- rest] ++ [(pc, False) : cfg | cfg <- rest]
+
+instantiateProgram :: [(PresenceCondition, Bool)] -> Stmt -> Stmt
+instantiateProgram _ (Assignment v e l) = Assignment v e l
+instantiateProgram _ (Skip l) = Skip l
+instantiateProgram config (Seq s1 s2) =
+    Seq (instantiateProgram config s1) (instantiateProgram config s2)
+instantiateProgram config (IfThenElse cond s1 s2) =
+    IfThenElse cond (instantiateProgram config s1) (instantiateProgram config s2)
+instantiateProgram config (While cond s) =
+    While cond (instantiateProgram config s)
+instantiateProgram config (Variant pc s1 s2) =
+    case lookup pc config of
+        Just True  -> instantiateProgram config s1
+        Just False -> instantiateProgram config s2
+        Nothing    -> error "Presence condition not found in configuration"
+
+encodeVariability :: Stmt -> [Valor]
+encodeVariability stmt =
+    let pcs = extractPresenceConditions stmt
+        uniquePcs = removeDuplicates pcs
+        configs = generateConfigurations uniquePcs
+        instantiatedPrograms = map (`instantiateProgram` stmt) configs
+    in map encodeStmtToValor instantiatedPrograms
+
+removeDuplicates :: Eq a => [a] -> [a]
+removeDuplicates [] = []
+removeDuplicates (x:xs)
+    | x `elem` xs = removeDuplicates xs
+    | otherwise   = x : removeDuplicates xs

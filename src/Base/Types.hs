@@ -18,7 +18,7 @@ data Valor
     | ValorPair
         { p :: (Valor, Valor)
         }
-    deriving (Show, Eq, Ord)
+    deriving (Show, Eq, Ord, Read)
 
 type Context k v = [(k, v)]
 

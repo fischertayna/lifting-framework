@@ -50,9 +50,11 @@ library
         Language.Typechecker.Driver
         Language.Typechecker.Typechecker
         WhileLang.WhileEncoder
-
-    -- Modules included in this library but not exported.
-    -- other-modules:
+        WhileLang.Examples
+        WhileLang.ComplexExamples
+        WhileLang.RunningExample
+        WhileLang.WhileDFAExamples
+    other-modules: Paths_lifting_framework
     other-extensions:
         InstanceSigs TupleSections FlexibleInstances LambdaCase
         MultiParamTypeClasses PatternSynonyms CPP
@@ -72,14 +74,12 @@ library
 
 executable lifting-framework
     main-is:          Main.hs
-
     -- Modules included in this executable, other than Main.
     -- other-modules:
     other-extensions:
         InstanceSigs TupleSections FlexibleInstances LambdaCase
         MultiParamTypeClasses PatternSynonyms CPP
         GeneralizedNewtypeDeriving OverlappingInstances MagicHash
-
     build-depends:
         base ^>=4.16.4.0,
         array ^>=0.5.4.0,
@@ -101,3 +101,17 @@ test-suite lifting-framework-test
         test-framework-hunit,
         text
     default-language:    Haskell2010
+
+benchmark benchmark-suite
+    type: exitcode-stdio-1.0
+    hs-source-dirs: benchmarks
+    main-is: Main.hs
+    other-modules: Benchmark, Paths_lifting_framework
+    build-depends:
+        base ^>=4.16.4.0,
+        time,
+        deepseq,
+        directory,
+        containers,
+        lifting-framework
+    default-language: Haskell2010

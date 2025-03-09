@@ -40,4 +40,4 @@ retrieveOrRun name x t = do
 data FuncKey = FuncKey
   { funcName :: String   -- Name of the function
   , funcArgsHash :: Int  -- Hash of the function arguments
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Read)

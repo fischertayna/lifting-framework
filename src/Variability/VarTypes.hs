@@ -13,6 +13,7 @@ import Data.List (sort)
 import Data.Maybe (fromJust)
 import Debug.Trace (trace)
 import qualified Data.Text as T
+import Text.Read (readMaybe)
 
 type HashTable k v = H.BasicHashTable k v
 
@@ -43,6 +44,9 @@ instance Show Prop where
     {-# INLINE show #-}
     show :: Prop -> String
     show (Prop b) = show b
+
+instance Read Prop where
+    readsPrec _ input = [(mkBDDVar input, "")]
 
 manager :: Cudd.Cudd.DDManager
 manager = cuddInit
@@ -181,6 +185,12 @@ instance Show a => Show (Var a) where
     show v' =
         let (Var v) = compact v'
         in "{" ++ L.intercalate ", " (map show v) ++ "}"
+
+instance (Read t) => Read (Var t) where
+    readsPrec _ input =
+        case readMaybe input of
+            Just vals -> [(Var vals, "")]
+            Nothing   -> []
 
 instance Functor Var where
     fmap :: (a -> b) -> Var a -> Var b
@@ -376,7 +386,7 @@ data VarValor = VarInteger { int :: Var Integer }
               | VarString { str :: Var String }
               | VarList { list :: [VarValor] }
               | VarPair { pair :: (VarValor, VarValor) }
-    deriving (Show, Eq)
+    deriving (Show, Eq, Read)
 
 instance Hashable VarValor where
   hashWithSalt salt (VarInteger i) = hashWithSalt salt i

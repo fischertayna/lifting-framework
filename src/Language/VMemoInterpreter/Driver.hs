@@ -32,12 +32,12 @@ initialState = []
 memoizedNames :: [String]
 memoizedNames = ["fib"]
 
-executeProg :: [String] -> String -> VarValor -> (VarValor, Mem)
-executeProg memoizedFunctionNames prog input =
+executeProg :: [String] -> Mem -> String -> VarValor -> (VarValor, Mem)
+executeProg memoizedFunctionNames initialState prog input =
   let Ok p = pProgram (myLexer prog)
   in (evalP p memoizedFunctionNames input) initialState
 
 calc :: String -> String
 calc s =
-  let r = executeProg memoizedNames s varList
+  let r = executeProg memoizedNames initialState s varList
   in show $ r

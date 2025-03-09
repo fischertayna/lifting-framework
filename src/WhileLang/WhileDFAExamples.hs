@@ -1,4 +1,4 @@
-module WhileExamples where
+module WhileLang.WhileDFAExamples where
 import WhileLang.WhileEncoder
     ( Stmt(..),
       BExp(..),
@@ -10,13 +10,13 @@ import Variability.VarTypes(Prop, VarValor(..), Var (Var), propA, propB, atbt, a
 rdS01, rdS02, rdWhileS1, rdWhileS2, rdS03 :: Stmt
 rdWhileTest :: (BExp, Label)
 
--- s01 = Assignment "x" (Const 5) 1
--- s02 = Assignment "y" (Const 1) 2
+---------------------------------------------------------------
+-- Examples taken from PPA
+---------------------------------------------------------------
 
--- whileTeste = (GTExp (Var "x") (Const 1), 3)
--- whileS1 = Assignment "y" (Mult (Var "x") (Var "y")) 4
--- whileS2 = Assignment "x" (Sub (Var "x") (Const 1)) 5
--- s03 = While whileTeste (Seq whileS1 whileS2)
+---------------------------------------------------------------
+-- Reaching Definitions
+---------------------------------------------------------------
 rdS01 = Assignment "x" (Const 5) 1
 rdS02 = Assignment "y" (Const 1) 2
 rdWhileTest = (GTExp (Variable "x") (Const 1), 3)
@@ -27,6 +27,9 @@ rdS03 = While rdWhileTest (Seq rdWhileS1 rdWhileS2)
 rdExample :: Program
 rdExample = Seq rdS01 (Seq rdS02 rdS03)
 
+---------------------------------------------------------------
+-- Live Variables
+---------------------------------------------------------------
 lvS01, lvS02, lvS03, lvS04, lvThenS1, lvThenS2, lvS05 :: Stmt
 lvIfTest :: (BExp, Label)
 
@@ -44,6 +47,9 @@ lvS05 = Assignment "x" (Variable "z") 7
 lvExample :: Program
 lvExample = Seq lvS01 (Seq lvS02 (Seq lvS03 (Seq lvS04 lvS05)))
 
+---------------------------------------------------------------
+-- Available Expressions
+---------------------------------------------------------------
 aeS01, aeS02, aeS03, aeWhileS1, aeWhileS2 :: Stmt
 aeWhileTest :: (BExp, Label)
 
@@ -58,6 +64,9 @@ aeS03 = While aeWhileTest (Seq aeWhileS1 aeWhileS2)
 aeExample :: Program
 aeExample = Seq aeS01 (Seq aeS02 aeS03)
 
+---------------------------------------------------------------
+-- Very Busy Expressions
+---------------------------------------------------------------
 vbS01, vbS02, vbS03, vbS04, vbS05, vbThenS1, vbThenS2 :: Stmt
 vbIfTest :: (BExp, Label)
 
@@ -75,22 +84,9 @@ vbS01 =  IfThenElse vbIfTest vbThenS1 vbThenS2
 vbExample :: Program
 vbExample = vbS01
 
-factorialS01, factorialS02, factorialS03, factorialS04, factorialWhileS1, factorialWhileS2 :: Stmt
-factorialWhileTest :: (BExp, Label)
-
-factorialS01 = Assignment "y" (Variable "x") 1
-factorialS02 = Assignment "z" (Const 1) 2
-
-factorialWhileTest = (GTExp (Variable "y") (Const 1), 3)
-factorialWhileS1 = Assignment "z" (Mult (Variable "z") (Variable "y")) 4
-factorialWhileS2 = Assignment "y" (Sub (Variable "y") (Const 1)) 5
-factorialS03 = While factorialWhileTest (Seq factorialWhileS1 factorialWhileS2)
-
-factorialS04 = Assignment "y" (Const 0) 6
-
-factorial :: Program
-factorial = Seq factorialS01 (Seq factorialS02 (Seq factorialS03 factorialS04))
-
+---------------------------------------------------------------
+-- Power
+---------------------------------------------------------------
 powerS01, powerS02, powerWhileS1, powerWhileS2 :: Stmt
 powerWhileTest :: (BExp, Label)
 
@@ -104,6 +100,9 @@ powerS02 = While powerWhileTest (Seq powerWhileS1 powerWhileS2)
 power :: Program
 power = Seq powerS01 powerS02
 
+---------------------------------------------------------------
+-- Example with Variability
+---------------------------------------------------------------
 ex2S01, ex2S02_3, ex2S04 :: Stmt
 
 ex2S01 = Assignment "x" (Const 1) 1

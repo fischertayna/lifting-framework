@@ -10,7 +10,7 @@ import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import Base.Types (Valor(..))
-import WhileExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
+import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
 import WhileLang.WhileEncoder (encodeStmtToValor)
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor

@@ -1,4 +1,4 @@
-module VarExamples where
+module VarDFAExamples where
 
 import Variability.VarTypes (Prop, VarValor(..), Var (Var), propA, propB, atbt, atbf, afbt, afbf, apply, substitute, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||))
 
