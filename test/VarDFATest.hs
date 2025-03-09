@@ -2,7 +2,7 @@ module VarDFATest where
 
 import Language.VInterpreter.Interpreter
 import Language.VInterpreter.Driver
-import Variability.VarTypes (Prop, VarValor(..), Var (Var), apply, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||), propA, propB, atbt, atbf, afbt, afbf, substitute)
+import Variability.VarTypes (Prop, VarValor(..), Var (Var), apply, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||), propA, propB, atbt, atbf, afbt, afbf, substitute, substituteWithSubstitutions)
 
 import Language.Frontend.ErrM
 import Helper (processFile)
@@ -11,6 +11,8 @@ import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While, lvExample, aeExample, vbExample)
+import WhileLang.RunningExample (running_example_variability)
+import WhileLang.ComplexExamples (deep_loop)
 import WhileLang.WhileEncoder (encodeStmt)
 import VarDFAExamples (
     ex1, 
@@ -29,6 +31,42 @@ exLV = encodeStmt lvExample
 exAE = encodeStmt aeExample
 
 exVB = encodeStmt vbExample
+
+exRunning = encodeStmt running_example_variability
+
+propALTINIT :: Prop
+propALTINIT = mkBDDVar "ALT_INIT"
+
+propFASTFIB :: Prop
+propFASTFIB = mkBDDVar "FAST_FIB"
+
+altTfastT :: Prop
+altTfastT = propALTINIT /\ propFASTFIB
+
+altTfastF :: Prop
+altTfastF = propALTINIT /\ notBDD propFASTFIB
+
+altFfastT :: Prop
+altFfastT = notBDD propALTINIT /\ propFASTFIB
+
+altFfastF :: Prop
+altFfastF = notBDD propALTINIT /\ notBDD propFASTFIB
+
+substitutionsRunning :: [(String, String)]
+substitutionsRunning =
+    [ (show altTfastT, " altT_fastT")
+    , (show altFfastT, " altF_fastT")
+    , (show altTfastF, " altT_fastF")
+    , (show altFfastF, " altF_fastF")
+    , (show tt, " tt")
+    , (show ff, " ff")
+    , (show ttPC, " ttPC")
+    , (show ffPC, " ffPC")
+    , (show propALTINIT, " ALT_INIT")
+    , (show (notBDD propALTINIT), " ~ALT_INIT")
+    , (show propFASTFIB, " FAST_FIB")
+    , (show (notBDD propFASTFIB), " ~FAST_FIB")
+    ]
 
 testElem :: Test
 testElem = TestCase $ do
@@ -135,6 +173,9 @@ testInitEx2_4 = testInit "Ex2_4" ex2_4 (VarString (Var [("4", ttPC)]))
 testInitexRD :: Test
 testInitexRD = testInit "PPA" exRD (VarString (Var [("1", ttPC)]))
 
+testInitexRunning :: Test
+testInitexRunning = testInit "Running" exRunning (VarString (Var [("1", ttPC)]))
+
 testFinal :: String -> VarValor -> VarValor -> Test
 testFinal name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/final.lng" input
@@ -162,6 +203,9 @@ testFinalEx2_4 = testFinal "ex2_4" ex2_4 (VarList [VarString (Var [("4", ttPC)])
 testFinalexRD :: Test
 testFinalexRD = testFinal "PPA" exRD (VarList [VarString (Var [("3", ttPC)])])
 
+testFinalexRunning :: Test
+testFinalexRunning = testFinal "Running" exRunning (VarList [VarString (Var [("7", ttPC)])])
+
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" input
@@ -187,6 +231,22 @@ testFlowexRD = testFlow "PPA" exRD (VarList[VarPair(VarString (Var [("1", ttPC)]
                                 VarPair(VarString (Var [("3", ttPC)]), VarString (Var [("4", ttPC)])),
                                 VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)]))
                             ])
+
+flowRunning = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", propALTINIT), ("-2", notBDD propALTINIT)])),
+                VarPair(VarString (Var [("3", notBDD propALTINIT), ("-3", propALTINIT)]), VarString (Var [("4", ttPC)])),
+                VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)])),
+                VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("6", ttPC)])),
+                VarPair(VarString (Var [("6", ttPC)]), VarString (Var [("7", ttPC)])),
+                VarPair(VarString (Var [("12", ttPC)]), VarString (Var [("7", ttPC)])),
+                VarPair(VarString (Var [("7", ttPC)]),VarString (Var [("8", propFASTFIB), ("-8", notBDD propFASTFIB)])),
+                VarPair(VarString (Var [("10", notBDD propFASTFIB), ("-10", propFASTFIB)]), VarString (Var [("11", ttPC)])),
+                VarPair(VarString (Var [("11", ttPC)]), VarString (Var [("12", ttPC)])),
+                VarPair(VarString (Var [("8", propFASTFIB), ("-8", notBDD propFASTFIB)]), VarString (Var [("9", notBDD propFASTFIB), ("-9", propFASTFIB)])),
+                VarPair(VarString (Var [("9", notBDD propFASTFIB), ("-9", propFASTFIB)]), VarString (Var [("10", notBDD propFASTFIB), ("-10", propFASTFIB)])),
+                VarPair(VarString (Var [("2", propALTINIT), ("-2", notBDD propALTINIT)]), VarString (Var [("3", notBDD propALTINIT), ("-3", propALTINIT)]))]
+
+testFlowExRunning :: Test
+testFlowExRunning = testFlow "Running" exRunning (flowRunning)
 
 testFlowR :: String -> VarValor -> VarValor -> Test
 testFlowR name input expectedOutput = TestCase $ do
@@ -948,4 +1008,7 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "testAEExit5" testAEExit5
                         ,   TestLabel "testAvailableExpressionsExPPA" testAvailableExpressionsExPPA
                         ,   TestLabel "testVeryBusyExpressionsExPPA" testVeryBusyExpressionsExPPA
+                        , TestLabel "testInitexRunning" testInitexRunning
+                        , TestLabel "testFinalexRunning" testFinalexRunning
+                        , TestLabel "testFlowExRunning" testFlowExRunning
                         ]

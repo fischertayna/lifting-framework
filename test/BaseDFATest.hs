@@ -12,6 +12,7 @@ import Control.Exception (evaluate)
 import Base.Types (Valor(..))
 import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
 import WhileLang.RunningExample (running_example_variability)
+import WhileLang.ComplexExamples (deep_loop)
 import WhileLang.WhileEncoder (encodeStmtToValor, encodeVariability)
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor
@@ -478,6 +479,8 @@ exRD =  encodeStmtToValor rdExample
 
 runningExample = encodeVariability running_example_variability
 
+exDeepLoop = encodeVariability deep_loop
+
 testIsPair :: Test
 testIsPair = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/isPair.lng" ex1
@@ -609,6 +612,12 @@ testInitExIF = TestCase $ do
     let expectedOutput = (ValorStr "4")
     assertEqual "init if" expectedOutput output
 
+testInitDeepLoop :: Test
+testInitDeepLoop = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" (exDeepLoop!!1)
+    let expectedOutput = (ValorStr "1")
+    assertEqual "init deep loop" expectedOutput output
+
 testFinalEx1 :: Test
 testFinalEx1 = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/final.lng" ex1
@@ -692,6 +701,12 @@ testFinalExIF = TestCase $ do
                             ))
     let expectedOutput = (ValorList [ValorStr "5", ValorStr "6"])
     assertEqual "final if" expectedOutput output
+
+testFinalDeepLoop :: Test
+testFinalDeepLoop = TestCase $ do
+    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" (exDeepLoop!!1)
+    let expectedOutput = (ValorList [ValorStr "2"])
+    assertEqual "final Deep Loop" expectedOutput output
 
 testElem :: Test
 testElem = TestCase $ do
@@ -785,6 +800,12 @@ testFlowFactorial = TestCase $ do
             ValorPair(ValorStr "3", ValorStr "4"),
             ValorPair(ValorStr "4", ValorStr "5")])
     assertEqual "Flow Factorial" expectedOutput output
+
+-- testFlowDeepLoop :: Test
+-- testFlowDeepLoop = TestCase $ do
+--     output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" (exDeepLoop!!1)
+--     let expectedOutput = (ValorList[])
+--     assertEqual "Flow deep loop" expectedOutput output
 
 testChaoticIteration1 :: Test
 testChaoticIteration1 = TestCase $ do
@@ -1148,6 +1169,12 @@ testReachingDefinitionsPPA = TestCase $ do
     output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (exRD)
     let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
+
+-- testReachingDefinitionsDeepLoop :: Test
+-- testReachingDefinitionsDeepLoop = TestCase $ do
+--     output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (exDeepLoop!!1)
+--     let expectedOutput = ValorPair(exRDEntry, exRDExit)
+--     assertEqual "testReachingDefinitionsDeepLoop" expectedOutput output
 
 baseDFATestSuite :: Test
 baseDFATestSuite = TestList [    TestLabel "is pair" testIsPair

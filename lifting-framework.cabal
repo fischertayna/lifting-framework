@@ -106,7 +106,7 @@ benchmark benchmark-suite
     type: exitcode-stdio-1.0
     hs-source-dirs: benchmarks
     main-is: Main.hs
-    other-modules: Benchmark, Paths_lifting_framework
+    other-modules: Benchmark, VarValorUtils, Paths_lifting_framework
     build-depends:
         base ^>=4.16.4.0,
         time,

@@ -18,20 +18,22 @@ import Variability.VarTypes (VarValor(..), Var(..), Val, PresenceCondition, sat,
 import Memoization.Core.Memory (KeyValueArray, FuncKey(..))
 import GHC.Stats (getRTSStats, RTSStats(..))
 import Paths_lifting_framework (getDataFileName)
-import System.Directory (doesFileExist)
+import System.Directory (doesFileExist, createDirectoryIfMissing)
 import System.IO.Error (tryIOError)
 import Debug.Trace (trace)
 import VarValorUtils (flattenVarValor, extractValues)
+import Control.Concurrent (threadDelay)
+
+outputDir = "benchmark_output/"
 
 -- Interpreters
 data Interpreter = Base | Variational | Memoized | VMemoized
     deriving (Show, Eq)
 
-type ExecutionResult = (NominalDiffTime, Integer, Int, Int, String) -- (Runtime, Memory, Cache Hits, Cache Reuse, Result)
+type ExecutionResult = (Double, Integer, Int, Int, String) -- (Runtime, Memory, Cache Hits, Cache Reuse, Result)
 
 newtype MemState v = MemState (KeyValueArray FuncKey v)
     deriving (Show, Read)
-    
 
 -- List of analyses with their respective memoized function names
 analyses :: [(String, [String])]
@@ -51,15 +53,15 @@ runAnalysis interpreter (analysisFile, memoizedFunctions) program memState = do
     filePath <- getDataFileName analysisFile
     content <- readFile filePath
     performGC -- Ensure garbage collection before timing
-    startTime <- getCurrentTime
+    startTime <- getCPUTime
     let (result, newMemState) = case (interpreter, memState) of
             (Base, Left mem)      -> let (r, m) = evaluateInterpreter Base content program mem memoizedFunctions in (r, Left m)
             (Memoized, Left mem)  -> let (r, m) = evaluateInterpreter Memoized content program mem memoizedFunctions in (r, Left m)
             (Variational, Right mem) -> let (r, m) = evaluateInterpreterVariational Variational content program mem memoizedFunctions in (r, Right m)
             (VMemoized, Right mem)  -> let (r, m) = evaluateInterpreterVariational VMemoized content program mem memoizedFunctions in (r, Right m)
             _ -> error ("Invalid memory state type for the chosen interpreter: " ++ show interpreter ++ ", " ++ show memState)
-    endTime <- getCurrentTime
-    let runtime = diffUTCTime endTime startTime
+    endTime <- getCPUTime
+    let runtime = fromIntegral (endTime - startTime) / (10^6) -- runtime in microseconds
     memoryUsage <- getMemoryUsage
     let (cacheHits, cacheReuse) = case newMemState of
             Left mem -> getMemoizationStats Memoized mem
@@ -95,8 +97,6 @@ evaluateInterpreterVariational VMemoized analysis program (MemState memState) me
     let (varResult, newMemState) = VMemoInterpreter.executeProg memoizedFunctions memState analysis (encodeStmt program)
     in (show varResult, MemState newMemState)
 
-
--- Collect memory usage
 getMemoryUsage :: IO Integer
 getMemoryUsage = do
     stats <- getRTSStats
@@ -109,8 +109,8 @@ getMemoizationStats VMemoized (MemState memState) = (length memState, 0)
 getMemoizationStats _ _ = (0, 0)
 
 memoryFileName :: Interpreter -> String -> String
-memoryFileName Memoized label = "memoized_state_" ++ label ++ ".dat"
-memoryFileName VMemoized label = "vmemoized_state_" ++ label ++ ".dat"
+memoryFileName Memoized label = outputDir ++ "memoized_state_" ++ label ++ ".dat"
+memoryFileName VMemoized label = outputDir ++ "vmemoized_state_" ++ label ++ ".dat"
 memoryFileName _ _ = ""
 
 saveMemoryState :: (Read v, Show v) => Interpreter -> String -> MemState v -> IO ()
@@ -145,34 +145,45 @@ loadMemoryState VMemoized label = do
         else return (MemState [])
 loadMemoryState _ _ = return (MemState [])
 
+formatRuntime :: Double -> String
+formatRuntime r = show r ++ " µs"
 
--- Function to write results
 writeResults :: [Interpreter] -> [(String, [ExecutionResult], [ExecutionResult])] -> IO ()
 writeResults interpreters results = do
-    withFile "benchmark_results.csv" WriteMode $ \h -> do
-        hPutStrLn h "Program,Interpreter,Version,Runtime,Memory,CacheHits,CacheReuse,Results vs Base, Results"
-        mapM_ (writeEntries h) results
+    createDirectoryIfMissing True outputDir
+    withFile (outputDir ++ "benchmark_metrics.csv") WriteMode $ \metricsHandle ->
+      withFile (outputDir ++ "benchmark_results.csv") WriteMode $ \resultsHandle -> do
+        hPutStrLn metricsHandle "Program,Interpreter,Version,Runtime,Memory,CacheHits,CacheReuse,Results vs Base"
+        hPutStrLn resultsHandle "Program,Interpreter,Version,Results"
+        mapM_ (writeEntries metricsHandle resultsHandle) results
   where
-    writeEntries h (name, res1, res2) =
+    writeEntries metricsHandle resultsHandle (name, res1, res2) =
         let baseResults1 = case lookup Base (zip interpreters res1) of
                             Just (_, _, _, _, baseRes) -> baseRes
                             Nothing -> []
             baseResults2 = case lookup Base (zip interpreters res2) of
                             Just (_, _, _, _, baseRes) -> baseRes
                             Nothing -> []
-        in mapM_ (\(interpreter, res1Entry, res2Entry) -> writeEntry h name interpreter res1Entry res2Entry baseResults1 baseResults2)
-                 (zip3 interpreters res1 res2)
+        in mapM_ (\(interpreter, res1Entry, res2Entry) ->
+                   writeEntry metricsHandle resultsHandle name interpreter res1Entry res2Entry baseResults1 baseResults2
+                 ) (zip3 interpreters res1 res2)
 
-    writeEntry h name interpreter (runtime1, memory1, cacheHits1, cacheReuse1, results1)
-                               (runtime2, memory2, cacheHits2, cacheReuse2, results2) baseResults1 baseResults2 =
+    writeEntry metricsHandle resultsHandle name interpreter
+               (runtime1, memory1, cacheHits1, cacheReuse1, results1)
+               (runtime2, memory2, cacheHits2, cacheReuse2, results2)
+               baseResults1 baseResults2 = do
         let baseComparison1 = show (results1 == baseResults1)
-            baseComparison2 = show (results1 == baseResults2)
-        in hPutStrLn h $ name ++ "," ++ show interpreter ++ ",V1," ++ show runtime1 ++ "," ++ show memory1 ++ "," ++ show cacheHits1 ++ "," ++ show cacheReuse1 ++ "," ++ baseComparison1 ++ "," ++ show results1 ++ "\n" ++
-                     name ++ "," ++ show interpreter ++ ",V2," ++ show runtime2 ++ "," ++ show memory2 ++ "," ++ show cacheHits2 ++ "," ++ show cacheReuse2 ++ "," ++ baseComparison2 ++ ","  ++ show results2
+            baseComparison2 = show (results2 == baseResults2)
+        -- Write metrics
+        hPutStrLn metricsHandle $ name ++ "," ++ show interpreter ++ ",V1," ++ formatRuntime runtime1 ++ "," ++ show memory1 ++ "," ++ show cacheHits1 ++ "," ++ show cacheReuse1 ++ "," ++ baseComparison1
+        hPutStrLn metricsHandle $ name ++ "," ++ show interpreter ++ ",V2," ++ formatRuntime runtime2 ++ "," ++ show memory2 ++ "," ++ show cacheHits2 ++ "," ++ show cacheReuse2 ++ "," ++ baseComparison2
+        -- Write results
+        hPutStrLn resultsHandle $ name ++ "," ++ show interpreter ++ ",V1," ++ show results1
+        hPutStrLn resultsHandle $ name ++ "," ++ show interpreter ++ ",V2," ++ show results2
 
--- Run experiments for all interpreters and analyses
 runExperiments :: IO ()
 runExperiments = do
+    createDirectoryIfMissing True outputDir
     let programs = [("Running-Example", running_example_variability, running_example_variability_v2),
                     ("Deep Loop", deep_loop, deep_loop_v2),
                     ("Nested Loop", nested_variability, nested_variability_v2),
@@ -189,26 +200,33 @@ runExperiments = do
 
         res1 <- mapM (\i -> do
             memState <- case i of
-                Base -> Left <$> loadMemoryState Base label1
+                Base -> return (Left (MemState []))
                 Memoized -> Left <$> loadMemoryState Memoized label1
-                Variational -> Right <$> loadMemoryState Variational label1
+                Variational -> return (Right (MemState []))
                 VMemoized -> Right <$> loadMemoryState VMemoized label1
             runAnalysis i (head analyses) prog1 memState
             ) interpreters
 
-        mapM_ (\(i, (_, mem)) -> case mem of
-            Left m -> saveMemoryState Memoized label1 m
-            Right m -> saveMemoryState VMemoized label1 m
+        mapM_ (\(i, (_, mem)) -> case (i, mem) of
+            (Memoized, Left m) -> saveMemoryState Memoized label1 m
+            (VMemoized, Right m) -> saveMemoryState VMemoized label1 m
+            _ -> return ()
             ) (zip interpreters res1)
 
         res2 <- mapM (\i -> do
             memState <- case i of
-                Base -> Left <$> loadMemoryState Base label2
+                Base -> return (Left (MemState []))
                 Memoized -> Left <$> loadMemoryState Memoized label2
-                Variational -> Right <$> loadMemoryState Variational label2
+                Variational -> return (Right (MemState []))
                 VMemoized -> Right <$> loadMemoryState VMemoized label2
             runAnalysis i (head analyses) prog2 memState
             ) interpreters
+
+        mapM_ (\(i, (_, mem)) -> case (i, mem) of
+            (Memoized, Left m) -> saveMemoryState Memoized label2 m
+            (VMemoized, Right m) -> saveMemoryState VMemoized label2 m
+            _ -> return ()
+            ) (zip interpreters res2)
 
         return (name, map fst res1, map fst res2)) programs
 

@@ -302,14 +302,17 @@ substitutions =
 replaceString :: String -> String -> String -> String
 replaceString old new text = T.unpack (T.replace (T.pack old) (T.pack new) (T.pack text))
 
-substitute :: String -> String
-substitute text =
+substituteWithSubstitutions :: [(String, String)] -> String -> String
+substituteWithSubstitutions substitutions text =
     let replaceAll :: [(String, String)] -> String -> String
         replaceAll [] txt = txt
         replaceAll ((key, value):xs) txt =
             replaceAll xs (replaceString key value txt)
     
     in replaceAll substitutions text
+
+substitute :: String -> String
+substitute text = substituteWithSubstitutions substitutions text
 
 (++++) :: VarValor -> VarValor -> VarValor
 (VarInteger lvint1) ++++ (VarInteger lvint2)

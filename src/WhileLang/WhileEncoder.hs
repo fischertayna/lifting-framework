@@ -124,7 +124,10 @@ encodeStmt stmt = encodeStmtPC' (stmtToStmtPC ttPC stmt)
                  VarPair (VarString (Var (presencePairsLabel (show l) pc)),
                           VarPair (VarString (Var [(v, pc)]), encodeAExpToVarValor e pc)))
 
-    encodeStmtPC' (SkipPC l pc) = VarString (Var [("SKIP", pc)])
+    encodeStmtPC' (SkipPC l pc) = 
+        VarPair (VarString (Var (presencePairsStmt "SKIP" pc)), 
+            VarPair (VarString (Var (presencePairsLabel (show l) pc)),
+                    VarString (Var (presencePairsLabel ("") pc))))
 
     encodeStmtPC' (SeqPC s1 s2) = 
         VarPair (VarString (Var (presencePairsStmt "SEQ" ttPC)), 
@@ -166,7 +169,10 @@ encodeStmtToValor (Assignment v e l) =
         ValorPair (ValorStr "ASGN", 
                  ValorPair (ValorStr (show l),
                           ValorPair (ValorStr v, encodeAExpToValor e)))
-encodeStmtToValor (Skip l) = ValorStr "SKIP"
+encodeStmtToValor (Skip l) = 
+        ValorPair (ValorStr "SKIP", 
+                 ValorPair (ValorStr (show l),
+                          ValorStr ""))
 encodeStmtToValor (Seq s1 s2) = 
         ValorPair (ValorStr "SEQ", 
                  ValorPair (encodeStmtToValor s1, encodeStmtToValor s2))
