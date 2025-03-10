@@ -70,7 +70,7 @@ substitutionsRunning =
 
 testElem :: Test
 testElem = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/elem.lng" (VarPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/elem.lng" (VarPair (
                                                         VarInteger (Var [(1, propA), (2, notBDD propA)]),
                                                         VarList [VarBool (Var [(True, ttPC)]), VarString (Var [("2", ttPC)]), VarInteger (Var [(1, ttPC)])]
                                                     ))
@@ -80,13 +80,13 @@ testElem = TestCase $ do
 
 testIsPair :: Test
 testIsPair = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isPair.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/isPair.lng" ex1
     let expectedOutput = (VarBool (Var [(True, ttPC)]))
     assertEqual "is ex1 pair" expectedOutput output
 
 testIsEqual1 :: Test
 testIsEqual1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isEqual.lng" (VarPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/isEqual.lng" (VarPair (
                                                         VarInteger (Var [(1, ttPC)]),
                                                         VarInteger (Var [(1, ttPC)])
                                                     ))
@@ -95,7 +95,7 @@ testIsEqual1 = TestCase $ do
 
 testIsEqual2 :: Test
 testIsEqual2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isEqual.lng" (VarPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/isEqual.lng" (VarPair (
                                                         VarInteger (Var [(2, propA), (1, notBDD propA)]),
                                                         VarInteger (Var [(1, ttPC)])
                                                     ))
@@ -104,7 +104,7 @@ testIsEqual2 = TestCase $ do
 
 testIsEqual3 :: Test
 testIsEqual3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isEqual.lng" (VarPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/isEqual.lng" (VarPair (
                                                         VarInteger (Var [(1, propA), (2, notBDD propA)]),
                                                         VarInteger (Var [(1, propA), (3, notBDD propA)])
                                                     ))
@@ -113,7 +113,7 @@ testIsEqual3 = TestCase $ do
 
 testIsEqual4 :: Test
 testIsEqual4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isEqual.lng" (VarPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/isEqual.lng" (VarPair (
                                                         VarString (Var [("ASGN", propA), ("DUMMY", notBDD propA)]),
                                                         VarString (Var [("ASGN", ttPC)])
                                                     ))
@@ -122,7 +122,7 @@ testIsEqual4 = TestCase $ do
 
 testCount :: String -> VarValor -> VarValor -> Test
 testCount name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" input
     -- putStrLn ("\n Count out: " ++ (substitute (show output)))
     assertEqual ("Count Asgns " ++ name) expectedOutput output
 
@@ -149,7 +149,7 @@ testCountexRD = testCount "PPA" exRD (VarInteger (Var [(4, ttPC)]))
 
 testInit :: String -> VarValor -> VarValor -> Test
 testInit name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" input
     assertEqual ("init " ++ name) expectedOutput output
 
 testInitEx1 :: Test
@@ -178,7 +178,7 @@ testInitexRunning = testInit "Running" exRunning (VarString (Var [("1", ttPC)]))
 
 testFinal :: String -> VarValor -> VarValor -> Test
 testFinal name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" input
     -- putStrLn ("\n final out " ++ name ++ ": " ++ (substitute (show output)))
     assertEqual ("final " ++ name) expectedOutput output
 
@@ -208,7 +208,7 @@ testFinalexRunning = testFinal "Running" exRunning (VarList [VarString (Var [("7
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" input
     -- putStrLn ("\n Flow out " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("flow " ++ name) expectedOutput output
 
@@ -250,7 +250,7 @@ testFlowExRunning = testFlow "Running" exRunning (flowRunning)
 
 testFlowR :: String -> VarValor -> VarValor -> Test
 testFlowR name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flowR.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/flowR.lng" input
     -- putStrLn ("\n FlowR out " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("flowR " ++ name) expectedOutput output
 
@@ -276,19 +276,19 @@ testFlowRexRD = testFlowR "PPA" exRD (VarList[VarPair(VarString (Var [("2", ttPC
 
 testChaoticIteration1 :: Test
 testChaoticIteration1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/chaoticIteration.lng" (VarPair(VarInteger (Var [(1, ttPC)]), VarInteger (Var [(2, ttPC)])))
+    output <- processFile executeProg "src/Language/Analysis/DFA/chaoticIteration.lng" (VarPair(VarInteger (Var [(1, ttPC)]), VarInteger (Var [(2, ttPC)])))
     let expectedOutput = (VarInteger (Var [(3, ttPC)]))
     assertEqual "chaotic iteration 1 test" expectedOutput output
 
 testChaoticIteration2 :: Test
 testChaoticIteration2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/chaoticIteration.lng" (VarPair(VarInteger (Var [(2, ttPC)]), VarInteger (Var [(2, ttPC)])))
+    output <- processFile executeProg "src/Language/Analysis/DFA/chaoticIteration.lng" (VarPair(VarInteger (Var [(2, ttPC)]), VarInteger (Var [(2, ttPC)])))
     let expectedOutput = (VarInteger (Var [(4, ttPC)]))
     assertEqual "chaotic iteration 2 test" expectedOutput output
 
 testAssignments :: String -> VarValor -> VarValor -> Test
 testAssignments name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" input
     -- putStrLn ("\n Assignments " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("Assignments " ++ name) expectedOutput output
 
@@ -318,7 +318,7 @@ testAssignmentsexRD = testAssignments "PPA" exRD (VarList[VarPair(VarString (Var
 
 testfv :: String -> VarValor -> VarValor -> Test
 testfv name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" input
     -- putStrLn ("\n fv " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("fv " ++ name) expectedOutput output
 
@@ -345,7 +345,7 @@ testfvexRD = testfv "PPA" exRD (VarList[VarString (Var [("x", ttPC)]), VarString
 
 testmakeSetOfFV :: String -> VarValor -> VarValor -> Test
 testmakeSetOfFV name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/makeSetOfFV.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/makeSetOfFV.lng" input
     -- putStrLn ("\n makeSetOfFV " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("makeSetOfFV " ++ name) expectedOutput output
 
@@ -361,7 +361,7 @@ testmakeSetOfFVEx2 = testmakeSetOfFV "ex2" ex2 (VarList[VarPair(VarString (Var [
 
 testFilterFlowBase :: String -> VarValor -> VarValor -> Test
 testFilterFlowBase name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/filterFlow.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/filterFlow.lng" input
     -- putStrLn ("\n FilterFlow " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("FilterFlow " ++ name) expectedOutput output
 
@@ -394,7 +394,7 @@ testFilterFlowEx2_4 = testFilterFlowBase "ex 2: 4" (VarPair(VarString (Var [("4"
 
 testRDEntry :: String -> VarValor -> VarValor -> Test
 testRDEntry name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdEntry.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdEntry.lng" input
     -- putStrLn ("\n RDEntry " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("RDEntry " ++ name) (show expectedOutput) (show output)
 
@@ -444,7 +444,7 @@ testRDEntry4 = testRDEntry "PPA_4" (VarPair(VarString (Var [("4", ttPC)]), VarPa
 
 testfindBlock :: String -> VarValor -> VarValor -> Test
 testfindBlock name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/findBlock.lng" input
     -- putStrLn ("\n findBlock " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("findBlock " ++ name) (expectedOutput) (output)
 
@@ -465,7 +465,7 @@ testfindBlock2_v = testfindBlock "Ex2 2 21" (VarPair(VarString (Var [("2", propA
 
 testFindOrDefault :: String -> VarValor -> VarValor -> Test
 testFindOrDefault name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findOrDefault.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/findOrDefault.lng" input
     -- putStrLn ("\n findOrDefault " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("findOrDefault " ++ name) (expectedOutput) (output)
 
@@ -491,20 +491,20 @@ testFindOrDefaultEntryEx2_2_v = testFindOrDefault "Entry Ex2 2 A  21 ~A" (VarPai
 
 testGenRD1 :: Test
 testGenRD1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (encodeStmt rdS01)
+    output <- processFile executeProg "src/Language/Analysis/DFA/genRD.lng" (encodeStmt rdS01)
     let expectedOutput = VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])) ]
     assertEqual "test genRD 1" expectedOutput output
 
 testGenRD2 :: Test
 testGenRD2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exRD)
+    output <- processFile executeProg "src/Language/Analysis/DFA/genRD.lng" (exRD)
     let expectedOutput = VarList[]
     assertEqual "test genRD" expectedOutput output
 
 testGenRDEx2_2 :: Test
 testGenRDEx2_2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (ex2_2)
+    output <- processFile executeProg "src/Language/Analysis/DFA/genRD.lng" (ex2_2)
     let expectedOutput = VarList[
                             VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])) ]
     -- putStrLn ("\n genRD Ex2 2: " ++ (substitute (show output)))
@@ -512,7 +512,7 @@ testGenRDEx2_2 = TestCase $ do
 
 testKillRD :: String -> VarValor -> VarValor -> Test
 testKillRD name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/killRD.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/killRD.lng" input
     -- putStrLn ("\n killRD " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("killRD " ++ name) (expectedOutput) (output)
 
@@ -529,7 +529,7 @@ testKillRDEx2_v = testKillRD "Ex2 21" (VarPair(ex2_2, ex2)) (VarList[
 
 testRDExit :: String -> VarValor -> VarValor -> Test
 testRDExit name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdExit.lng" input
     -- putStrLn ("\n RDExit " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("RDExit " ++ name) (expectedOutput) (output)
 
@@ -578,13 +578,13 @@ testRDExit4 = testRDExit "Ex4" (VarPair(VarString (Var [("4", ttPC)]), VarPair(e
 
 testLabels :: Test
 testLabels = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/labels.lng" (ex2)
+    output <- processFile executeProg "src/Language/Analysis/DFA/labels.lng" (ex2)
     let expectedOutput = VarList[VarString (Var [("1", ttPC)]), VarString (Var [("2", propA), ("-2", notBDD propA)]), VarString (Var [("3", notBDD propA), ("-3", propA)]), VarString (Var [("4", ttPC)])]
     assertEqual "labels" expectedOutput output
 
 testInsertInto1 :: Test
 testInsertInto1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/insertIntoMap.lng" (VarPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/insertIntoMap.lng" (VarPair(
                         VarString (Var [("2", ttPC)]),
                         VarPair(
                             VarList [
@@ -620,7 +620,7 @@ testInsertInto1 = TestCase $ do
 
 testInsertInto2 :: Test
 testInsertInto2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/insertIntoMap.lng" (VarPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/insertIntoMap.lng" (VarPair(
                         VarString (Var [("2", propA), ("-2", notBDD propA)]),
                         VarPair(
                             VarList[VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
@@ -635,13 +635,13 @@ testInsertInto2 = TestCase $ do
 
 testUpdateMappings :: Test
 testUpdateMappings = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/updateMappings.lng" (ex2)
+    output <- processFile executeProg "src/Language/Analysis/DFA/updateMappings.lng" (ex2)
     let expectedOutput = VarPair(ex2Entry, ex2Exit)
     assertEqual "testUpdateMappings" expectedOutput output
 
 testReachingDefinitions :: String -> VarValor -> VarValor -> Test
 testReachingDefinitions name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" input
     -- putStrLn ("\n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("ReachingDefinitions " ++ name) expectedOutput output
 
@@ -653,7 +653,7 @@ testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (exRD) (VarPair(rdEx
 
 testUnion :: String -> VarValor -> VarValor -> Test
 testUnion name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/union.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/union.lng" input
     -- putStrLn ("\n union " ++ name ++ ", result: " ++ (substitute (show output)))
     assertEqual ("union " ++ name) expectedOutput output
 
@@ -686,7 +686,7 @@ testUnion8 = testUnion "VarList {list = [VarString {str = {('a', A), ('b', ~A)}}
 
 testIntersection :: String -> VarValor -> VarValor -> Test
 testIntersection name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/intersection.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/intersection.lng" input
     -- putStrLn ("\n intersection " ++ name ++ ", result: " ++ (substitute (show output)))
     assertEqual ("intersection " ++ name) expectedOutput output
 
@@ -719,7 +719,7 @@ testIntersection8 = testIntersection "8: VarList {list = [VarString {str = {('a'
 
 testIsMember :: String -> VarValor -> VarValor -> Test
 testIsMember name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isMember.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/isMember.lng" input
     -- putStrLn ("\n isMember " ++ name ++ ", result: " ++ (substitute (show output)))
     assertEqual ("isMember " ++ name) (show expectedOutput) (show output)
 
@@ -752,7 +752,7 @@ testIsMember8 = testIsMember "8: VarString {str = {('a', A), ('b', ~A)}} and Var
 
 testLVEntry :: String -> VarValor -> VarValor -> Test
 testLVEntry name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/lvEntry.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/lvEntry.lng" input
     -- putStrLn ("\n LVEntry " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("LVEntry " ++ name) (show expectedOutput) (show output)
 
@@ -786,7 +786,7 @@ testLVEntry7 = testLVEntry "ExPPA 7" (VarPair(VarString (Var [("7", ttPC)]), Var
 
 testLiveVariables :: String -> VarValor -> VarValor -> Test
 testLiveVariables name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/liveVariables.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/liveVariables.lng" input
     -- putStrLn ("\n LiveVariables " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("LiveVariables " ++ name) expectedOutput output
 
@@ -795,7 +795,7 @@ testLiveVariablesExPPA = testLiveVariables "ExPPA LV"  (exLV) (VarPair(lvExample
 
 testAEEntry :: String -> VarValor -> VarValor -> Test
 testAEEntry name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/aeEntry.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/aeEntry.lng" input
     -- putStrLn ("\n AEEntry " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("AEEntry " ++ name) (show expectedOutput) (show output)
 
@@ -821,7 +821,7 @@ testAEEntry5 = testAEEntry "ExPPA 5" (VarPair(VarString (Var [("5", ttPC)]), Var
 
 testAEExit :: String -> VarValor -> VarValor -> Test
 testAEExit name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/aeExit.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/aeExit.lng" input
     -- putStrLn ("\n AEExit " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("AEExit " ++ name) (expectedOutput) (output)
 
@@ -847,7 +847,7 @@ testAEExit5 = testAEExit "ExPPA 5" (VarPair(VarString (Var [("5", ttPC)]), VarPa
 
 testAvailableExpressions :: String -> VarValor -> VarValor -> Test
 testAvailableExpressions name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/availableExpressions.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/availableExpressions.lng" input
     -- putStrLn ("\n AvailableExpressions " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("AvailableExpressions " ++ name) expectedOutput output
 
@@ -856,7 +856,7 @@ testAvailableExpressionsExPPA = testAvailableExpressions "ExPPA AE"  (exAE) (Var
 
 testVBExit :: String -> VarValor -> VarValor -> Test
 testVBExit name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/vbExit.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/vbExit.lng" input
     -- putStrLn ("\n VBExit " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("VBExit " ++ name) (expectedOutput) (output)
 
@@ -866,7 +866,7 @@ testVBExit1 = testVBExit "ExPPA 1" (VarPair(VarString (Var [("1", ttPC)]), VarPa
 
 testVeryBusyExpressions :: String -> VarValor -> VarValor -> Test
 testVeryBusyExpressions name input expectedOutput = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/veryBusyExpressions.lng" input
+    output <- processFile executeProg "src/Language/Analysis/DFA/veryBusyExpressions.lng" input
     -- putStrLn ("\n VeryBusyExpressions " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("VeryBusyExpressions " ++ name) expectedOutput output
 

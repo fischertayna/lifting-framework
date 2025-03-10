@@ -112,6 +112,7 @@ benchmark benchmark-suite
         time,
         deepseq,
         directory,
+        filepath,
         containers,
         lifting-framework
     default-language: Haskell2010

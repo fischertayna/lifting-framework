@@ -10,12 +10,12 @@ bnfc --haskell --name-space=Language.Frontend --output=src ./src/Language/Langua
 ### Running one of the interpreters
 
 ```
-cabal run < src/Language/Examples/Simple.lng
+cabal run < src/Language/Analysis/Simple.lng
 ```
 
 <!-- mkdir -p build
 ghc -isrc src/Language/Interpreter/Driver.hs -o build/Driver
-./build/Driver < src/Language/Examples/Simple.lng -->
+./build/Driver < src/Language/Analysis/Simple.lng -->
 
 ### Running Tests
 

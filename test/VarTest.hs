@@ -54,56 +54,56 @@ inputPolymorphicPair = VarPair (VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atb
 
 testSimples :: Test
 testSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Simple.lng" inputInt
+    output <- processFile executeProg "src/Language/Analysis/Simple.lng" inputInt
     let expectedOutput = (VarInteger (Var [(6, atbt), (7, afbt), (8, atbf), (9, afbf)]))
     assertEqual "Simple Conditional (3 + (if x then x+1 else x-1))" expectedOutput output
 
 testFibonacci :: Test
 testFibonacci = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Fibonacci.lng" inputInt
+    output <- processFile executeProg "src/Language/Analysis/Fibonacci.lng" inputInt
     let expectedOutput = (VarInteger (Var [(5, afbf), (3, atbf), (2, afbt), (1, atbt)]))
     assertEqual "Fibonacci x" expectedOutput output
 
 testFatorial :: Test
 testFatorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Fatorial.lng" inputInt
+    output <- processFile executeProg "src/Language/Analysis/Fatorial.lng" inputInt
     let expectedOutput = (VarInteger (Var [(2, atbt), (6, afbt), (24, atbf), (120, afbf)]))
     assertEqual "Fatorial x" expectedOutput output
 
 testSomaListaSimples :: Test
 testSomaListaSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Lista.lng" inputInt
+    output <- processFile executeProg "src/Language/Analysis/Lista.lng" inputInt
     let expectedOutput = (VarInteger (Var [(14, atbt), (18, afbt), (22, atbf), (26, afbf)]))
     assertEqual "Soma lista [x, x+1, x+2, x+3]" expectedOutput output
 
 testSomaLista :: Test
 testSomaLista = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Lista-inputList.lng" inputList
+    output <- processFile executeProg "src/Language/Analysis/Lista-inputList.lng" inputList
     let expectedOutput = (VarInteger (Var [(13, atbt), (8, afbt), (9, atbf), (10, afbf)]))
     assertEqual "Soma lista" expectedOutput output
 
 testSomaParSimples :: Test
 testSomaParSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Pares.lng" inputInt
+    output <- processFile executeProg "src/Language/Analysis/Pares.lng" inputInt
     let expectedOutput = VarInteger (Var [(22, atbt), (23, afbt),  (24, atbf), (25, afbf)])
     assertEqual "Soma par (x, 20)" expectedOutput output
 
 testSomaPar :: Test
 testSomaPar = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Pares-inputPair.lng" inputPair
+    output <- processFile executeProg "src/Language/Analysis/Pares-inputPair.lng" inputPair
     let expectedOutput = (VarInteger (Var [(10, atbt), ( 6, afbt),  (4, atbf), (7, afbf)]))
     assertEqual "Soma par (x, y)" expectedOutput output
 
 testBool :: Test
 testBool = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Bool.lng" inputBool
+    output <- processFile executeProg "src/Language/Analysis/Bool.lng" inputBool
     let expectedOutput = VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)])
     assertEqual "Bool true" expectedOutput output
 
 
 testConcatSimples :: Test
 testConcatSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Concat.lng" inputString
+    output <- processFile executeProg "src/Language/Analysis/Concat.lng" inputString
     let expectedOutput = VarString (Var [
             ("abc_concatenated", atbt), 
             ("def_concatenated", afbt), 
@@ -113,7 +113,7 @@ testConcatSimples = TestCase $ do
 
 testConcatLista :: Test
 testConcatLista = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Concat-inputList.lng" inputListString
+    output <- processFile executeProg "src/Language/Analysis/Concat-inputList.lng" inputListString
     let expectedOutput = VarString (Var [
             ("abcdefghi", atbt), 
             ("123456789", afbt), 
@@ -123,14 +123,14 @@ testConcatLista = TestCase $ do
 
 testPolymorphicPair :: Test
 testPolymorphicPair = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" inputPolymorphicPair
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-pair.lng" inputPolymorphicPair
     let expectedOutput = (VarPair (VarBool (Var [(True, atbt), (False, afbt),  (False, atbf), (False, afbf)]), VarInteger (Var [(8, atbt), ( 5, afbt),  (0, atbf), (1, afbf)])))
     assertEqual "Invert pair" expectedOutput output
 
 
 testPolymorphicList :: Test
 testPolymorphicList = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicList
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-list.lng" inputPolymorphicList
     let expectedOutput = (VarInteger (Var [(3, atbt), (3, afbt), (3, atbf), (3, afbf)]))
     assertEqual "length list" (show expectedOutput) (show output)
 
@@ -139,7 +139,7 @@ testPolymorphicList = TestCase $ do
 --  but got: "VarInteger {int = {(3,DDNode {unDDNode = 0x00007fe0d600ac20})}}"
 testPolymorphicListIncomplete :: Test
 testPolymorphicListIncomplete = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" inputPolymorphicListIncomplete
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-list.lng" inputPolymorphicListIncomplete
     let expectedOutput = (VarInteger (Var [(1, atbt), (3, afbt), (3, atbf), (2, afbf)]))
     assertEqual "length list" (show expectedOutput) (show output)
 

@@ -483,13 +483,13 @@ exDeepLoop = encodeVariability deep_loop
 
 testIsPair :: Test
 testIsPair = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isPair.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/isPair.lng" ex1
     let expectedOutput = (ValorBool True)
     assertEqual "is ex1 pair" expectedOutput output
 
 testIsEqual :: Test
 testIsEqual = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/isEqual.lng" (ValorPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/isEqual.lng" (ValorPair (
                                                         ValorInt 1,
                                                         ValorInt 1
                                                     ))
@@ -499,44 +499,44 @@ testIsEqual = TestCase $ do
 
 testCountEx1 :: Test
 testCountEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" ex1
     let expectedOutput = (ValorInt 3)
     assertEqual "Count Asgns ex1" expectedOutput output
 
 testCountEx2 :: Test
 testCountEx2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" ex2
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" ex2
     let expectedOutput = (ValorInt 1)
     assertEqual "Count Asgns ex2" expectedOutput output
 
 
 testCountEx3 :: Test
 testCountEx3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" ex3
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" ex3
     let expectedOutput = (ValorInt 5)
     assertEqual "Count Asgns ex3" expectedOutput output
 
 testCountEx4 :: Test
 testCountEx4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" ex4
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" ex4
     let expectedOutput = (ValorInt 5)
     assertEqual "Count Asgns ex4" expectedOutput output
 
 testCountFactorial :: Test
 testCountFactorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/Count-Asgns.lng" factorialProg
+    output <- processFile executeProg "src/Language/Analysis/DFA/Count-Asgns.lng" factorialProg
     let expectedOutput = (ValorInt 5)
     assertEqual "Count Asgns Factorial" expectedOutput output
 
 testInitEx1 :: Test
 testInitEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" ex1
     let expectedOutput = (ValorStr "1")
     assertEqual "init ex1" expectedOutput output
 
 testInitExWhile :: Test
 testInitExWhile = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" (ValorPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" (ValorPair (
                                 ValorStr "WHILE", 
                                 ValorPair ( 
                                     ValorStr "3",
@@ -566,7 +566,7 @@ testInitExWhile = TestCase $ do
 
 testInitExIF :: Test
 testInitExIF = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" (ValorPair(
                                 ValorStr "IF",
                                 ValorPair ( 
                                     ValorStr "4",
@@ -614,19 +614,19 @@ testInitExIF = TestCase $ do
 
 testInitDeepLoop :: Test
 testInitDeepLoop = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/init.lng" (exDeepLoop!!1)
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" (exDeepLoop!!1)
     let expectedOutput = (ValorStr "1")
     assertEqual "init deep loop" expectedOutput output
 
 testFinalEx1 :: Test
 testFinalEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" ex1
     let expectedOutput = (ValorList [ValorStr "3"])
     assertEqual "final ex1" expectedOutput output
 
 testFinalExWhile :: Test
 testFinalExWhile = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" (ValorPair (
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" (ValorPair (
                                 ValorStr "WHILE", 
                                 ValorPair ( 
                                     ValorStr "3",
@@ -656,7 +656,7 @@ testFinalExWhile = TestCase $ do
 
 testFinalExIF :: Test
 testFinalExIF = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" (ValorPair(
                                 ValorStr "IF",
                                 ValorPair ( 
                                     ValorStr "4",
@@ -704,13 +704,13 @@ testFinalExIF = TestCase $ do
 
 testFinalDeepLoop :: Test
 testFinalDeepLoop = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/final.lng" (exDeepLoop!!1)
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" (exDeepLoop!!1)
     let expectedOutput = (ValorList [ValorStr "2"])
     assertEqual "final Deep Loop" expectedOutput output
 
 testElem :: Test
 testElem = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/elem.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/elem.lng" (ValorPair(
             ValorStr "b",
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
@@ -719,7 +719,7 @@ testElem = TestCase $ do
 
 testNotElem :: Test
 testNotElem = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/elem.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/elem.lng" (ValorPair(
             ValorStr "a",
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
@@ -728,7 +728,7 @@ testNotElem = TestCase $ do
 
 testAddUnique :: Test
 testAddUnique = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/addUnique.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/addUnique.lng" (ValorPair(
             ValorStr "a",
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
@@ -737,7 +737,7 @@ testAddUnique = TestCase $ do
 
 testAddUniqueSame :: Test
 testAddUniqueSame = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/addUnique.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/addUnique.lng" (ValorPair(
             ValorStr "b",
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
@@ -746,7 +746,7 @@ testAddUniqueSame = TestCase $ do
 
 testUnion :: Test
 testUnion = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/union.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/union.lng" (ValorPair(
             ValorList [ValorStr "a", ValorStr "b", ValorInt 1],
             ValorList [ValorBool True, ValorStr "b", ValorInt 4]
         ))
@@ -755,20 +755,20 @@ testUnion = TestCase $ do
 
 testFlowEx1 :: Test
 testFlowEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" ex1
     let expectedOutput = (ValorList[ValorPair(ValorStr "1", ValorStr "2"), ValorPair(ValorStr "2", ValorStr "3")])
     assertEqual "Flow ex1" expectedOutput output
 
 testFlowEx2 :: Test
 testFlowEx2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" ex2
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" ex2
     let expectedOutput = (ValorList[])
     assertEqual "Flow ex2" expectedOutput output
 
 
 testFlowEx3 :: Test
 testFlowEx3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" ex3
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" ex3
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
@@ -780,7 +780,7 @@ testFlowEx3 = TestCase $ do
 
 testFlowEx4 :: Test
 testFlowEx4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" ex4
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" ex4
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
@@ -791,7 +791,7 @@ testFlowEx4 = TestCase $ do
 
 testFlowFactorial :: Test
 testFlowFactorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" factorialProg
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" factorialProg
     let expectedOutput = (ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
@@ -803,25 +803,25 @@ testFlowFactorial = TestCase $ do
 
 -- testFlowDeepLoop :: Test
 -- testFlowDeepLoop = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/DFA/flow.lng" (exDeepLoop!!1)
+--     output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" (exDeepLoop!!1)
 --     let expectedOutput = (ValorList[])
 --     assertEqual "Flow deep loop" expectedOutput output
 
 testChaoticIteration1 :: Test
 testChaoticIteration1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/chaoticIteration.lng" (ValorPair(ValorInt 1, ValorInt 2))
+    output <- processFile executeProg "src/Language/Analysis/DFA/chaoticIteration.lng" (ValorPair(ValorInt 1, ValorInt 2))
     let expectedOutput = (ValorInt 3)
     assertEqual "chaotic iteration 1 test" expectedOutput output
 
 testChaoticIteration2 :: Test
 testChaoticIteration2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/chaoticIteration.lng" (ValorPair(ValorInt 2, ValorInt 2))
+    output <- processFile executeProg "src/Language/Analysis/DFA/chaoticIteration.lng" (ValorPair(ValorInt 2, ValorInt 2))
     let expectedOutput = (ValorInt 4)
     assertEqual "chaotic iteration 2 test" expectedOutput output
 
 testAssignmentsEx1 :: Test
 testAssignmentsEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" ex1
     let expectedOutput = ValorList[ValorPair(ValorStr "z", ValorStr "3"),
                                    ValorPair(ValorStr "y", ValorStr "2"),
                                    ValorPair(ValorStr "x", ValorStr "1")]
@@ -829,14 +829,14 @@ testAssignmentsEx1 = TestCase $ do
 
 testAssignmentsEx2 :: Test
 testAssignmentsEx2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" ex2
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" ex2
     let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "1")]
     assertEqual " Asgns ex2" expectedOutput output
 
 
 testAssignmentsEx3 :: Test
 testAssignmentsEx3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" ex3
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" ex3
     let expectedOutput = ValorList[ValorPair(ValorStr "c", ValorStr "6"),
                                    ValorPair(ValorStr "soma", ValorStr "5"),
                                    ValorPair(ValorStr "c", ValorStr "3"),
@@ -846,7 +846,7 @@ testAssignmentsEx3 = TestCase $ do
 
 testAssignmentsEx4 :: Test
 testAssignmentsEx4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" ex4
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" ex4
     let expectedOutput = ValorList[ValorPair(ValorStr "soma", ValorStr "6"),
                                    ValorPair(ValorStr "soma", ValorStr "5"),
                                    ValorPair(ValorStr "c", ValorStr "3"),
@@ -856,7 +856,7 @@ testAssignmentsEx4 = TestCase $ do
 
 testAssignmentsFactorial :: Test
 testAssignmentsFactorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/assignments.lng" factorialProg
+    output <- processFile executeProg "src/Language/Analysis/DFA/assignments.lng" factorialProg
     let expectedOutput = ValorList[ValorPair(ValorStr "y", ValorStr "6"),
                                    ValorPair(ValorStr "y", ValorStr "5"),
                                    ValorPair(ValorStr "z", ValorStr "4"),
@@ -866,38 +866,38 @@ testAssignmentsFactorial = TestCase $ do
 
 testfvEx1 :: Test
 testfvEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" ex1
     let expectedOutput = ValorList[ValorStr "x", ValorStr "y", ValorStr "z"]
     assertEqual "fv ex1" expectedOutput output
 
 testfvEx2 :: Test
 testfvEx2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" ex2
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" ex2
     let expectedOutput = ValorList[ValorStr "x"]
     assertEqual "fv ex2" expectedOutput output
 
 
 testfvEx3 :: Test
 testfvEx3 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" ex3
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" ex3
     let expectedOutput = ValorList[ValorStr "c", ValorStr "soma", ValorStr "x"]
     assertEqual "fv ex3" expectedOutput output
 
 testfvEx4 :: Test
 testfvEx4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" ex4
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" ex4
     let expectedOutput = ValorList[ValorStr "soma", ValorStr "c", ValorStr "x"]
     assertEqual "fv ex4" expectedOutput output
 
 testfvFactorial :: Test
 testfvFactorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/fv.lng" factorialProg
+    output <- processFile executeProg "src/Language/Analysis/DFA/fv.lng" factorialProg
     let expectedOutput = ValorList[ValorStr "y", ValorStr "z", ValorStr "x"]
     assertEqual "fv Factorial" expectedOutput output
 
 testmakeSetOfFVEx1 :: Test
 testmakeSetOfFVEx1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/makeSetOfFV.lng" ex1
+    output <- processFile executeProg "src/Language/Analysis/DFA/makeSetOfFV.lng" ex1
     let expectedOutput = ValorList[ValorPair(ValorStr "x", ValorStr "?"), 
                                    ValorPair(ValorStr "y", ValorStr "?"), 
                                    ValorPair(ValorStr "z", ValorStr "?") ]
@@ -905,7 +905,7 @@ testmakeSetOfFVEx1 = TestCase $ do
 
 testFilterFlow :: Test
 testFilterFlow = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/filterFlow.lng" (ValorPair(ValorStr "3", ValorList[
+    output <- processFile executeProg "src/Language/Analysis/DFA/filterFlow.lng" (ValorPair(ValorStr "3", ValorList[
             ValorPair(ValorStr "1", ValorStr "2"), 
             ValorPair(ValorStr "2", ValorStr "3"),
             ValorPair(ValorStr "3", ValorStr "4"),
@@ -961,7 +961,7 @@ exRDExit = ValorList[
 
 testFindOrDefault :: Test
 testFindOrDefault = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findOrDefault.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/findOrDefault.lng" (
                                 ValorPair(
                                     ValorStr "2", 
                                     exRDExit))
@@ -973,7 +973,7 @@ testFindOrDefault = TestCase $ do
 
 testFindOrDefault2 :: Test
 testFindOrDefault2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findOrDefault.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/findOrDefault.lng" (
                                 ValorPair(
                                     ValorStr "6", 
                                     exRDExit))
@@ -983,7 +983,7 @@ testFindOrDefault2 = TestCase $ do
 
 testRDEntry1 :: Test
 testRDEntry1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdEntry.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdEntry.lng" (
                                 ValorPair(ValorStr "1", 
                                           ValorPair(
                                             exRD, 
@@ -994,7 +994,7 @@ testRDEntry1 = TestCase $ do
 
 testRDEntry2 :: Test
 testRDEntry2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdEntry.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdEntry.lng" (
                                 ValorPair(
                                     ValorStr "2", 
                                     ValorPair(
@@ -1008,7 +1008,7 @@ testRDEntry2 = TestCase $ do
 
 testRDEntry4 :: Test
 testRDEntry4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdEntry.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdEntry.lng" (
                                 ValorPair(
                                     ValorStr "4", 
                                     ValorPair(
@@ -1024,44 +1024,44 @@ testRDEntry4 = TestCase $ do
 
 testfindBlock1 :: Test
 testfindBlock1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "1", exRD))
+    output <- processFile executeProg "src/Language/Analysis/DFA/findBlock.lng" (ValorPair(ValorStr "1", exRD))
     let expectedOutput = s01
     assertEqual "testfindBlock 1" expectedOutput output
 
 testfindBlock2 :: Test
 testfindBlock2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "2", exRD))
+    output <- processFile executeProg "src/Language/Analysis/DFA/findBlock.lng" (ValorPair(ValorStr "2", exRD))
     let expectedOutput = s02
     assertEqual "testfindBlock 2" expectedOutput output
 
 testfindBlock4 :: Test
 testfindBlock4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "4", exRD))
+    output <- processFile executeProg "src/Language/Analysis/DFA/findBlock.lng" (ValorPair(ValorStr "4", exRD))
     let expectedOutput = whileS1
     assertEqual "testfindBlock 4" expectedOutput output
 
 testfindBlock5 :: Test
 testfindBlock5 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/findBlock.lng" (ValorPair(ValorStr "5", exRD))
+    output <- processFile executeProg "src/Language/Analysis/DFA/findBlock.lng" (ValorPair(ValorStr "5", exRD))
     let expectedOutput = whileS2
     assertEqual "testfindBlock 5" expectedOutput output
 
 testGenRD1 :: Test
 testGenRD1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (s01)
+    output <- processFile executeProg "src/Language/Analysis/DFA/genRD.lng" (s01)
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1") ]
     assertEqual "test genRD 1" expectedOutput output
 
 testGenRD2 :: Test
 testGenRD2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/genRD.lng" (exRD)
+    output <- processFile executeProg "src/Language/Analysis/DFA/genRD.lng" (exRD)
     let expectedOutput = ValorList[]
     assertEqual "test genRD factorial" expectedOutput output
 
 testKillRD :: Test
 testKillRD = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/killRD.lng" (ValorPair(s01, exRD))
+    output <- processFile executeProg "src/Language/Analysis/DFA/killRD.lng" (ValorPair(s01, exRD))
     let expectedOutput = ValorList[
                             ValorPair(ValorStr "x", ValorStr "1"),
                             ValorPair(ValorStr "x", ValorStr "5"),
@@ -1070,7 +1070,7 @@ testKillRD = TestCase $ do
 
 testRDExit1 :: Test
 testRDExit1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "1", 
                                           ValorPair(
                                             exRD, 
@@ -1082,7 +1082,7 @@ testRDExit1 = TestCase $ do
 
 testRDExit2 :: Test
 testRDExit2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "2", 
                                           ValorPair(
                                             exRD, 
@@ -1094,7 +1094,7 @@ testRDExit2 = TestCase $ do
 
 testRDExit4 :: Test
 testRDExit4 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/rdExit.lng" (
+    output <- processFile executeProg "src/Language/Analysis/DFA/rdExit.lng" (
                                 ValorPair(ValorStr "4", 
                                           ValorPair(
                                             exRD, 
@@ -1107,13 +1107,13 @@ testRDExit4 = TestCase $ do
 
 testLabels :: Test
 testLabels = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/labels.lng" (exRD)
+    output <- processFile executeProg "src/Language/Analysis/DFA/labels.lng" (exRD)
     let expectedOutput = ValorList[ValorStr "1", ValorStr "2", ValorStr "3", ValorStr "4", ValorStr "5"]
     assertEqual "labels" expectedOutput output
 
 testInsertInto1 :: Test
 testInsertInto1 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/insertIntoMap.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/insertIntoMap.lng" (ValorPair(
                         ValorStr "2",
                         ValorPair(
                             ValorList [
@@ -1148,7 +1148,7 @@ testInsertInto1 = TestCase $ do
 
 testInsertInto2 :: Test
 testInsertInto2 = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/insertIntoMap.lng" (ValorPair(
+    output <- processFile executeProg "src/Language/Analysis/DFA/insertIntoMap.lng" (ValorPair(
                         ValorStr "2",
                         ValorPair(
                             ValorList [
@@ -1160,19 +1160,19 @@ testInsertInto2 = TestCase $ do
 
 testUpdateMappings :: Test
 testUpdateMappings = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/updateMappings.lng" (exRD)
+    output <- processFile executeProg "src/Language/Analysis/DFA/updateMappings.lng" (exRD)
     let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testUpdateMappings" expectedOutput output
 
 testReachingDefinitionsPPA :: Test
 testReachingDefinitionsPPA = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (exRD)
+    output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" (exRD)
     let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
 -- testReachingDefinitionsDeepLoop :: Test
 -- testReachingDefinitionsDeepLoop = TestCase $ do
---     output <- processFile executeProg "src/Language/Examples/DFA/reachingDefinitions.lng" (exDeepLoop!!1)
+--     output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" (exDeepLoop!!1)
 --     let expectedOutput = ValorPair(exRDEntry, exRDExit)
 --     assertEqual "testReachingDefinitionsDeepLoop" expectedOutput output
 

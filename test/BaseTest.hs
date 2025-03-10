@@ -16,19 +16,19 @@ timeoutP t fun = timeout t $ fun
 
 testSimples :: Test
 testSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Simple.lng" (ValorInt 10)
+    output <- processFile executeProg "src/Language/Analysis/Simple.lng" (ValorInt 10)
     let expectedOutput = (ValorInt 14)
     assertEqual "Simple Conditional (3 + (if x then x+1 else x-1))" expectedOutput output
 
 testFibonacci :: Test
 testFibonacci = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Fibonacci.lng" (ValorInt 10)
+    output <- processFile executeProg "src/Language/Analysis/Fibonacci.lng" (ValorInt 10)
     let expectedOutput = (ValorInt 55)
     assertEqual "Fibonacci 10" expectedOutput output
 
 -- testHighFibonacci :: Test
 -- testHighFibonacci = TestCase $ do
---     result <- timeoutP (1 * 100000) $ (processFile executeProg "src/Language/Examples/Fibonacci.lng" (ValorInt 100))
+--     result <- timeoutP (1 * 100000) $ (processFile executeProg "src/Language/Analysis/Fibonacci.lng" (ValorInt 100))
 --     let expectedOutput = (ValorInt 354224848179261915075)
 --     case result of
 --         Nothing -> assertFailure "Fibonacci 100 timed out!"
@@ -36,19 +36,19 @@ testFibonacci = TestCase $ do
 
 testFatorial :: Test
 testFatorial = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Fatorial.lng" (ValorInt 10)
+    output <- processFile executeProg "src/Language/Analysis/Fatorial.lng" (ValorInt 10)
     let expectedOutput = (ValorInt 3628800)
     assertEqual "Fatorial x" expectedOutput output
 
 testSomaListaSimples :: Test
 testSomaListaSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Lista.lng" (ValorInt 10)
+    output <- processFile executeProg "src/Language/Analysis/Lista.lng" (ValorInt 10)
     let expectedOutput = (ValorInt 46)
     assertEqual "Soma lista [x, x+1, x+2, x+3]" expectedOutput output
 
 testSomaLista :: Test
 testSomaLista = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Lista-inputList.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Lista-inputList.lng" (
                     ValorList [
                       ValorInt 10,
                       ValorInt 11,
@@ -60,38 +60,38 @@ testSomaLista = TestCase $ do
 
 testSomaParSimples :: Test
 testSomaParSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Pares.lng" (ValorInt 10)
+    output <- processFile executeProg "src/Language/Analysis/Pares.lng" (ValorInt 10)
     let expectedOutput = (ValorInt 30)
     assertEqual "Soma par (x, 20)" expectedOutput output
 
 testSomaPar :: Test
 testSomaPar = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Pares-inputPair.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Pares-inputPair.lng" (
                     ValorPair (ValorInt 10, ValorInt 20))
     let expectedOutput = (ValorInt 30)
     assertEqual "Soma par (x, y)" expectedOutput output
 
 testBoolTrue :: Test
 testBoolTrue = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Bool.lng" (ValorBool True)
+    output <- processFile executeProg "src/Language/Analysis/Bool.lng" (ValorBool True)
     let expectedOutput = (ValorBool True)
     assertEqual "Bool true" expectedOutput output
 
 testBoolFalse :: Test
 testBoolFalse = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Bool.lng" (ValorBool False)
+    output <- processFile executeProg "src/Language/Analysis/Bool.lng" (ValorBool False)
     let expectedOutput = (ValorBool False)
     assertEqual "Bool false" expectedOutput output
 
 testConcatSimples :: Test
 testConcatSimples = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Concat.lng" (ValorStr "test")
+    output <- processFile executeProg "src/Language/Analysis/Concat.lng" (ValorStr "test")
     let expectedOutput = (ValorStr "test_concatenated")
     assertEqual "concat x" expectedOutput output
 
 testConcatLista :: Test
 testConcatLista = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Concat-inputList.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Concat-inputList.lng" (
                     ValorList [
                       ValorStr "test",
                       ValorStr "_",
@@ -106,7 +106,7 @@ testConcatLista = TestCase $ do
 
 testConcatTwoLists :: Test
 testConcatTwoLists = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Concat-list.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Concat-list.lng" (
                     ValorPair (
                         ValorList [
                             ValorStr "test",
@@ -133,7 +133,7 @@ testConcatTwoLists = TestCase $ do
 
 testPolymorphicPairSameType :: Test
 testPolymorphicPairSameType = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-pair.lng" (
                     ValorPair (ValorStr "test", ValorStr "1"))
     let expectedOutput = (ValorPair (ValorStr "1", ValorStr "test"))
     assertEqual "Invert pair same type" expectedOutput output
@@ -141,7 +141,7 @@ testPolymorphicPairSameType = TestCase $ do
 
 testPolymorphicPair :: Test
 testPolymorphicPair = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-pair.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-pair.lng" (
                     ValorPair (ValorStr "test", ValorBool True))
     let expectedOutput = (ValorPair (ValorBool True, ValorStr "test"))
     assertEqual "Invert pair" expectedOutput output
@@ -149,7 +149,7 @@ testPolymorphicPair = TestCase $ do
 
 testPolymorphicList :: Test
 testPolymorphicList = TestCase $ do
-    output <- processFile executeProg "src/Language/Examples/Polymorphic-list.lng" (
+    output <- processFile executeProg "src/Language/Analysis/Polymorphic-list.lng" (
                     ValorList [
                       ValorStr "test",
                       ValorInt 1,

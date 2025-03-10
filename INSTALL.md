@@ -43,6 +43,6 @@ Acesse novamente esse projeto, e execute o build:<br>
 <code>C_INCLUDE_PATH=/usr/local/include LIBRARY_PATH=/usr/local/lib/ cabal build</code>
 
 A partir de agora, pode executar o projeto normalmente*:<br>
-<code>cabal run < src/Language/Examples/Concat.lng</code> 
+<code>cabal run < src/Language/Analysis/Concat.lng</code> 
 
 Verifique no arquivo app/Main.js qual programa será executado (Typecheck, Base, Var, etc.) e qual input está sendo enviado no Driver.hs correspondente.

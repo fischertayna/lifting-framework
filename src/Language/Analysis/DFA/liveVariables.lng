@@ -116,7 +116,13 @@ getVarFromBexp (bexp) {
                 then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
                 else if (checkType(bexp, "OR"))
                     then union(getVarFromBexp(fst(snd(bexp))), getVarFromBexp(snd(snd(bexp))))
-                    else union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+                    else if (checkType(bexp, "EQ"))
+                        then union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+                        else if (checkType(bexp, "GT"))
+                            then union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+                            else if (checkType(bexp, "LT"))
+                                then union(getVarFromAexp(fst(snd(bexp))), getVarFromAexp(snd(snd(bexp))))
+                                else []
         else []
 }
 
