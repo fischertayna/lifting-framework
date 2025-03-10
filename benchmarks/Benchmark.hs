@@ -210,11 +210,15 @@ runExperiments :: IO ()
 runExperiments = do
     createDirectoryIfMissing True outputDir
     let programs = [("Running-Example", running_example_variability, running_example_variability_v2),
+                    -- ("Combining Factorial and Fibonacci", combining_fib_fat_with_variability, combining_fib_fat_with_variability_v2),
                     ("Deep Loop", deep_loop, deep_loop_v2),
                     ("Nested Loop", nested_variability, nested_variability_v2),
                     ("Interprocedural", interprocedural_sim, interprocedural_sim_v2),
                     ("Recursion Sim", factorial_rec_sim, factorial_rec_sim_v2),
-                    ("Arithmetic Heavy", arithmetic_heavy, arithmetic_heavy_v2)]
+                    ("Arithmetic Heavy", arithmetic_heavy, arithmetic_heavy_v2),
+                    ("Variational Initialization", init_variability, init_variability_v2),
+                    ("Loop with Multiple Variants", loop_multi_variant, loop_multi_variant_v2),
+                    ("Deeply Nested Variants", deep_nested_variants, deep_nested_variants_v2)]
     
     let interpreters = [Base, Variational, Memoized, VMemoized]
 

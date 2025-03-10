@@ -1,193 +1,289 @@
 Analysis,Program,Interpreter,Version,Runtime,Memory,CacheSize,CacheMiss,CacheHits
-reachingDefinitions,Running-Example,Base,V1,2.0 µs,49448,0,0,0
+reachingDefinitions,Running-Example,Base,V1,1.0 µs,49448,0,0,0
 reachingDefinitions,Running-Example,Base,V2,0.0 µs,1530568,0,0,0
-reachingDefinitions,Running-Example,Variational,V1,1.0 µs,69520,0,0,0
+reachingDefinitions,Running-Example,Variational,V1,0.0 µs,69520,0,0,0
 reachingDefinitions,Running-Example,Variational,V2,1.0 µs,1530568,0,0,0
-reachingDefinitions,Running-Example,Memoized,V1,1.0 µs,90688,34325,143,2557
-reachingDefinitions,Running-Example,Memoized,V2,1.0 µs,1530568,53379,63,2637
-reachingDefinitions,Running-Example,VMemoized,V1,1.0 µs,110776,25539,53,797
+reachingDefinitions,Running-Example,Memoized,V1,0.0 µs,90688,34325,143,2557
+reachingDefinitions,Running-Example,Memoized,V2,2.0 µs,1530568,53379,63,2637
+reachingDefinitions,Running-Example,VMemoized,V1,0.0 µs,110776,25539,53,797
 reachingDefinitions,Running-Example,VMemoized,V2,1.0 µs,1530568,25530,0,797
-reachingDefinitions,Deep Loop,Base,V1,2.0 µs,2098944,0,0,0
-reachingDefinitions,Deep Loop,Base,V2,1.0 µs,2098944,0,0,0
-reachingDefinitions,Deep Loop,Variational,V1,1.0 µs,2098944,0,0,0
-reachingDefinitions,Deep Loop,Variational,V2,2.0 µs,2098944,0,0,0
-reachingDefinitions,Deep Loop,Memoized,V1,1.0 µs,2098944,6788,36,197
-reachingDefinitions,Deep Loop,Memoized,V2,2.0 µs,2098944,14794,37,324
-reachingDefinitions,Deep Loop,VMemoized,V1,2.0 µs,2098944,10082,25,299
-reachingDefinitions,Deep Loop,VMemoized,V2,0.0 µs,2098944,12298,4,401
-reachingDefinitions,Nested Loop,Base,V1,1.0 µs,2098944,0,0,0
-reachingDefinitions,Nested Loop,Base,V2,1.0 µs,2098944,0,0,0
-reachingDefinitions,Nested Loop,Variational,V1,2.0 µs,2098944,0,0,0
-reachingDefinitions,Nested Loop,Variational,V2,1.0 µs,2098944,0,0,0
-reachingDefinitions,Nested Loop,Memoized,V1,2.0 µs,2098944,11150,53,506
-reachingDefinitions,Nested Loop,Memoized,V2,2.0 µs,2098944,20354,39,761
-reachingDefinitions,Nested Loop,VMemoized,V1,0.0 µs,2098944,13214,33,367
-reachingDefinitions,Nested Loop,VMemoized,V2,0.0 µs,2098944,14661,4,533
-reachingDefinitions,Interprocedural,Base,V1,1.0 µs,2098944,0,0,0
-reachingDefinitions,Interprocedural,Base,V2,0.0 µs,2099832,0,0,0
-reachingDefinitions,Interprocedural,Variational,V1,0.0 µs,2098944,0,0,0
-reachingDefinitions,Interprocedural,Variational,V2,1.0 µs,2099832,0,0,0
-reachingDefinitions,Interprocedural,Memoized,V1,1.0 µs,2098944,8627,45,387
-reachingDefinitions,Interprocedural,Memoized,V2,1.0 µs,2099832,21625,60,852
-reachingDefinitions,Interprocedural,VMemoized,V1,1.0 µs,2098944,11699,29,229
-reachingDefinitions,Interprocedural,VMemoized,V2,2.0 µs,2099832,16825,12,471
-reachingDefinitions,Recursion Sim,Base,V1,1.0 µs,2099832,0,0,0
+reachingDefinitions,Deep Loop,Base,V1,0.0 µs,2160440,0,0,0
+reachingDefinitions,Deep Loop,Base,V2,2.0 µs,2160440,0,0,0
+reachingDefinitions,Deep Loop,Variational,V1,0.0 µs,2160440,0,0,0
+reachingDefinitions,Deep Loop,Variational,V2,0.0 µs,2160440,0,0,0
+reachingDefinitions,Deep Loop,Memoized,V1,1.0 µs,2160440,6788,36,197
+reachingDefinitions,Deep Loop,Memoized,V2,2.0 µs,2160440,14794,37,324
+reachingDefinitions,Deep Loop,VMemoized,V1,1.0 µs,2160440,10082,25,299
+reachingDefinitions,Deep Loop,VMemoized,V2,1.0 µs,2160440,12298,4,401
+reachingDefinitions,Nested Loop,Base,V1,2.0 µs,2160440,0,0,0
+reachingDefinitions,Nested Loop,Base,V2,2.0 µs,2160440,0,0,0
+reachingDefinitions,Nested Loop,Variational,V1,1.0 µs,2160440,0,0,0
+reachingDefinitions,Nested Loop,Variational,V2,1.0 µs,2160440,0,0,0
+reachingDefinitions,Nested Loop,Memoized,V1,2.0 µs,2160440,11150,53,506
+reachingDefinitions,Nested Loop,Memoized,V2,0.0 µs,2160440,20354,39,761
+reachingDefinitions,Nested Loop,VMemoized,V1,1.0 µs,2160440,13214,33,367
+reachingDefinitions,Nested Loop,VMemoized,V2,2.0 µs,2160440,14661,4,533
+reachingDefinitions,Interprocedural,Base,V1,1.0 µs,2160440,0,0,0
+reachingDefinitions,Interprocedural,Base,V2,0.0 µs,2160440,0,0,0
+reachingDefinitions,Interprocedural,Variational,V1,2.0 µs,2160440,0,0,0
+reachingDefinitions,Interprocedural,Variational,V2,2.0 µs,2160440,0,0,0
+reachingDefinitions,Interprocedural,Memoized,V1,1.0 µs,2160440,8627,45,387
+reachingDefinitions,Interprocedural,Memoized,V2,2.0 µs,2160440,21625,60,852
+reachingDefinitions,Interprocedural,VMemoized,V1,2.0 µs,2160440,11699,29,229
+reachingDefinitions,Interprocedural,VMemoized,V2,1.0 µs,2160440,16825,12,471
+reachingDefinitions,Recursion Sim,Base,V1,0.0 µs,2160440,0,0,0
 reachingDefinitions,Recursion Sim,Base,V2,1.0 µs,2446448,0,0,0
-reachingDefinitions,Recursion Sim,Variational,V1,0.0 µs,2099832,0,0,0
-reachingDefinitions,Recursion Sim,Variational,V2,2.0 µs,2446448,0,0,0
-reachingDefinitions,Recursion Sim,Memoized,V1,2.0 µs,2099832,8790,43,282
-reachingDefinitions,Recursion Sim,Memoized,V2,1.0 µs,2446448,18612,43,474
-reachingDefinitions,Recursion Sim,VMemoized,V1,2.0 µs,2099832,12252,29,401
-reachingDefinitions,Recursion Sim,VMemoized,V2,2.0 µs,2446448,14509,4,467
+reachingDefinitions,Recursion Sim,Variational,V1,1.0 µs,2160440,0,0,0
+reachingDefinitions,Recursion Sim,Variational,V2,1.0 µs,2446448,0,0,0
+reachingDefinitions,Recursion Sim,Memoized,V1,1.0 µs,2160440,8790,43,282
+reachingDefinitions,Recursion Sim,Memoized,V2,2.0 µs,2446448,18612,43,474
+reachingDefinitions,Recursion Sim,VMemoized,V1,2.0 µs,2160440,12252,29,401
+reachingDefinitions,Recursion Sim,VMemoized,V2,1.0 µs,2446448,14509,4,467
 reachingDefinitions,Arithmetic Heavy,Base,V1,1.0 µs,2575840,0,0,0
 reachingDefinitions,Arithmetic Heavy,Base,V2,2.0 µs,2652432,0,0,0
-reachingDefinitions,Arithmetic Heavy,Variational,V1,2.0 µs,2575840,0,0,0
-reachingDefinitions,Arithmetic Heavy,Variational,V2,0.0 µs,2652432,0,0,0
+reachingDefinitions,Arithmetic Heavy,Variational,V1,1.0 µs,2575840,0,0,0
+reachingDefinitions,Arithmetic Heavy,Variational,V2,20.0 µs,2652432,0,0,0
 reachingDefinitions,Arithmetic Heavy,Memoized,V1,1.0 µs,2575840,12155,53,549
-reachingDefinitions,Arithmetic Heavy,Memoized,V2,1.0 µs,2652432,25445,53,797
-reachingDefinitions,Arithmetic Heavy,VMemoized,V1,1.0 µs,2575840,14558,33,367
+reachingDefinitions,Arithmetic Heavy,Memoized,V2,0.0 µs,2652432,25445,53,797
+reachingDefinitions,Arithmetic Heavy,VMemoized,V1,0.0 µs,2575840,14558,33,367
 reachingDefinitions,Arithmetic Heavy,VMemoized,V2,2.0 µs,2652432,16874,4,533
-liveVariables,Running-Example,Base,V1,1.0 µs,2703864,0,0,0
-liveVariables,Running-Example,Base,V2,1.0 µs,3587848,0,0,0
-liveVariables,Running-Example,Variational,V1,1.0 µs,2703864,0,0,0
-liveVariables,Running-Example,Variational,V2,1.0 µs,3587848,0,0,0
-liveVariables,Running-Example,Memoized,V1,2.0 µs,2703864,22783,108,2132
-liveVariables,Running-Example,Memoized,V2,1.0 µs,3587848,38108,52,2188
-liveVariables,Running-Example,VMemoized,V1,2.0 µs,2703864,17201,50,660
-liveVariables,Running-Example,VMemoized,V2,2.0 µs,3587848,17192,0,660
-liveVariables,Deep Loop,Base,V1,0.0 µs,4039280,0,0,0
-liveVariables,Deep Loop,Base,V2,2.0 µs,4039280,0,0,0
-liveVariables,Deep Loop,Variational,V1,1.0 µs,4039280,0,0,0
-liveVariables,Deep Loop,Variational,V2,2.0 µs,4039280,0,0,0
-liveVariables,Deep Loop,Memoized,V1,2.0 µs,4039280,4934,28,92
-liveVariables,Deep Loop,Memoized,V2,1.0 µs,4039280,10376,24,288
-liveVariables,Deep Loop,VMemoized,V1,1.0 µs,4039280,7567,22,94
-liveVariables,Deep Loop,VMemoized,V2,2.0 µs,4039280,9297,4,254
-liveVariables,Nested Loop,Base,V1,1.0 µs,4039280,0,0,0
-liveVariables,Nested Loop,Base,V2,2.0 µs,4039280,0,0,0
-liveVariables,Nested Loop,Variational,V1,1.0 µs,4039280,0,0,0
-liveVariables,Nested Loop,Variational,V2,1.0 µs,4039280,0,0,0
-liveVariables,Nested Loop,Memoized,V1,1.0 µs,4039280,8207,42,308
-liveVariables,Nested Loop,Memoized,V2,2.0 µs,4039280,16413,34,458
-liveVariables,Nested Loop,VMemoized,V1,2.0 µs,4039280,10052,30,257
-liveVariables,Nested Loop,VMemoized,V2,1.0 µs,4039280,11567,4,295
-liveVariables,Interprocedural,Base,V1,2.0 µs,4039280,0,0,0
-liveVariables,Interprocedural,Base,V2,1.0 µs,4039280,0,0,0
-liveVariables,Interprocedural,Variational,V1,2.0 µs,4039280,0,0,0
-liveVariables,Interprocedural,Variational,V2,2.0 µs,4039280,0,0,0
-liveVariables,Interprocedural,Memoized,V1,2.0 µs,4039280,6353,34,236
-liveVariables,Interprocedural,Memoized,V2,1.0 µs,4039280,15261,40,860
-liveVariables,Interprocedural,VMemoized,V1,2.0 µs,4039280,8428,25,305
-liveVariables,Interprocedural,VMemoized,V2,1.0 µs,4054640,12415,12,473
-liveVariables,Recursion Sim,Base,V1,2.0 µs,4375336,0,0,0
-liveVariables,Recursion Sim,Base,V2,0.0 µs,4455640,0,0,0
-liveVariables,Recursion Sim,Variational,V1,2.0 µs,4375336,0,0,0
-liveVariables,Recursion Sim,Variational,V2,2.0 µs,4455640,0,0,0
-liveVariables,Recursion Sim,Memoized,V1,2.0 µs,4375336,6191,34,226
-liveVariables,Recursion Sim,Memoized,V2,2.0 µs,4461784,12724,28,327
-liveVariables,Recursion Sim,VMemoized,V1,2.0 µs,4375336,8849,26,149
-liveVariables,Recursion Sim,VMemoized,V2,2.0 µs,4500208,10665,4,298
-liveVariables,Arithmetic Heavy,Base,V1,2.0 µs,4545344,0,0,0
-liveVariables,Arithmetic Heavy,Base,V2,1.0 µs,4621144,0,0,0
-liveVariables,Arithmetic Heavy,Variational,V1,2.0 µs,4545344,0,0,0
-liveVariables,Arithmetic Heavy,Variational,V2,0.0 µs,4640640,0,0,0
-liveVariables,Arithmetic Heavy,Memoized,V1,2.0 µs,4545344,8359,42,308
-liveVariables,Arithmetic Heavy,Memoized,V2,1.0 µs,4689648,16696,34,581
-liveVariables,Arithmetic Heavy,VMemoized,V1,1.0 µs,4549608,10181,30,175
-liveVariables,Arithmetic Heavy,VMemoized,V2,1.0 µs,4728072,11766,4,201
-availableExpressions,Running-Example,Base,V1,1.0 µs,4765528,0,0,0
-availableExpressions,Running-Example,Base,V2,2.0 µs,4942656,0,0,0
-availableExpressions,Running-Example,Variational,V1,2.0 µs,4765528,0,0,0
-availableExpressions,Running-Example,Variational,V2,2.0 µs,4961192,0,0,0
-availableExpressions,Running-Example,Memoized,V1,2.0 µs,4771256,29091,134,314
-availableExpressions,Running-Example,Memoized,V2,1.0 µs,5138952,51809,89,359
-availableExpressions,Running-Example,VMemoized,V1,2.0 µs,4791344,18996,50,92
-availableExpressions,Running-Example,VMemoized,V2,2.0 µs,5177376,18987,0,92
-availableExpressions,Deep Loop,Base,V1,1.0 µs,5234376,0,0,0
-availableExpressions,Deep Loop,Base,V2,2.0 µs,5380016,0,0,0
-availableExpressions,Deep Loop,Variational,V1,2.0 µs,5236784,0,0,0
-availableExpressions,Deep Loop,Variational,V2,2.0 µs,5380016,0,0,0
-availableExpressions,Deep Loop,Memoized,V1,2.0 µs,5236784,5921,30,50
-availableExpressions,Deep Loop,Memoized,V2,2.0 µs,5380016,13228,32,72
-availableExpressions,Deep Loop,VMemoized,V1,2.0 µs,5241424,9328,22,36
-availableExpressions,Deep Loop,VMemoized,V2,2.0 µs,5398456,11553,4,44
-availableExpressions,Nested Loop,Base,V1,2.0 µs,5428056,0,0,0
-availableExpressions,Nested Loop,Base,V2,1.0 µs,5572488,0,0,0
-availableExpressions,Nested Loop,Variational,V1,1.0 µs,5445536,0,0,0
-availableExpressions,Nested Loop,Variational,V2,2.0 µs,5572488,0,0,0
-availableExpressions,Nested Loop,Memoized,V1,1.0 µs,5466360,9612,47,93
-availableExpressions,Nested Loop,Memoized,V2,1.0 µs,5598312,20094,47,117
-availableExpressions,Nested Loop,VMemoized,V1,2.0 µs,5466360,11231,30,52
-availableExpressions,Nested Loop,VMemoized,V2,1.0 µs,5636736,12683,4,60
-availableExpressions,Interprocedural,Base,V1,2.0 µs,5659768,0,0,0
-availableExpressions,Interprocedural,Base,V2,2.0 µs,5754040,0,0,0
-availableExpressions,Interprocedural,Variational,V1,1.0 µs,5676576,0,0,0
-availableExpressions,Interprocedural,Variational,V2,1.0 µs,5775072,0,0,0
-availableExpressions,Interprocedural,Memoized,V1,1.0 µs,5676576,7675,40,76
-availableExpressions,Interprocedural,Memoized,V2,1.0 µs,5819616,18496,55,133
-availableExpressions,Interprocedural,VMemoized,V1,2.0 µs,5681360,10187,26,79
-availableExpressions,Interprocedural,VMemoized,V2,0.0 µs,5858040,14032,12,121
-availableExpressions,Recursion Sim,Base,V1,3.0 µs,5893496,0,0,0
-availableExpressions,Recursion Sim,Base,V2,0.0 µs,5992120,0,0,0
-availableExpressions,Recursion Sim,Variational,V1,1.0 µs,5914528,0,0,0
-availableExpressions,Recursion Sim,Variational,V2,1.0 µs,6013056,0,0,0
-availableExpressions,Recursion Sim,Memoized,V1,1.0 µs,5914528,7441,37,67
-availableExpressions,Recursion Sim,Memoized,V2,1.0 µs,6055872,16375,38,90
-availableExpressions,Recursion Sim,VMemoized,V1,1.0 µs,5919264,10963,26,44
-availableExpressions,Recursion Sim,VMemoized,V2,1.0 µs,6094296,13618,4,52
-availableExpressions,Arithmetic Heavy,Base,V1,2.0 µs,6121392,0,0,0
-availableExpressions,Arithmetic Heavy,Base,V2,0.0 µs,6256152,0,0,0
-availableExpressions,Arithmetic Heavy,Variational,V1,2.0 µs,6121392,0,0,0
-availableExpressions,Arithmetic Heavy,Variational,V2,1.0 µs,6256152,0,0,0
-availableExpressions,Arithmetic Heavy,Memoized,V1,0.0 µs,6126664,10836,47,303
-availableExpressions,Arithmetic Heavy,Memoized,V2,2.0 µs,6302544,22189,47,445
-availableExpressions,Arithmetic Heavy,VMemoized,V1,2.0 µs,6146752,13081,30,216
-availableExpressions,Arithmetic Heavy,VMemoized,V2,0.0 µs,6340968,15400,4,295
-veryBusyExpressions,Running-Example,Base,V1,2.0 µs,6368184,0,0,0
-veryBusyExpressions,Running-Example,Base,V2,4.0 µs,6545784,0,0,0
-veryBusyExpressions,Running-Example,Variational,V1,1.0 µs,6387968,0,0,0
-veryBusyExpressions,Running-Example,Variational,V2,1.0 µs,6545784,0,0,0
-veryBusyExpressions,Running-Example,Memoized,V1,2.0 µs,6387968,23995,108,1472
-veryBusyExpressions,Running-Example,Memoized,V2,1.0 µs,6705992,39268,52,1528
-veryBusyExpressions,Running-Example,VMemoized,V1,1.0 µs,6392728,19641,50,447
-veryBusyExpressions,Running-Example,VMemoized,V2,2.0 µs,6744416,19634,0,447
-veryBusyExpressions,Deep Loop,Base,V1,2.0 µs,6796008,0,0,0
-veryBusyExpressions,Deep Loop,Base,V2,2.0 µs,6887392,0,0,0
-veryBusyExpressions,Deep Loop,Variational,V1,2.0 µs,6796008,0,0,0
-veryBusyExpressions,Deep Loop,Variational,V2,2.0 µs,6907464,0,0,0
-veryBusyExpressions,Deep Loop,Memoized,V1,1.0 µs,6796960,6202,30,96
-veryBusyExpressions,Deep Loop,Memoized,V2,2.0 µs,6940136,13549,32,130
-veryBusyExpressions,Deep Loop,VMemoized,V1,2.0 µs,6817048,9967,22,65
-veryBusyExpressions,Deep Loop,VMemoized,V2,1.0 µs,6978560,12386,4,79
-veryBusyExpressions,Nested Loop,Base,V1,1.0 µs,7012672,0,0,0
-veryBusyExpressions,Nested Loop,Base,V2,1.0 µs,7106456,0,0,0
-veryBusyExpressions,Nested Loop,Variational,V1,1.0 µs,7012672,0,0,0
-veryBusyExpressions,Nested Loop,Variational,V2,3.0 µs,7127008,0,0,0
-veryBusyExpressions,Nested Loop,Memoized,V1,2.0 µs,7013480,9881,47,93
-veryBusyExpressions,Nested Loop,Memoized,V2,2.0 µs,7184368,18151,35,129
-veryBusyExpressions,Nested Loop,VMemoized,V1,1.0 µs,7033568,11915,30,52
-veryBusyExpressions,Nested Loop,VMemoized,V2,1.0 µs,7222792,13364,4,60
-veryBusyExpressions,Interprocedural,Base,V1,1.0 µs,7244544,0,0,0
-veryBusyExpressions,Interprocedural,Base,V2,2.0 µs,7339816,0,0,0
-veryBusyExpressions,Interprocedural,Variational,V1,1.0 µs,7244544,0,0,0
-veryBusyExpressions,Interprocedural,Variational,V2,1.0 µs,7360848,0,0,0
-veryBusyExpressions,Interprocedural,Memoized,V1,2.0 µs,7246888,7564,38,70
-veryBusyExpressions,Interprocedural,Memoized,V2,2.0 µs,7403816,16674,43,137
-veryBusyExpressions,Interprocedural,VMemoized,V1,1.0 µs,7266976,10229,25,107
-veryBusyExpressions,Interprocedural,VMemoized,V2,1.0 µs,7442240,14023,12,167
-veryBusyExpressions,Recursion Sim,Base,V1,1.0 µs,7486240,0,0,0
-veryBusyExpressions,Recursion Sim,Base,V2,2.0 µs,7606736,0,0,0
-veryBusyExpressions,Recursion Sim,Variational,V1,1.0 µs,7486240,0,0,0
-veryBusyExpressions,Recursion Sim,Variational,V2,0.0 µs,7606736,0,0,0
-veryBusyExpressions,Recursion Sim,Memoized,V1,2.0 µs,7486240,7716,37,125
-veryBusyExpressions,Recursion Sim,Memoized,V2,2.0 µs,7644000,16683,38,195
-veryBusyExpressions,Recursion Sim,VMemoized,V1,2.0 µs,7502960,11604,26,114
-veryBusyExpressions,Recursion Sim,VMemoized,V2,2.0 µs,7682424,14458,4,134
-veryBusyExpressions,Arithmetic Heavy,Base,V1,1.0 µs,7721984,0,0,0
-veryBusyExpressions,Arithmetic Heavy,Base,V2,8.0 µs,7811720,0,0,0
-veryBusyExpressions,Arithmetic Heavy,Variational,V1,1.0 µs,7721984,0,0,0
-veryBusyExpressions,Arithmetic Heavy,Variational,V2,1.0 µs,7811720,0,0,0
-veryBusyExpressions,Arithmetic Heavy,Memoized,V1,2.0 µs,7721984,10873,47,163
-veryBusyExpressions,Arithmetic Heavy,Memoized,V2,2.0 µs,7893064,22265,47,486
-veryBusyExpressions,Arithmetic Heavy,VMemoized,V1,1.0 µs,7738680,13147,30,93
-veryBusyExpressions,Arithmetic Heavy,VMemoized,V2,2.0 µs,7931488,15420,4,389
+reachingDefinitions,Variational Initialization,Base,V1,1.0 µs,2703864,0,0,0
+reachingDefinitions,Variational Initialization,Base,V2,2.0 µs,4768136,0,0,0
+reachingDefinitions,Variational Initialization,Variational,V1,2.0 µs,2703864,0,0,0
+reachingDefinitions,Variational Initialization,Variational,V2,1.0 µs,4768136,0,0,0
+reachingDefinitions,Variational Initialization,Memoized,V1,0.0 µs,2703864,22506,111,593
+reachingDefinitions,Variational Initialization,Memoized,V2,2.0 µs,4768136,51404,130,1030
+reachingDefinitions,Variational Initialization,VMemoized,V1,1.0 µs,2703864,14286,29,272
+reachingDefinitions,Variational Initialization,VMemoized,V2,2.0 µs,4768136,15951,4,367
+reachingDefinitions,Loop with Multiple Variants,Base,V1,2.0 µs,5555856,0,0,0
+reachingDefinitions,Loop with Multiple Variants,Base,V2,2.0 µs,5980520,0,0,0
+reachingDefinitions,Loop with Multiple Variants,Variational,V1,1.0 µs,5555856,0,0,0
+reachingDefinitions,Loop with Multiple Variants,Variational,V2,2.0 µs,5980520,0,0,0
+reachingDefinitions,Loop with Multiple Variants,Memoized,V1,1.0 µs,5555856,16101,77,1363
+reachingDefinitions,Loop with Multiple Variants,Memoized,V2,2.0 µs,5980520,34693,80,2328
+reachingDefinitions,Loop with Multiple Variants,VMemoized,V1,1.0 µs,5555856,14490,37,533
+reachingDefinitions,Loop with Multiple Variants,VMemoized,V2,2.0 µs,5980520,16751,4,599
+reachingDefinitions,Deeply Nested Variants,Base,V1,1.0 µs,6300696,0,0,0
+reachingDefinitions,Deeply Nested Variants,Base,V2,2.0 µs,13908736,0,0,0
+reachingDefinitions,Deeply Nested Variants,Variational,V1,2.0 µs,6300696,0,0,0
+reachingDefinitions,Deeply Nested Variants,Variational,V2,1.0 µs,13908736,0,0,0
+reachingDefinitions,Deeply Nested Variants,Memoized,V1,2.0 µs,6300696,6645,43,469
+reachingDefinitions,Deeply Nested Variants,Memoized,V2,1.0 µs,13908736,18546,62,1378
+reachingDefinitions,Deeply Nested Variants,VMemoized,V1,0.0 µs,6300696,13857,29,272
+reachingDefinitions,Deeply Nested Variants,VMemoized,V2,1.0 µs,13908736,15103,4,367
+liveVariables,Running-Example,Base,V1,1.0 µs,15089184,0,0,0
+liveVariables,Running-Example,Base,V2,1.0 µs,15089184,0,0,0
+liveVariables,Running-Example,Variational,V1,1.0 µs,15089184,0,0,0
+liveVariables,Running-Example,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Running-Example,Memoized,V1,1.0 µs,15089184,22783,108,2132
+liveVariables,Running-Example,Memoized,V2,1.0 µs,15089184,38108,52,2188
+liveVariables,Running-Example,VMemoized,V1,2.0 µs,15089184,17201,50,660
+liveVariables,Running-Example,VMemoized,V2,2.0 µs,15089184,17192,0,660
+liveVariables,Deep Loop,Base,V1,1.0 µs,15089184,0,0,0
+liveVariables,Deep Loop,Base,V2,0.0 µs,15089184,0,0,0
+liveVariables,Deep Loop,Variational,V1,2.0 µs,15089184,0,0,0
+liveVariables,Deep Loop,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Deep Loop,Memoized,V1,0.0 µs,15089184,4934,28,92
+liveVariables,Deep Loop,Memoized,V2,2.0 µs,15089184,10376,24,288
+liveVariables,Deep Loop,VMemoized,V1,1.0 µs,15089184,7567,22,94
+liveVariables,Deep Loop,VMemoized,V2,2.0 µs,15089184,9297,4,254
+liveVariables,Nested Loop,Base,V1,2.0 µs,15089184,0,0,0
+liveVariables,Nested Loop,Base,V2,2.0 µs,15089184,0,0,0
+liveVariables,Nested Loop,Variational,V1,2.0 µs,15089184,0,0,0
+liveVariables,Nested Loop,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Nested Loop,Memoized,V1,1.0 µs,15089184,8207,42,308
+liveVariables,Nested Loop,Memoized,V2,2.0 µs,15089184,16413,34,458
+liveVariables,Nested Loop,VMemoized,V1,2.0 µs,15089184,10052,30,257
+liveVariables,Nested Loop,VMemoized,V2,0.0 µs,15089184,11567,4,295
+liveVariables,Interprocedural,Base,V1,3.0 µs,15089184,0,0,0
+liveVariables,Interprocedural,Base,V2,1.0 µs,15089184,0,0,0
+liveVariables,Interprocedural,Variational,V1,1.0 µs,15089184,0,0,0
+liveVariables,Interprocedural,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Interprocedural,Memoized,V1,2.0 µs,15089184,6353,34,236
+liveVariables,Interprocedural,Memoized,V2,2.0 µs,15089184,15261,40,860
+liveVariables,Interprocedural,VMemoized,V1,4.0 µs,15089184,8428,25,305
+liveVariables,Interprocedural,VMemoized,V2,1.0 µs,15089184,12415,12,473
+liveVariables,Recursion Sim,Base,V1,1.0 µs,15089184,0,0,0
+liveVariables,Recursion Sim,Base,V2,0.0 µs,15089184,0,0,0
+liveVariables,Recursion Sim,Variational,V1,1.0 µs,15089184,0,0,0
+liveVariables,Recursion Sim,Variational,V2,2.0 µs,15089184,0,0,0
+liveVariables,Recursion Sim,Memoized,V1,1.0 µs,15089184,6191,34,226
+liveVariables,Recursion Sim,Memoized,V2,1.0 µs,15089184,12724,28,327
+liveVariables,Recursion Sim,VMemoized,V1,1.0 µs,15089184,8849,26,149
+liveVariables,Recursion Sim,VMemoized,V2,0.0 µs,15089184,10665,4,298
+liveVariables,Arithmetic Heavy,Base,V1,1.0 µs,15089184,0,0,0
+liveVariables,Arithmetic Heavy,Base,V2,2.0 µs,15089184,0,0,0
+liveVariables,Arithmetic Heavy,Variational,V1,0.0 µs,15089184,0,0,0
+liveVariables,Arithmetic Heavy,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Arithmetic Heavy,Memoized,V1,2.0 µs,15089184,8359,42,308
+liveVariables,Arithmetic Heavy,Memoized,V2,1.0 µs,15089184,16696,34,581
+liveVariables,Arithmetic Heavy,VMemoized,V1,1.0 µs,15089184,10181,30,175
+liveVariables,Arithmetic Heavy,VMemoized,V2,2.0 µs,15089184,11766,4,201
+liveVariables,Variational Initialization,Base,V1,2.0 µs,15089184,0,0,0
+liveVariables,Variational Initialization,Base,V2,0.0 µs,15089184,0,0,0
+liveVariables,Variational Initialization,Variational,V1,0.0 µs,15089184,0,0,0
+liveVariables,Variational Initialization,Variational,V2,0.0 µs,15089184,0,0,0
+liveVariables,Variational Initialization,Memoized,V1,1.0 µs,15089184,14690,76,604
+liveVariables,Variational Initialization,Memoized,V2,1.0 µs,15089184,33179,82,838
+liveVariables,Variational Initialization,VMemoized,V1,1.0 µs,15089184,9823,26,324
+liveVariables,Variational Initialization,VMemoized,V2,2.0 µs,15089184,11402,4,380
+liveVariables,Loop with Multiple Variants,Base,V1,2.0 µs,15089184,0,0,0
+liveVariables,Loop with Multiple Variants,Base,V2,1.0 µs,15089184,0,0,0
+liveVariables,Loop with Multiple Variants,Variational,V1,1.0 µs,15089184,0,0,0
+liveVariables,Loop with Multiple Variants,Variational,V2,1.0 µs,15089184,0,0,0
+liveVariables,Loop with Multiple Variants,Memoized,V1,2.0 µs,15089184,12504,64,1096
+liveVariables,Loop with Multiple Variants,Memoized,V2,1.0 µs,15089184,26334,58,1867
+liveVariables,Loop with Multiple Variants,VMemoized,V1,1.0 µs,15089184,11114,34,436
+liveVariables,Loop with Multiple Variants,VMemoized,V2,2.0 µs,15089184,12863,4,492
+liveVariables,Deeply Nested Variants,Base,V1,2.0 µs,15089184,0,0,0
+liveVariables,Deeply Nested Variants,Base,V2,1.0 µs,16327664,0,0,0
+liveVariables,Deeply Nested Variants,Variational,V1,2.0 µs,15089184,0,0,0
+liveVariables,Deeply Nested Variants,Variational,V2,1.0 µs,16327664,0,0,0
+liveVariables,Deeply Nested Variants,Memoized,V1,1.0 µs,15089184,4155,30,290
+liveVariables,Deeply Nested Variants,Memoized,V2,2.0 µs,16327664,11576,38,1018
+liveVariables,Deeply Nested Variants,VMemoized,V1,3.0 µs,15089184,9113,26,44
+liveVariables,Deeply Nested Variants,VMemoized,V2,2.0 µs,16327664,10703,4,93
+availableExpressions,Running-Example,Base,V1,2.0 µs,16806064,0,0,0
+availableExpressions,Running-Example,Base,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Running-Example,Variational,V1,2.0 µs,16806064,0,0,0
+availableExpressions,Running-Example,Variational,V2,0.0 µs,16806064,0,0,0
+availableExpressions,Running-Example,Memoized,V1,1.0 µs,16806064,29091,134,314
+availableExpressions,Running-Example,Memoized,V2,1.0 µs,16806064,51809,89,359
+availableExpressions,Running-Example,VMemoized,V1,1.0 µs,16806064,18996,50,92
+availableExpressions,Running-Example,VMemoized,V2,1.0 µs,16806064,18987,0,92
+availableExpressions,Deep Loop,Base,V1,0.0 µs,16806064,0,0,0
+availableExpressions,Deep Loop,Base,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Deep Loop,Variational,V1,2.0 µs,16806064,0,0,0
+availableExpressions,Deep Loop,Variational,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Deep Loop,Memoized,V1,1.0 µs,16806064,5921,30,50
+availableExpressions,Deep Loop,Memoized,V2,1.0 µs,16806064,13228,32,72
+availableExpressions,Deep Loop,VMemoized,V1,1.0 µs,16806064,9328,22,36
+availableExpressions,Deep Loop,VMemoized,V2,0.0 µs,16806064,11553,4,44
+availableExpressions,Nested Loop,Base,V1,2.0 µs,16806064,0,0,0
+availableExpressions,Nested Loop,Base,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Nested Loop,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Nested Loop,Variational,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Nested Loop,Memoized,V1,1.0 µs,16806064,9612,47,93
+availableExpressions,Nested Loop,Memoized,V2,1.0 µs,16806064,20094,47,117
+availableExpressions,Nested Loop,VMemoized,V1,2.0 µs,16806064,11231,30,52
+availableExpressions,Nested Loop,VMemoized,V2,2.0 µs,16806064,12683,4,60
+availableExpressions,Interprocedural,Base,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Interprocedural,Base,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Interprocedural,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Interprocedural,Variational,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Interprocedural,Memoized,V1,1.0 µs,16806064,7675,40,76
+availableExpressions,Interprocedural,Memoized,V2,1.0 µs,16806064,18496,55,133
+availableExpressions,Interprocedural,VMemoized,V1,2.0 µs,16806064,10187,26,79
+availableExpressions,Interprocedural,VMemoized,V2,0.0 µs,16806064,14032,12,121
+availableExpressions,Recursion Sim,Base,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Recursion Sim,Base,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Recursion Sim,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Recursion Sim,Variational,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Recursion Sim,Memoized,V1,1.0 µs,16806064,7441,37,67
+availableExpressions,Recursion Sim,Memoized,V2,1.0 µs,16806064,16375,38,90
+availableExpressions,Recursion Sim,VMemoized,V1,2.0 µs,16806064,10963,26,44
+availableExpressions,Recursion Sim,VMemoized,V2,0.0 µs,16806064,13618,4,52
+availableExpressions,Arithmetic Heavy,Base,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Arithmetic Heavy,Base,V2,2.0 µs,16806064,0,0,0
+availableExpressions,Arithmetic Heavy,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Arithmetic Heavy,Variational,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Arithmetic Heavy,Memoized,V1,0.0 µs,16806064,10836,47,303
+availableExpressions,Arithmetic Heavy,Memoized,V2,1.0 µs,16806064,22189,47,445
+availableExpressions,Arithmetic Heavy,VMemoized,V1,1.0 µs,16806064,13081,30,216
+availableExpressions,Arithmetic Heavy,VMemoized,V2,1.0 µs,16806064,15400,4,295
+availableExpressions,Variational Initialization,Base,V1,0.0 µs,16806064,0,0,0
+availableExpressions,Variational Initialization,Base,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Variational Initialization,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Variational Initialization,Variational,V2,0.0 µs,16806064,0,0,0
+availableExpressions,Variational Initialization,Memoized,V1,1.0 µs,16806064,19066,94,178
+availableExpressions,Variational Initialization,Memoized,V2,0.0 µs,16806064,44526,113,439
+availableExpressions,Variational Initialization,VMemoized,V1,1.0 µs,16806064,13219,26,79
+availableExpressions,Variational Initialization,VMemoized,V2,1.0 µs,16806064,15947,4,134
+availableExpressions,Loop with Multiple Variants,Base,V1,2.0 µs,16806064,0,0,0
+availableExpressions,Loop with Multiple Variants,Base,V2,1.0 µs,16806064,0,0,0
+availableExpressions,Loop with Multiple Variants,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Loop with Multiple Variants,Variational,V2,0.0 µs,16806064,0,0,0
+availableExpressions,Loop with Multiple Variants,Memoized,V1,2.0 µs,16806064,15677,76,388
+availableExpressions,Loop with Multiple Variants,Memoized,V2,1.0 µs,16806064,34620,81,479
+availableExpressions,Loop with Multiple Variants,VMemoized,V1,2.0 µs,16806064,13218,34,60
+availableExpressions,Loop with Multiple Variants,VMemoized,V2,1.0 µs,16806064,15879,4,68
+availableExpressions,Deeply Nested Variants,Base,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Deeply Nested Variants,Base,V2,2.0 µs,22501864,0,0,0
+availableExpressions,Deeply Nested Variants,Variational,V1,1.0 µs,16806064,0,0,0
+availableExpressions,Deeply Nested Variants,Variational,V2,1.0 µs,22501864,0,0,0
+availableExpressions,Deeply Nested Variants,Memoized,V1,1.0 µs,16806064,3931,30,290
+availableExpressions,Deeply Nested Variants,Memoized,V2,2.0 µs,22501864,13405,49,655
+availableExpressions,Deeply Nested Variants,VMemoized,V1,1.0 µs,16806064,8711,26,44
+availableExpressions,Deeply Nested Variants,VMemoized,V2,2.0 µs,22501864,13090,4,52
+veryBusyExpressions,Running-Example,Base,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Running-Example,Base,V2,0.0 µs,22971216,0,0,0
+veryBusyExpressions,Running-Example,Variational,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Running-Example,Variational,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Running-Example,Memoized,V1,0.0 µs,22971216,23995,108,1472
+veryBusyExpressions,Running-Example,Memoized,V2,1.0 µs,22971216,39268,52,1528
+veryBusyExpressions,Running-Example,VMemoized,V1,2.0 µs,22971216,19641,50,447
+veryBusyExpressions,Running-Example,VMemoized,V2,2.0 µs,22971216,19634,0,447
+veryBusyExpressions,Deep Loop,Base,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Deep Loop,Base,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Deep Loop,Variational,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Deep Loop,Variational,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Deep Loop,Memoized,V1,2.0 µs,22971216,6202,30,96
+veryBusyExpressions,Deep Loop,Memoized,V2,1.0 µs,22971216,13549,32,130
+veryBusyExpressions,Deep Loop,VMemoized,V1,1.0 µs,22971216,9967,22,65
+veryBusyExpressions,Deep Loop,VMemoized,V2,2.0 µs,22971216,12386,4,79
+veryBusyExpressions,Nested Loop,Base,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Nested Loop,Base,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Nested Loop,Variational,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Nested Loop,Variational,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Nested Loop,Memoized,V1,1.0 µs,22971216,9881,47,93
+veryBusyExpressions,Nested Loop,Memoized,V2,1.0 µs,22971216,18151,35,129
+veryBusyExpressions,Nested Loop,VMemoized,V1,1.0 µs,22971216,11915,30,52
+veryBusyExpressions,Nested Loop,VMemoized,V2,2.0 µs,22971216,13364,4,60
+veryBusyExpressions,Interprocedural,Base,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Interprocedural,Base,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Interprocedural,Variational,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Interprocedural,Variational,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Interprocedural,Memoized,V1,2.0 µs,22971216,7564,38,70
+veryBusyExpressions,Interprocedural,Memoized,V2,2.0 µs,22971216,16674,43,137
+veryBusyExpressions,Interprocedural,VMemoized,V1,1.0 µs,22971216,10229,25,107
+veryBusyExpressions,Interprocedural,VMemoized,V2,1.0 µs,22971216,14023,12,167
+veryBusyExpressions,Recursion Sim,Base,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Recursion Sim,Base,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Recursion Sim,Variational,V1,0.0 µs,22971216,0,0,0
+veryBusyExpressions,Recursion Sim,Variational,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Recursion Sim,Memoized,V1,1.0 µs,22971216,7716,37,125
+veryBusyExpressions,Recursion Sim,Memoized,V2,2.0 µs,22971216,16683,38,195
+veryBusyExpressions,Recursion Sim,VMemoized,V1,1.0 µs,22971216,11604,26,114
+veryBusyExpressions,Recursion Sim,VMemoized,V2,1.0 µs,22971216,14458,4,134
+veryBusyExpressions,Arithmetic Heavy,Base,V1,0.0 µs,22971216,0,0,0
+veryBusyExpressions,Arithmetic Heavy,Base,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Arithmetic Heavy,Variational,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Arithmetic Heavy,Variational,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Arithmetic Heavy,Memoized,V1,2.0 µs,22971216,10873,47,163
+veryBusyExpressions,Arithmetic Heavy,Memoized,V2,1.0 µs,22971216,22265,47,486
+veryBusyExpressions,Arithmetic Heavy,VMemoized,V1,1.0 µs,22971216,13147,30,93
+veryBusyExpressions,Arithmetic Heavy,VMemoized,V2,1.0 µs,22971216,15420,4,389
+veryBusyExpressions,Variational Initialization,Base,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Variational Initialization,Base,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Variational Initialization,Variational,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Variational Initialization,Variational,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Variational Initialization,Memoized,V1,0.0 µs,22971216,16583,80,328
+veryBusyExpressions,Variational Initialization,Memoized,V2,1.0 µs,22971216,37943,93,459
+veryBusyExpressions,Variational Initialization,VMemoized,V1,2.0 µs,22971216,13245,26,219
+veryBusyExpressions,Variational Initialization,VMemoized,V2,2.0 µs,22971216,15921,4,257
+veryBusyExpressions,Loop with Multiple Variants,Base,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Loop with Multiple Variants,Base,V2,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Loop with Multiple Variants,Variational,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Loop with Multiple Variants,Variational,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Loop with Multiple Variants,Memoized,V1,1.0 µs,22971216,14460,68,860
+veryBusyExpressions,Loop with Multiple Variants,Memoized,V2,1.0 µs,22971216,31524,71,1049
+veryBusyExpressions,Loop with Multiple Variants,VMemoized,V1,1.0 µs,22971216,13862,34,436
+veryBusyExpressions,Loop with Multiple Variants,VMemoized,V2,2.0 µs,22971216,16709,4,492
+veryBusyExpressions,Deeply Nested Variants,Base,V1,2.0 µs,22971216,0,0,0
+veryBusyExpressions,Deeply Nested Variants,Base,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Deeply Nested Variants,Variational,V1,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Deeply Nested Variants,Variational,V2,1.0 µs,22971216,0,0,0
+veryBusyExpressions,Deeply Nested Variants,Memoized,V1,0.0 µs,22971216,4046,30,290
+veryBusyExpressions,Deeply Nested Variants,Memoized,V2,1.0 µs,22971216,13212,44,1012
+veryBusyExpressions,Deeply Nested Variants,VMemoized,V1,1.0 µs,22971216,8729,26,44
+veryBusyExpressions,Deeply Nested Variants,VMemoized,V2,1.0 µs,22971216,13060,4,380
