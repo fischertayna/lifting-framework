@@ -19,7 +19,7 @@ import Memoization.Core.Memory (KeyValueArray, FuncKey(..), resetCounters, sumCo
 import Memoization.Core.State (State(..))
 import GHC.Stats (getRTSStats, RTSStats(..))
 import Paths_lifting_framework (getDataFileName)
-import System.Directory (doesFileExist, createDirectoryIfMissing)
+import System.Directory (doesFileExist, createDirectoryIfMissing, getFileSize)
 import System.IO.Error (tryIOError)
 import Debug.Trace (trace)
 import VarValorUtils (flattenVarValor, extractValues)
@@ -152,6 +152,17 @@ loadMemoryState VMemoized label = do
         else return (MemState [])
 loadMemoryState _ _ = return (MemState [])
 
+getCacheFileSize :: Interpreter -> String -> IO Integer
+getCacheFileSize Memoized label = do
+    let file = memoryFileName Memoized label
+    exists <- doesFileExist file
+    if exists then getFileSize file else return 0
+getCacheFileSize VMemoized label = do
+    let file = memoryFileName VMemoized label
+    exists <- doesFileExist file
+    if exists then getFileSize file else return 0
+getCacheFileSize _ _ = return 0
+
 resetAfterLoad :: MemState v -> MemState v
 resetAfterLoad (MemState memState) = MemState (snd (resetCounters `runState` memState))
 
@@ -163,7 +174,7 @@ writeResults interpreters results = do
     createDirectoryIfMissing True outputDir
     withFile (outputDir ++ "benchmark_metrics.csv") WriteMode $ \metricsHandle ->
       withFile (outputDir ++ "benchmark_results.csv") WriteMode $ \resultsHandle -> do
-        hPutStrLn metricsHandle "Analysis,Program,Interpreter,Version,Runtime,Memory,CacheMiss,CacheHits"
+        hPutStrLn metricsHandle "Analysis,Program,Interpreter,Version,Runtime,Memory,CacheSize,CacheMiss,CacheHits"
         hPutStrLn resultsHandle "Analysis,Program,Interpreter,Version,Results"
         mapM_ (writeEntries metricsHandle resultsHandle) results
   where
@@ -184,9 +195,13 @@ writeResults interpreters results = do
                baseResults1 baseResults2 = do
         -- let baseComparison1 = show (results1 == baseResults1)
         --     baseComparison2 = show (results2 == baseResults2)
+        let label1 = analysisName ++ "_" ++ name ++ "_V1"
+        let label2 = analysisName ++ "_" ++ name ++ "_V2"
+        cacheSize1 <- getCacheFileSize interpreter label1
+        cacheSize2 <- getCacheFileSize interpreter label2
         -- Write metrics
-        hPutStrLn metricsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V1," ++ formatRuntime runtime1 ++ "," ++ show memory1 ++ "," ++ show cacheMiss1 ++ "," ++ show cacheHits1
-        hPutStrLn metricsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V2," ++ formatRuntime runtime2 ++ "," ++ show memory2 ++ "," ++ show (cacheMiss2 - cacheMiss1) ++ "," ++ show cacheHits2
+        hPutStrLn metricsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V1," ++ formatRuntime runtime1 ++ "," ++ show memory1 ++ "," ++ show cacheSize1 ++ "," ++ show cacheMiss1 ++ "," ++ show cacheHits1
+        hPutStrLn metricsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V2," ++ formatRuntime runtime2 ++ "," ++ show memory2 ++ "," ++ show cacheSize2 ++ "," ++ show (cacheMiss2 - cacheMiss1) ++ "," ++ show cacheHits2
         -- Write results
         hPutStrLn resultsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V1," ++ show results1
         hPutStrLn resultsHandle $ analysisName ++ "," ++ name ++ "," ++ show interpreter ++ ",V2," ++ show results2
