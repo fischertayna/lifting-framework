@@ -1,7 +1,6 @@
 module Benchmark where
 
-import WhileLang.ComplexExamples
-import WhileLang.RunningExample
+import ComplexExamples
 import WhileLang.WhileEncoder
 import System.CPUTime
 import Control.DeepSeq (deepseq, NFData(..))
@@ -209,9 +208,7 @@ writeResults interpreters results = do
 runExperiments :: IO ()
 runExperiments = do
     createDirectoryIfMissing True outputDir
-    let programs = [("Running-Example", running_example_variability, running_example_variability_v2),
-                    -- ("Combining Factorial and Fibonacci", combining_fib_fat_with_variability, combining_fib_fat_with_variability_v2),
-                    ("Deep Loop", deep_loop, deep_loop_v2),
+    let programs = [("Deep Loop", deep_loop, deep_loop_v2),
                     ("Nested Loop", nested_variability, nested_variability_v2),
                     ("Interprocedural", interprocedural_sim, interprocedural_sim_v2),
                     ("Recursion Sim", factorial_rec_sim, factorial_rec_sim_v2),

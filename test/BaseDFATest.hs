@@ -11,8 +11,7 @@ import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import Base.Types (Valor(..))
 import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While)
-import WhileLang.RunningExample (running_example_variability)
-import WhileLang.ComplexExamples (deep_loop)
+import WhileLang.RunningExample (divisionByZeroExample)
 import WhileLang.WhileEncoder (encodeStmtToValor, encodeVariability)
 
 ex1, ex2, ex3, ex4, factorialProg :: Valor
@@ -477,9 +476,7 @@ whileS2 = encodeStmtToValor rdWhileS2
 
 exRD =  encodeStmtToValor rdExample
 
-runningExample = encodeVariability running_example_variability
-
-exDeepLoop = encodeVariability deep_loop
+runningExample = encodeVariability divisionByZeroExample
 
 testIsPair :: Test
 testIsPair = TestCase $ do
@@ -612,11 +609,11 @@ testInitExIF = TestCase $ do
     let expectedOutput = (ValorStr "4")
     assertEqual "init if" expectedOutput output
 
-testInitDeepLoop :: Test
-testInitDeepLoop = TestCase $ do
-    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" (exDeepLoop!!1)
+testInitRunningExample :: Test
+testInitRunningExample = TestCase $ do
+    output <- processFile executeProg "src/Language/Analysis/DFA/init.lng" (runningExample!!0)
     let expectedOutput = (ValorStr "1")
-    assertEqual "init deep loop" expectedOutput output
+    assertEqual "init runningExample" expectedOutput output
 
 testFinalEx1 :: Test
 testFinalEx1 = TestCase $ do
@@ -702,11 +699,11 @@ testFinalExIF = TestCase $ do
     let expectedOutput = (ValorList [ValorStr "5", ValorStr "6"])
     assertEqual "final if" expectedOutput output
 
-testFinalDeepLoop :: Test
-testFinalDeepLoop = TestCase $ do
-    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" (exDeepLoop!!1)
-    let expectedOutput = (ValorList [ValorStr "2"])
-    assertEqual "final Deep Loop" expectedOutput output
+testFinalRunningExample :: Test
+testFinalRunningExample = TestCase $ do
+    output <- processFile executeProg "src/Language/Analysis/DFA/final.lng" (runningExample!!1)
+    let expectedOutput = (ValorList [ValorStr "4"])
+    assertEqual "final runningExample" expectedOutput output
 
 testElem :: Test
 testElem = TestCase $ do
@@ -801,11 +798,11 @@ testFlowFactorial = TestCase $ do
             ValorPair(ValorStr "4", ValorStr "5")])
     assertEqual "Flow Factorial" expectedOutput output
 
--- testFlowDeepLoop :: Test
--- testFlowDeepLoop = TestCase $ do
---     output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" (exDeepLoop!!1)
---     let expectedOutput = (ValorList[])
---     assertEqual "Flow deep loop" expectedOutput output
+testFlowRunningExample :: Test
+testFlowRunningExample = TestCase $ do
+    output <- processFile executeProg "src/Language/Analysis/DFA/flow.lng" (runningExample!!1)
+    let expectedOutput = (ValorList[])
+    assertEqual "Flow runningExample" expectedOutput output
 
 testChaoticIteration1 :: Test
 testChaoticIteration1 = TestCase $ do
@@ -1170,11 +1167,53 @@ testReachingDefinitionsPPA = TestCase $ do
     let expectedOutput = ValorPair(exRDEntry, exRDExit)
     assertEqual "testReachingDefinitionsPPA" expectedOutput output
 
--- testReachingDefinitionsDeepLoop :: Test
--- testReachingDefinitionsDeepLoop = TestCase $ do
---     output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" (exDeepLoop!!1)
---     let expectedOutput = ValorPair(exRDEntry, exRDExit)
---     assertEqual "testReachingDefinitionsDeepLoop" expectedOutput output
+runningRDEntry = ValorList[
+    ValorPair(ValorStr "1", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "?"), 
+                            ValorPair(ValorStr "y", ValorStr "?") ]),
+    ValorPair(ValorStr "2", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "?") ]),
+    ValorPair(ValorStr "3", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "2"),
+                            ValorPair(ValorStr "y", ValorStr "4") ]),
+    ValorPair(ValorStr "4", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "2"), 
+                            ValorPair(ValorStr "y", ValorStr "4") ]),
+    ValorPair(ValorStr "5", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"),
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "4") ])]
+
+runningRDExit = ValorList[
+    ValorPair(ValorStr "1", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "?") ]),
+    ValorPair(ValorStr "2", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "y", ValorStr "2") ]),
+    ValorPair(ValorStr "3", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "2"),
+                            ValorPair(ValorStr "y", ValorStr "4") ]),
+    ValorPair(ValorStr "4", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "1"), 
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "4") ]),
+    ValorPair(ValorStr "5", ValorList[
+                            ValorPair(ValorStr "x", ValorStr "5"),
+                            ValorPair(ValorStr "y", ValorStr "4") ])]
+
+testReachingDefinitionsRunningExample :: Test
+testReachingDefinitionsRunningExample = TestCase $ do
+    output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" (runningExample!!1)
+    let expectedOutput = ValorPair(runningRDEntry, runningRDExit)
+    assertEqual "testReachingDefinitionsRunningExample" expectedOutput output
 
 baseDFATestSuite :: Test
 baseDFATestSuite = TestList [    TestLabel "is pair" testIsPair

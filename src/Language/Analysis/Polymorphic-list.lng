@@ -3,7 +3,7 @@ main (n) {
     length (n)
 }
 
-length :: [Any] -> int
+length :: [int] -> int
 length (lst) {
     if ((isNil (lst)))
         then 0

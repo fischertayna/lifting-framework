@@ -2,7 +2,7 @@ module VarDFATest where
 
 import Language.VInterpreter.Interpreter
 import Language.VInterpreter.Driver
-import Variability.VarTypes (Prop, VarValor(..), Var (Var), apply, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||), propA, propB, atbt, atbf, afbt, afbf, substitute, substituteWithSubstitutions)
+import Variability.VarTypes (Prop, VarValor(..), Var (Var), apply, mkBDDVar, notBDD, ttPC, ffPC, tt, ff, (/\), (\/), (|||), propA, propB, atbt, atbf, afbt, afbf, substitute, substitutions, substituteWithSubstitutions)
 
 import Language.Frontend.ErrM
 import Helper (processFile)
@@ -11,8 +11,7 @@ import Test.HUnit
 import System.Timeout (timeout)
 import Control.Exception (evaluate)
 import WhileLang.WhileDFAExamples (rdS01, rdS02, rdWhileS1,rdWhileS2, rdExample, ex2While, lvExample, aeExample, vbExample)
-import WhileLang.RunningExample (running_example_variability)
-import WhileLang.ComplexExamples (deep_loop)
+import WhileLang.RunningExample (divisionByZeroExample, propUnsafeDiv)
 import WhileLang.WhileEncoder (encodeStmt)
 import VarDFAExamples (
     ex1, 
@@ -20,7 +19,8 @@ import VarDFAExamples (
     rdExampleEntry, rdExampleExit,
     lvExampleEntry, lvExampleExit,
     a_plus_b, a_mult_b, aeExampleEntry, aeExampleExit,
-    a_minus_b, b_minus_a, vbExampleEntry, vbExampleExit)
+    a_minus_b, b_minus_a, vbExampleEntry, vbExampleExit,
+    runningRDEntry, runningRDExit)
 
 ex2 = encodeStmt ex2While
 
@@ -32,41 +32,7 @@ exAE = encodeStmt aeExample
 
 exVB = encodeStmt vbExample
 
-exRunning = encodeStmt running_example_variability
-
-propALTINIT :: Prop
-propALTINIT = mkBDDVar "ALT_INIT"
-
-propFASTFIB :: Prop
-propFASTFIB = mkBDDVar "FAST_FIB"
-
-altTfastT :: Prop
-altTfastT = propALTINIT /\ propFASTFIB
-
-altTfastF :: Prop
-altTfastF = propALTINIT /\ notBDD propFASTFIB
-
-altFfastT :: Prop
-altFfastT = notBDD propALTINIT /\ propFASTFIB
-
-altFfastF :: Prop
-altFfastF = notBDD propALTINIT /\ notBDD propFASTFIB
-
-substitutionsRunning :: [(String, String)]
-substitutionsRunning =
-    [ (show altTfastT, " altT_fastT")
-    , (show altFfastT, " altF_fastT")
-    , (show altTfastF, " altT_fastF")
-    , (show altFfastF, " altF_fastF")
-    , (show tt, " tt")
-    , (show ff, " ff")
-    , (show ttPC, " ttPC")
-    , (show ffPC, " ffPC")
-    , (show propALTINIT, " ALT_INIT")
-    , (show (notBDD propALTINIT), " ~ALT_INIT")
-    , (show propFASTFIB, " FAST_FIB")
-    , (show (notBDD propFASTFIB), " ~FAST_FIB")
-    ]
+runningExample = encodeStmt divisionByZeroExample
 
 testElem :: Test
 testElem = TestCase $ do
@@ -173,8 +139,8 @@ testInitEx2_4 = testInit "Ex2_4" ex2_4 (VarString (Var [("4", ttPC)]))
 testInitexRD :: Test
 testInitexRD = testInit "PPA" exRD (VarString (Var [("1", ttPC)]))
 
-testInitexRunning :: Test
-testInitexRunning = testInit "Running" exRunning (VarString (Var [("1", ttPC)]))
+testInitrunningExample :: Test
+testInitrunningExample = testInit "Running" runningExample (VarString (Var [("1", ttPC)]))
 
 testFinal :: String -> VarValor -> VarValor -> Test
 testFinal name input expectedOutput = TestCase $ do
@@ -203,8 +169,8 @@ testFinalEx2_4 = testFinal "ex2_4" ex2_4 (VarList [VarString (Var [("4", ttPC)])
 testFinalexRD :: Test
 testFinalexRD = testFinal "PPA" exRD (VarList [VarString (Var [("3", ttPC)])])
 
-testFinalexRunning :: Test
-testFinalexRunning = testFinal "Running" exRunning (VarList [VarString (Var [("7", ttPC)])])
+testFinalrunningExample :: Test
+testFinalrunningExample = testFinal "Running" runningExample (VarList [VarString (Var [("5", ttPC)])])
 
 testFlow :: String -> VarValor -> VarValor -> Test
 testFlow name input expectedOutput = TestCase $ do
@@ -232,21 +198,13 @@ testFlowexRD = testFlow "PPA" exRD (VarList[VarPair(VarString (Var [("1", ttPC)]
                                 VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)]))
                             ])
 
-flowRunning = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", propALTINIT), ("-2", notBDD propALTINIT)])),
-                VarPair(VarString (Var [("3", notBDD propALTINIT), ("-3", propALTINIT)]), VarString (Var [("4", ttPC)])),
-                VarPair(VarString (Var [("4", ttPC)]), VarString (Var [("5", ttPC)])),
-                VarPair(VarString (Var [("5", ttPC)]), VarString (Var [("6", ttPC)])),
-                VarPair(VarString (Var [("6", ttPC)]), VarString (Var [("7", ttPC)])),
-                VarPair(VarString (Var [("12", ttPC)]), VarString (Var [("7", ttPC)])),
-                VarPair(VarString (Var [("7", ttPC)]),VarString (Var [("8", propFASTFIB), ("-8", notBDD propFASTFIB)])),
-                VarPair(VarString (Var [("10", notBDD propFASTFIB), ("-10", propFASTFIB)]), VarString (Var [("11", ttPC)])),
-                VarPair(VarString (Var [("11", ttPC)]), VarString (Var [("12", ttPC)])),
-                VarPair(VarString (Var [("8", propFASTFIB), ("-8", notBDD propFASTFIB)]), VarString (Var [("9", notBDD propFASTFIB), ("-9", propFASTFIB)])),
-                VarPair(VarString (Var [("9", notBDD propFASTFIB), ("-9", propFASTFIB)]), VarString (Var [("10", notBDD propFASTFIB), ("-10", propFASTFIB)])),
-                VarPair(VarString (Var [("2", propALTINIT), ("-2", notBDD propALTINIT)]), VarString (Var [("3", notBDD propALTINIT), ("-3", propALTINIT)]))]
+flowRunning = VarList[VarPair(VarString (Var [("1", ttPC)]),VarString (Var [("2", ttPC)])),
+                VarPair(VarString (Var [("2", ttPC)]), VarString (Var [("3", propUnsafeDiv), ("-3", notBDD propUnsafeDiv)])),
+                VarPair(VarString (Var [("4", notBDD propUnsafeDiv), ("-4", propUnsafeDiv)]), VarString (Var [("5", ttPC)])),
+                VarPair(VarString (Var [("-3", notBDD propUnsafeDiv), ("3", propUnsafeDiv)]), VarString (Var [("4", notBDD propUnsafeDiv), ("-4", propUnsafeDiv)]))]
 
-testFlowExRunning :: Test
-testFlowExRunning = testFlow "Running" exRunning (flowRunning)
+testFlowrunningExample :: Test
+testFlowrunningExample = testFlow "Running" runningExample (flowRunning)
 
 testFlowR :: String -> VarValor -> VarValor -> Test
 testFlowR name input expectedOutput = TestCase $ do
@@ -560,6 +518,13 @@ testRDExit2_4 = testRDExit "Ex2_4" (VarPair(VarString (Var [("4", ttPC)]), VarPa
             VarPair(VarString (Var [("y", propA)]), VarString (Var [("2", propA)])),
             VarPair(VarString (Var [("y", notBDD propA)]), VarString (Var [("3", notBDD propA)])) ])
 
+testRDExitRunning_3 :: Test
+testRDExitRunning_3 = testRDExit "ExRunning_3" (VarPair(VarString (Var [("3", propUnsafeDiv), ("-3", notBDD propUnsafeDiv)]), VarPair(runningExample, runningRDEntry)))  (
+    VarList[ VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])),
+             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
+             VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+             VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])
+
 testRDExit1 :: Test
 testRDExit1 = testRDExit "Ex1" (VarPair(VarString (Var [("1", ttPC)]), VarPair(exRD, rdExampleEntry))) (
     VarList[VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
@@ -642,7 +607,7 @@ testUpdateMappings = TestCase $ do
 testReachingDefinitions :: String -> VarValor -> VarValor -> Test
 testReachingDefinitions name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Analysis/DFA/reachingDefinitions.lng" input
-    -- putStrLn ("\n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show output)))
+    -- putStrLn ("\n \n ReachingDefinitions " ++ name ++ " : " ++ (substitute (show output)))
     assertEqual ("ReachingDefinitions " ++ name) expectedOutput output
 
 testReachingDefinitionsEx2 :: Test
@@ -650,6 +615,9 @@ testReachingDefinitionsEx2 = testReachingDefinitions "Ex2"  (ex2) (VarPair(ex2En
 
 testReachingDefinitionsPPA :: Test
 testReachingDefinitionsPPA = testReachingDefinitions "PPA"  (exRD) (VarPair(rdExampleEntry, rdExampleExit))
+
+testReachingDefinitionsRunning :: Test
+testReachingDefinitionsRunning = testReachingDefinitions "Running Example"  (runningExample) (VarPair(runningRDEntry, runningRDExit))
 
 testUnion :: String -> VarValor -> VarValor -> Test
 testUnion name input expectedOutput = TestCase $ do
@@ -956,11 +924,13 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "rdExit 1" testRDExit1
                         ,   TestLabel "rdExit 2" testRDExit2
                         ,   TestLabel "rdExit 4" testRDExit4
+                        ,   TestLabel "rdExit Running_3" testRDExitRunning_3
                         ,   TestLabel "labels" testLabels
                         ,   TestLabel "testInsertInto 1" testInsertInto1
                         ,   TestLabel "testInsertInto 2" testInsertInto2
                         ,   TestLabel "testReachingDefinitionsEx2" testReachingDefinitionsEx2
                         ,   TestLabel "testReachingDefinitionsPPA" testReachingDefinitionsPPA
+                        ,   TestLabel "testReachingDefinitionsRunning" testReachingDefinitionsRunning
                         ,   TestLabel "union 1" testUnion1
                         ,   TestLabel "union 2" testUnion2
                         ,   TestLabel "union 2_2" testUnion2_2
@@ -1008,7 +978,7 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "testAEExit5" testAEExit5
                         ,   TestLabel "testAvailableExpressionsExPPA" testAvailableExpressionsExPPA
                         ,   TestLabel "testVeryBusyExpressionsExPPA" testVeryBusyExpressionsExPPA
-                        , TestLabel "testInitexRunning" testInitexRunning
-                        , TestLabel "testFinalexRunning" testFinalexRunning
-                        , TestLabel "testFlowExRunning" testFlowExRunning
+                        ,   TestLabel "testInitrunningExample" testInitrunningExample
+                        ,   TestLabel "testFinalrunningExample" testFinalrunningExample
+                        ,   TestLabel "testFlowrunningExample" testFlowrunningExample
                         ]

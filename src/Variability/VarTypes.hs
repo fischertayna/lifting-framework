@@ -285,6 +285,9 @@ afbt = notBDD propA /\ propB
 afbf :: Prop
 afbf = notBDD propA /\ notBDD propB
 
+propUnsafeDiv :: Prop
+propUnsafeDiv = mkBDDVar "UNSAFE_DIV"
+
 substitutions :: [(String, String)]
 substitutions =
     [ (show atbt, " atbt")
@@ -297,6 +300,8 @@ substitutions =
     , (show ffPC, " ffPC")
     , (show propA, " A")
     , (show (notBDD propA), " ~A")
+    , (show propUnsafeDiv, " UNSAFE_DIV")
+    , (show (notBDD propUnsafeDiv), " ~UNSAFE_DIV")
     ]
 
 replaceString :: String -> String -> String -> String

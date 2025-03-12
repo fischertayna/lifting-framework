@@ -884,3 +884,58 @@ rdExampleExit = VarList[
                             VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("5", ttPC)])),
                             VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("4", ttPC)])) ])]
 
+propUnsafeDiv :: Prop
+propUnsafeDiv = mkBDDVar "UNSAFE_DIV"
+
+runningRDEntry = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("?", ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("3", propUnsafeDiv), ("-3", notBDD propUnsafeDiv)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("4", notBDD propUnsafeDiv), ("-4", propUnsafeDiv)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
+                            VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", propUnsafeDiv)]), VarString (Var [("1", propUnsafeDiv)])),
+                            VarPair(VarString (Var [("x", notBDD propUnsafeDiv)]), VarString (Var [("4", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ])]
+
+runningRDExit = VarList[
+    VarPair(VarString (Var [("1", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("?", ttPC)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("2", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])), 
+                            VarPair(VarString (Var [("y", ttPC)]), VarString (Var [("2", ttPC)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("3", propUnsafeDiv), ("-3", notBDD propUnsafeDiv)]), VarList[
+                            VarPair(VarString (Var [("x", ttPC)]), VarString (Var [("1", ttPC)])),
+                            VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("4", notBDD propUnsafeDiv), ("-4", propUnsafeDiv)]), VarList[
+                            VarPair(VarString (Var [("x", propUnsafeDiv)]), VarString (Var [("1", propUnsafeDiv)])),
+                            VarPair(VarString (Var [("x", notBDD propUnsafeDiv)]), VarString (Var [("4", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("?", ttPC)])) ]),
+    VarPair(VarString (Var [("5", ttPC)]), VarList[
+                            VarPair(VarString (Var [("x", propUnsafeDiv)]), VarString (Var [("1", propUnsafeDiv)])),
+                            VarPair(VarString (Var [("x", notBDD propUnsafeDiv)]), VarString (Var [("4", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", notBDD propUnsafeDiv)]), VarString (Var [("2", notBDD propUnsafeDiv)])), 
+                            VarPair(VarString (Var [("y", propUnsafeDiv)]), VarString (Var [("3", propUnsafeDiv)])),
+                            VarPair(VarString (Var [("z", ttPC)]), VarString (Var [("5", ttPC)])) ])]
+
