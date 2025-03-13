@@ -1,0 +1,129 @@
+Interpreter,Analysis,Program,Version,CacheSize,CacheMiss,CacheHits
+reachingDefinitions,Nested Loop,v1,Memoized,11150,53,506
+veryBusyExpressions,Nested Loop,v2,Memoized,11392,54,110
+veryBusyExpressions,Deep Nested Variants,v1,Memoized,4046,30,290
+reachingDefinitions,Nested Loop,v2,Memoized,12665,60,740
+veryBusyExpressions,Nested Loop,v1,Memoized,9881,47,93
+veryBusyExpressions,Deep Nested Variants,v2,Memoized,9730,50,1006
+liveVariables,Deep Loop,v2,Memoized,6491,34,278
+reachingDefinitions,Deep Loop,v2,Memoized,8639,42,319
+availableExpressions,Arithmetic Heavy,v1,Memoized,10836,47,303
+reachingDefinitions,Variational Init,v2,Memoized,29804,136,1024
+liveVariables,Arithmetic Heavy,v2,Memoized,9821,48,567
+reachingDefinitions,Multi Variant Loop,v2,Memoized,19585,88,2320
+liveVariables,Deep Loop,v1,Memoized,4934,28,92
+availableExpressions,Arithmetic Heavy,v2,Memoized,12695,54,438
+reachingDefinitions,Deep Loop,v1,Memoized,6788,36,197
+reachingDefinitions,Variational Init,v1,Memoized,22506,111,593
+liveVariables,Arithmetic Heavy,v1,Memoized,8359,42,308
+reachingDefinitions,Multi Variant Loop,v1,Memoized,16101,77,1363
+veryBusyExpressions,Recursion Sim,v2,Memoized,9872,44,189
+availableExpressions,Deep Loop,v2,Memoized,7770,37,67
+reachingDefinitions,Recursion Sim,v1,Memoized,8790,43,282
+availableExpressions,Deep Nested Variants,v2,Memoized,10038,55,649
+veryBusyExpressions,Recursion Sim,v1,Memoized,7716,37,125
+availableExpressions,Deep Loop,v1,Memoized,5921,30,50
+reachingDefinitions,Recursion Sim,v2,Memoized,10613,49,468
+availableExpressions,Deep Nested Variants,v1,Memoized,3931,30,290
+liveVariables,Nested Loop,v2,Memoized,9654,48,444
+availableExpressions,Variational Init,v2,Memoized,26357,119,433
+reachingDefinitions,Arithmetic Heavy,v1,Memoized,12155,53,549
+liveVariables,Variational Init,v1,Memoized,14690,76,604
+liveVariables,Nested Loop,v1,Memoized,8207,42,308
+availableExpressions,Variational Init,v1,Memoized,19066,94,178
+reachingDefinitions,Arithmetic Heavy,v2,Memoized,14280,60,790
+liveVariables,Variational Init,v2,Memoized,19793,94,826
+liveVariables,Interprocedural,v2,Memoized,10193,52,848
+availableExpressions,Interprocedural,v2,Memoized,11719,61,127
+liveVariables,Interprocedural,v1,Memoized,6353,34,236
+availableExpressions,Interprocedural,v1,Memoized,7675,40,76
+liveVariables,Deep Nested Variants,v1,Memoized,4155,30,290
+veryBusyExpressions,Multi Variant Loop,v1,Memoized,14460,68,860
+reachingDefinitions,Interprocedural,v2,Memoized,13786,66,846
+reachingDefinitions,Deep Nested Variants,v1,Memoized,6645,43,469
+veryBusyExpressions,Arithmetic Heavy,v1,Memoized,10873,47,163
+liveVariables,Deep Nested Variants,v2,Memoized,8643,50,1006
+veryBusyExpressions,Multi Variant Loop,v2,Memoized,18171,79,1041
+reachingDefinitions,Interprocedural,v1,Memoized,8627,45,387
+reachingDefinitions,Deep Nested Variants,v2,Memoized,12806,68,1372
+veryBusyExpressions,Arithmetic Heavy,v2,Memoized,12733,54,479
+liveVariables,Recursion Sim,v2,Memoized,7795,40,315
+availableExpressions,Recursion Sim,v1,Memoized,7441,37,67
+liveVariables,Multi Variant Loop,v2,Memoized,15469,74,1851
+liveVariables,Recursion Sim,v1,Memoized,6191,34,226
+availableExpressions,Recursion Sim,v2,Memoized,9485,44,84
+liveVariables,Multi Variant Loop,v1,Memoized,12504,64,1096
+availableExpressions,Nested Loop,v1,Memoized,9612,47,93
+veryBusyExpressions,Deep Loop,v1,Memoized,6202,30,96
+availableExpressions,Multi Variant Loop,v2,Memoized,19682,89,471
+veryBusyExpressions,Interprocedural,v1,Memoized,7564,38,70
+veryBusyExpressions,Variational Init,v2,Memoized,22265,99,453
+availableExpressions,Nested Loop,v2,Memoized,11126,54,110
+veryBusyExpressions,Deep Loop,v2,Memoized,8158,37,125
+availableExpressions,Multi Variant Loop,v1,Memoized,15677,76,388
+veryBusyExpressions,Interprocedural,v2,Memoized,11610,59,121
+veryBusyExpressions,Variational Init,v1,Memoized,16583,80,328
+liveVariables,Variational Init,v1,VMemoized,6583,26,324
+veryBusyExpressions,Arithmetic Heavy,v1,VMemoized,9648,30,93
+liveVariables,Recursion Sim,v2,VMemoized,8168,30,298
+availableExpressions,Variational Init,v1,VMemoized,9187,26,79
+liveVariables,Variational Init,v2,VMemoized,7699,30,380
+veryBusyExpressions,Arithmetic Heavy,v2,VMemoized,11291,34,389
+liveVariables,Recursion Sim,v1,VMemoized,6883,26,149
+availableExpressions,Variational Init,v2,VMemoized,11045,30,134
+availableExpressions,Interprocedural,v2,VMemoized,10518,38,121
+liveVariables,Deep Nested Variants,v2,VMemoized,8782,30,93
+availableExpressions,Deep Loop,v2,VMemoized,8569,26,44
+availableExpressions,Interprocedural,v1,VMemoized,7681,26,79
+liveVariables,Deep Nested Variants,v1,VMemoized,7637,26,44
+availableExpressions,Deep Loop,v1,VMemoized,6982,22,36
+liveVariables,Arithmetic Heavy,v2,VMemoized,8738,34,201
+veryBusyExpressions,Variational Init,v2,VMemoized,11048,30,257
+veryBusyExpressions,Recursion Sim,v1,VMemoized,9098,26,114
+availableExpressions,Recursion Sim,v2,VMemoized,10413,30,52
+reachingDefinitions,Recursion Sim,v2,VMemoized,10929,33,467
+reachingDefinitions,Deep Loop,v2,VMemoized,8968,29,401
+veryBusyExpressions,Nested Loop,v2,VMemoized,9935,34,60
+reachingDefinitions,Nested Loop,v1,VMemoized,9643,33,367
+veryBusyExpressions,Multi Variant Loop,v2,VMemoized,12856,38,492
+availableExpressions,Arithmetic Heavy,v2,VMemoized,11274,34,295
+liveVariables,Arithmetic Heavy,v1,VMemoized,7596,30,175
+veryBusyExpressions,Variational Init,v1,VMemoized,9209,26,219
+veryBusyExpressions,Recursion Sim,v2,VMemoized,11069,30,134
+availableExpressions,Recursion Sim,v1,VMemoized,8568,26,44
+reachingDefinitions,Recursion Sim,v1,VMemoized,9376,29,401
+reachingDefinitions,Deep Loop,v1,VMemoized,7468,25,299
+veryBusyExpressions,Nested Loop,v1,VMemoized,8878,30,52
+veryBusyExpressions,Multi Variant Loop,v1,VMemoized,10793,34,436
+reachingDefinitions,Nested Loop,v2,VMemoized,10695,37,533
+availableExpressions,Arithmetic Heavy,v1,VMemoized,9592,30,216
+availableExpressions,Multi Variant Loop,v1,VMemoized,10311,34,60
+veryBusyExpressions,Deep Nested Variants,v2,VMemoized,10704,30,380
+availableExpressions,Multi Variant Loop,v2,VMemoized,12228,38,68
+veryBusyExpressions,Deep Nested Variants,v1,VMemoized,7341,26,44
+reachingDefinitions,Variational Init,v2,VMemoized,10617,33,367
+veryBusyExpressions,Deep Loop,v1,VMemoized,7473,22,65
+reachingDefinitions,Variational Init,v1,VMemoized,9521,29,272
+veryBusyExpressions,Deep Loop,v2,VMemoized,9182,26,79
+veryBusyExpressions,Interprocedural,v1,VMemoized,7678,25,107
+veryBusyExpressions,Interprocedural,v2,VMemoized,10481,37,167
+liveVariables,Multi Variant Loop,v1,VMemoized,8622,34,436
+reachingDefinitions,Multi Variant Loop,v1,VMemoized,11023,37,533
+liveVariables,Nested Loop,v1,VMemoized,7520,30,257
+reachingDefinitions,Arithmetic Heavy,v1,VMemoized,10463,33,367
+reachingDefinitions,Deep Nested Variants,v2,VMemoized,12228,33,367
+liveVariables,Multi Variant Loop,v2,VMemoized,9883,38,492
+reachingDefinitions,Multi Variant Loop,v2,VMemoized,12581,41,599
+liveVariables,Nested Loop,v2,VMemoized,8613,34,295
+reachingDefinitions,Arithmetic Heavy,v2,VMemoized,12041,37,533
+reachingDefinitions,Deep Nested Variants,v1,VMemoized,11435,29,272
+liveVariables,Interprocedural,v2,VMemoized,9185,37,473
+availableExpressions,Deep Nested Variants,v1,VMemoized,7332,26,44
+availableExpressions,Nested Loop,v2,VMemoized,9440,34,60
+liveVariables,Deep Loop,v2,VMemoized,6892,26,254
+reachingDefinitions,Interprocedural,v2,VMemoized,12163,41,471
+liveVariables,Interprocedural,v1,VMemoized,6278,25,305
+availableExpressions,Deep Nested Variants,v2,VMemoized,10732,30,52
+availableExpressions,Nested Loop,v1,VMemoized,8389,30,52
+liveVariables,Deep Loop,v1,VMemoized,5677,22,94
+reachingDefinitions,Interprocedural,v1,VMemoized,8567,29,229

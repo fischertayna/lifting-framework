@@ -2,7 +2,7 @@
 
 module Main where
 
-import Benchmark (Interpreter(..), MemState(..), memoryFileName, loadMemoryState, loadMemoryStateVar)
+import Benchmark (Interpreter(..), MemState(..), memoryFileName, loadMemoryState)
 import Memoization.Core.Memory (sumCounters)
 import Memoization.Core.State (runState)
 import System.Directory (listDirectory, doesFileExist, getFileSize)
