@@ -1,6 +1,6 @@
 module Main where
 
-import Benchmark (runExperiments)
+import BenchmarkCriterion (benchmarkAll)
 
 main :: IO ()
-main = runExperiments
+main = benchmarkAll

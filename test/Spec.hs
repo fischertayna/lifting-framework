@@ -7,10 +7,12 @@ import BaseDFATest
 import VarDFATest
 import VMemoDFATest
 import EncodingTest
+import ReadTest
 
 main :: IO ()
 main = do
     putStrLn "Running tests..."
+    runTestTT test_serialization
     runTestTT baseTestSuite
     runTestTT varTestSuite
     runTestTT memoTestSuite

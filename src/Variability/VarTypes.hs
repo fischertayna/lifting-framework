@@ -14,6 +14,7 @@ import Data.Maybe (fromJust)
 import Debug.Trace (trace)
 import qualified Data.Text as T
 import Text.Read (readMaybe)
+import Text.ParserCombinators.ReadP (ReadP, munch1, char, between, skipSpaces, string, readP_to_S)
 
 type HashTable k v = H.BasicHashTable k v
 
@@ -22,77 +23,103 @@ instance Hashable DDNode where
     hashWithSalt :: Int -> DDNode -> Int
     hashWithSalt s d = hashWithSalt s (nodeReadIndex d)
 
-newtype Prop = Prop
+data Prop = Prop
   { b :: DDNode
+  , pname :: String
   }
 
 instance Eq Prop where
   {-# INLINE (==) #-}
   (==) :: Prop -> Prop -> Bool
-  (Prop b0) == (Prop b1) = b0 == b1
+  (Prop b0 _) == (Prop b1 _) = b0 == b1
 
 instance Ord Prop where
     (<=) :: Prop -> Prop -> Bool
-    (Prop b0) <= (Prop b1) = nodeReadIndex b0 <= nodeReadIndex b1
+    (Prop b0 _) <= (Prop b1 _) = nodeReadIndex b0 <= nodeReadIndex b1
 
 instance Hashable Prop where
     {-# INLINE hashWithSalt #-}
     hashWithSalt :: Int -> Prop -> Int
-    hashWithSalt s (Prop b) = hashWithSalt s b
+    hashWithSalt s (Prop b _) = hashWithSalt s b
 
 instance Show Prop where
-    {-# INLINE show #-}
-    show :: Prop -> String
-    show (Prop b) = show b
+  show (Prop _ name) = "Prop " ++ show name
 
 instance Read Prop where
-    readsPrec _ input = [(mkBDDVar input, "")]
+  readsPrec _ = readP_to_S parseProp
+
+parseProp :: ReadP Prop
+parseProp = do
+  _ <- string "Prop"
+  skipSpaces
+  name <- between (char '"') (char '"') (munch1 (/= '"'))
+  let prop = case name of
+                "tt" -> tt
+                "ff" -> ff
+                _    -> mkBDDVar name
+  return prop
 
 manager :: Cudd.Cudd.DDManager
 manager = cuddInit
 
 {-# INLINE tt #-}
 tt :: Prop
-tt = newBDD (readOne manager)
+tt = newBDD (readOne manager) "tt"
 
 {-# INLINE ff #-}
 ff :: Prop
-ff = newBDD (readLogicZero manager)
+ff = newBDD (readLogicZero manager) "ff"
 
 {-# INLINE newBDD #-}
-newBDD :: DDNode -> Prop
-newBDD = Prop
+newBDD :: DDNode -> String -> Prop
+newBDD node name = Prop node name
 
 mkBDDVar :: String -> Prop
 mkBDDVar name =
   let i = lookupVar name
       r = ithVar manager i
-   in newBDD r
+   in newBDD r name
 
 {-# INLINE andBDD #-}
 andBDD :: Prop -> Prop -> Prop
-andBDD p0@(Prop b0) p1@(Prop b1)
+andBDD p0@(Prop b0 n0) p1@(Prop b1 n1)
   | p0 == ff = ff
   | p1 == ff = ff
   | p0 == tt = p1
   | p1 == tt = p0
-  | otherwise = newBDD $ bAnd manager b0 b1
+  | b0 == b1 = p0  -- same BDD node ⇒ reuse existing name
+  | otherwise =
+      let b = bAnd manager b0 b1
+          name = if b == b0 then n0
+                 else if b == b1 then n1
+                 else "(" ++ n0 ++ " && " ++ n1 ++ ")"
+      in newBDD b name
 
-{-# INLINE orBDD #-}
+
 orBDD :: Prop -> Prop -> Prop
-orBDD p0@(Prop b0) p1@(Prop b1)
+orBDD p0@(Prop b0 n0) p1@(Prop b1 n1)
   | p0 == tt = tt
   | p1 == tt = tt
   | p0 == ff = p1
   | p1 == ff = p0
-  | otherwise = newBDD $ bOr manager b0 b1
+  | b0 == b1 = p0
+  | otherwise =
+      let b = bOr manager b0 b1
+          name = if b == b0 then n0
+                 else if b == b1 then n1
+                 else "(" ++ n0 ++ " || " ++ n1 ++ ")"
+      in newBDD b name
 
-{-# INLINE notBDD #-}
 notBDD :: Prop -> Prop
-notBDD p@(Prop b)
-  | p == tt = ff
-  | p == ff = tt
-  | otherwise = newBDD $ bNot manager b
+notBDD p@(Prop b n)
+  | b == readOne manager      = ff
+  | b == readLogicZero manager = tt
+  | otherwise =
+      let b' = bNot manager b
+          name = case n of
+                    ('~':rest) -> rest    -- Double negation simplification: ~~A → A
+                    _          -> "~" ++ n
+      in newBDD b' name
 
 sat :: Prop -> Bool
 sat p = p /= ff
@@ -181,16 +208,11 @@ compact :: Var t -> Var t
 compact (Var v) = Var (groupVals v (===))
 
 instance Show a => Show (Var a) where
-    show :: Show a => Var a -> String
-    show v' =
-        let (Var v) = compact v'
-        in "{" ++ L.intercalate ", " (map show v) ++ "}"
+  show (Var v) = show v
 
-instance (Read t) => Read (Var t) where
-    readsPrec _ input =
-        case readMaybe input of
-            Just vals -> [(Var vals, "")]
-            Nothing   -> []
+instance Read t => Read (Var t) where
+  readsPrec d input =
+    [ (Var v, rest) | (v, rest) <- readsPrec d input ]
 
 instance Functor Var where
     fmap :: (a -> b) -> Var a -> Var b

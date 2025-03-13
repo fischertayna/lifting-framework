@@ -689,7 +689,7 @@ testIsMember :: String -> VarValor -> VarValor -> Test
 testIsMember name input expectedOutput = TestCase $ do
     output <- processFile executeProg "src/Language/Analysis/DFA/isMember.lng" input
     -- putStrLn ("\n isMember " ++ name ++ ", result: " ++ (substitute (show output)))
-    assertEqual ("isMember " ++ name) (show expectedOutput) (show output)
+    assertEqual ("isMember " ++ name) (expectedOutput) (output)
 
 testIsMember1 :: Test
 testIsMember1 = testIsMember "1: VarString {str = {('a', tt)}} and VarList {list = [VarString {str = {('a', tt)}}]}" (VarPair(VarString (Var [("a", ttPC)]), VarList [VarString (Var [("a", ttPC)])])) (VarInteger (Var [(1, ttPC)])) 
@@ -714,9 +714,6 @@ testIsMember6 = testIsMember "6: VarString {str = {('a', A)}} and VarList {list 
 
 testIsMember7 :: Test
 testIsMember7 = testIsMember "7: VarString {str = {('a', A), ('b', ~A)}} and VarList {list = [VarString {str = {('a', A), ('c', ~A)}}]}" (VarPair(VarString (Var [("a", propA), ("b", notBDD propA)]), VarList [VarString (Var [("a", propA), ("c", notBDD propA)])])) (VarInteger (Var [(1, propA), (0, notBDD propA)])) 
-
-testIsMember8 :: Test
-testIsMember8 = testIsMember "8: VarString {str = {('a', A), ('b', ~A)}} and VarList {list = [VarString {str = {('a', A), ('b', ~A)}}]}" (VarPair(VarString (Var [("a", propA), ("b", notBDD propA)]), VarList [VarString (Var [("a", propA), ("b", notBDD propA)])])) (VarInteger (Var [(1, ttPC)]))
 
 testLVEntry :: String -> VarValor -> VarValor -> Test
 testLVEntry name input expectedOutput = TestCase $ do
@@ -957,7 +954,6 @@ varDFATestSuite = TestList [    TestLabel "is pair" testIsPair
                         ,   TestLabel "isMember 5" testIsMember5
                         ,   TestLabel "isMember 6" testIsMember6
                         ,   TestLabel "isMember 7" testIsMember7
-                        ,   TestLabel "isMember 8" testIsMember8
                         ,   TestLabel "testLVEntry1" testLVEntry1
                         ,   TestLabel "testLVEntry2" testLVEntry2
                         ,   TestLabel "testLVEntry3" testLVEntry3

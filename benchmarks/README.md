@@ -1,9 +1,13 @@
 # Running Benchmark
 
-1. Create memoized_state.dat vmemoized_state.dat if not exists
+1. Execute benchmark using criterion
 
-```touch memoized_state.dat vmemoized_state.dat```
+```cabal run benchmark-suite -- --json benchmark_output/benchmark.json```
 
-2. Execute benchmark enabling GC stats
+2. generate runtime metrics
 
-```cabal bench --benchmark-options="+RTS -T -RTS"```
+```python3 benchmarks/scripts/generateCSV.py```
+
+3.   generate cache metrics
+
+```cabal run cache-metrics-extractor```

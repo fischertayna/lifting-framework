@@ -100,13 +100,15 @@ test-suite lifting-framework-test
         text
     default-language:    Haskell2010
 
-benchmark benchmark-suite
+executable benchmark-suite
     type: exitcode-stdio-1.0
     hs-source-dirs: benchmarks
     main-is: Main.hs
-    other-modules: Benchmark, ComplexExamples, VarValorUtils, Paths_lifting_framework
+    other-modules: Benchmark, BenchmarkCriterion, ComplexExamples, VarValorUtils, Paths_lifting_framework
     build-depends:
         base ^>=4.16.4.0,
+        criterion,
+        criterion-measurement,
         time,
         deepseq,
         directory,
@@ -114,3 +116,15 @@ benchmark benchmark-suite
         containers,
         lifting-framework
     default-language: Haskell2010
+
+executable cache-metrics-extractor
+  main-is:             CacheMetricsExtractor.hs
+  hs-source-dirs:      benchmarks
+  build-depends:       
+        base, 
+        lifting-framework,
+        filepath,
+        directory,
+        containers,
+        deepseq
+  default-language:    Haskell2010
