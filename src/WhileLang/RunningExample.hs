@@ -37,7 +37,7 @@ loadPassword = Assignment "pwd" (Variable "input") 1
 sanitizeOrNot :: Stmt
 sanitizeOrNot = Variant propSanitize
   (Assignment "pwd" (Variable "sanitized_input") 2) 
-  (Skip 3)                                          
+  (Assignment "pwd" (Mult (Variable "pwd") (Variable "pwd")) 3)                                          
 
 usePassword :: Stmt
 usePassword = Assignment "result" (Variable "pwd") 4
