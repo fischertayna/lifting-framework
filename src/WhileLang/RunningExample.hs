@@ -23,3 +23,24 @@ s4 = Assignment "z" (Div (Variable "x") (Variable "y")) 5
 
 divisionByZeroExample :: Program
 divisionByZeroExample = Seq s1 (Seq s2 (Seq s3 s4))
+
+---------------------------------------------------------------
+-- Running Example - Presentation
+---------------------------------------------------------------
+
+propSanitize :: Prop
+propSanitize = mkBDDVar "SANITIZE"
+
+loadPassword :: Stmt
+loadPassword = Assignment "pwd" (Variable "input") 1
+
+sanitizeOrNot :: Stmt
+sanitizeOrNot = Variant propSanitize
+  (Assignment "pwd" (Variable "sanitized_input") 2) 
+  (Skip 3)                                          
+
+usePassword :: Stmt
+usePassword = Assignment "result" (Variable "pwd") 4
+
+passwordSanitizationExample :: Program
+passwordSanitizationExample = Seq loadPassword (Seq sanitizeOrNot usePassword)
