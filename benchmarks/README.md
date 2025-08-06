@@ -32,21 +32,21 @@ You can, then, execute the same commands as the above Native Environment section
 
 ### Persisting Results to the Host
 
-All benchmark artefacts are written to /app/benchmark_output inside the container.
+All benchmark artefacts are written to /lifting-framework/benchmark_output inside the container.
 Mount a host directory to keep them after the container exits:
 
 ```bash
 docker run -it \
-  -v "$(pwd)/benchmark_output:/app/benchmark_output" \
+  -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
   ghcr.io/fischertayna/lifting-framework:sblp25 \
-  cabal run benchmark-suite -- --json /app/benchmark_output/benchmark.json
+  cabal run benchmark-suite -- --json /lifting-framework/benchmark_output/benchmark.json
 ```
 
 You can also generate directly all the metrics:
 
 ```bash
 docker run -it \
-  -v "$(pwd)/benchmark_output:/app/benchmark_output" \
+  -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
   ghcr.io/fischertayna/lifting-framework:sblp25 \
   python3 benchmarks/scripts/generateCSV.py
 ```
@@ -55,7 +55,7 @@ and
 
 ```bash
 docker run -it \
-  -v "$(pwd)/benchmark_output:/app/benchmark_output" \
+  -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
   ghcr.io/fischertayna/lifting-framework:sblp25 \
   cabal run cache-metrics-extractor
 ```
@@ -71,7 +71,7 @@ If you forgot to mount a volume, you can still retrieve the data:
 docker ps -a
 
 # Copy the folder to the current directory
-docker cp <CONTAINER_ID>:/app/benchmark_output ./benchmark_output
+docker cp <CONTAINER_ID>:/lifting-framework/benchmark_output ./benchmark_output
 ```
 
 Now you have the benchmark_output directory locally, ready for further analysis.
