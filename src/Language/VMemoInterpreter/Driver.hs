@@ -39,5 +39,5 @@ executeProg memoizedFunctionNames initialState prog input =
 
 calc :: String -> String
 calc s =
-  let r = executeProg memoizedNames initialState s varList
+  let r = executeProg memoizedNames initialState s varInt
   in show $ r

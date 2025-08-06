@@ -15,6 +15,9 @@ main = do
   interact calc
   putStrLn ""
 
+inputI :: Valor
+inputI = ValorInt 10
+
 inputL:: Valor
 inputL = ValorList [ValorInt 10, ValorInt 12, ValorInt 13]
 
@@ -31,5 +34,5 @@ executeProg memoizedFunctionNames initialState prog input =
 
 calc :: String -> String
 calc s =
-  let r = executeProg memoizedNames initialState s inputL
+  let r = executeProg memoizedNames initialState s inputI
   in show $ r

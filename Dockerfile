@@ -70,7 +70,7 @@ RUN ./configure --enable-obj --enable-dddmp --enable-shared && \
 RUN cabal install --lib cudd
 
 # Copy project files
-WORKDIR /app
+WORKDIR /lifting-framework
 COPY . .
 
 # Build the project
