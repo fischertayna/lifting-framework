@@ -21,6 +21,7 @@ The **paper PDF** and any artwork are released under [CC-BY 4.0](LICENSE-PAPER).
 
 ## Repository Layout
 
+```text
 .
 ├── LICENSE # MIT license (code)
 ├── LICENSE-PAPER # CC-BY 4.0 license (Paper PDF and artwork)
@@ -50,6 +51,7 @@ The **paper PDF** and any artwork are released under [CC-BY 4.0](LICENSE-PAPER).
 │ ├── raw_outputs/ # Raw resuls of benchmark evaluation using criterion
 │ └── memoization/ # Metrics and graphics of runtime performance
 └── test/ # HSpec unit tests
+```
 
 ---
 
