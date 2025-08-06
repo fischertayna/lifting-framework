@@ -1,48 +1,147 @@
-# Passos para execução do projeto
+# How to Build & Run the Project
 
-O roteiro abaixo foi testado em sistemas Linux. Funcionou com sucesso no Ubuntu 22.4 e Fedora 38.
+These steps were tested on **Ubuntu 22.04** and **Fedora 38**.  
+Minor tweaks may be required on other Linux distributions.
 
-## Haskell
-Para execução é necessária instalação do GCH, Cabal, entre outros.
-Recomemdamos a instalação via GHCup (https://www.haskell.org/ghcup/), que possui as versões mais recentes dos programas.
-Durante a execução o ghcup vai apresentar as bibliotecas necessárias. Certifique-se se instalá-las.<br>
-<code> curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh </code>
+## 1  Install the Haskell toolchain
+
+This project needs **GHC**, **Cabal**, and related tools.  
+The simplest way to install them is via **GHCup**:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+```
+
+GHCup will prompt you to install extra components (e.g., ghc, cabal).
+Accept those prompts so Cabal can build the project later.
+
+This project was tested using ghc 9.2.8 and cabal 3.10.2.1
+
+```bash
+ghcup install ghc 9.2.8 && \
+ghcup set ghc 9.2.8 && \
+ghcup install cabal 3.10.2.1 && \
+ghcup set cabal 3.10.2.1
+```
+
+Verify the versions
+
+```bash
+ghc --version && cabal --version
+```
+
+## 2 Install build-time utilities (alex, happy, bnfc)
+
+The lexer/parser generators listed below are mandatory:
+
+```bash
+cabal install alex
+cabal install happy
+cabal install BNFC         # Tested with BNFC 2.9.4.1
+```
+
+\* Even if bnfc is already present, reinstall it to guarantee a recent version.
+
+## 3 Build & Install CUDD
+
+The project depends on the CUDD BDD library.
+
+```bash
+git clone https://github.com/ivmai/cudd
+cd cudd
+
+./configure --enable-obj --enable-dddmp --enable-shared
+make
+make check
+sudo make install
+```
+
+Some header files are not installed by default; copy them manually:
+
+```bash
+sudo cp config.h /usr/local/include/
+sudo cp util/util.h /usr/local/include/
+sudo cp mtr/mtr.h /usr/local/include/
+```
+
+Next, expose CUDD to Cabal (note the --lib flag):
+
+```bash
+C_INCLUDE_PATH=/usr/local/include \
+LIBRARY_PATH=/usr/local/lib \
+cabal install --lib cudd
+```
+
+## 4 Build This Project
+
+Return to the project root and compile:
+
+```bash
+C_INCLUDE_PATH=/usr/local/include \
+LIBRARY_PATH=/usr/local/lib \
+cabal build
+```
+
+## 5 Run
+
+You can now run the sample analysis pipeline (replace the input file as needed):
+
+```bash
+cabal run < src/Language/Analysis/Concat.lng
+```
+
+Open app/Main.hs to choose which interpreter (e.g., Typecheck, Base, Var, Memo, …) is executed and inspect the corresponding Driver.hs to see which input file is supplied.
+
+---
+
+## Troubleshooting
+
+- **make don't work for CUDD** - If there is an error with aclocal.m4 you can use the tag cudd-3.0.0 and touch the file.
+
+Change the first block of commands of CUDD instructions for:
+
+```bash
+git clone --branch cudd-3.0.0 https://github.com/ivmai/cudd
+cd cudd
+touch aclocal.m4 configure Makefile.in
+```
+
+The following commands stays the same.
+
+- **Missing headers or libraries** – verify that `/usr/local/include` and `/usr/local/lib` contain the CUDD artifacts and that the environment variables above are set.
+
+It may be necessary to export some variables:
+
+```
+export PATH="/root/.cabal/bin:/root/.ghcup/bin:${PATH}" \
+    C_INCLUDE_PATH=/usr/local/include \
+    LIBRARY_PATH=/usr/local/lib \
+    LD_LIBRARY_PATH=/usr/local/lib
+```
+
+- **bnfc version mismatch** – reinstall with cabal install BNFC to fetch the latest release.
 
 
-## Demais programas necessários
+---
 
-Os programas `alex`, `bnfc`* e `happy` são necesários à execução do projeto.<br> Instale-os com o cabal:<br>
-<code>cabal install alex</code>
-<code>cabal install happy</code>
-<code>cabal install BNFC</code>
+## Docker image
 
-\* Possivelmente o bnfc já estará instalado numa versão anterior. Instale-o novamente para buscar a versão mais recente. O projeto foi executado na versão 2.9.4.1
+A ready-to-use Docker image containing the full build environment is published on the GitHub Container Registry.
 
-## CUDD
-O projeto necessita, ainda, do CUDD para ser executado. Siga as instruções abaixo:
+| Tag                                             | Description                        |
+| ----------------------------------------------- | ---------------------------------- |
+| `ghcr.io/fischertayna/lifting-framework:sblp25` | Release used in the SBLP ’25 paper |
 
-Faça um clone do projeto e acesse a pasta:<br>
-<code>git clone https://github.com/ivmai/cudd</code><br>
-<code>cd cudd</code><br>
+1. **Pull the image**
 
-Configure, teste e instale o cudd:<br>
-<code>./configure --enable-obj --enable-dddmp --enable-shared</code><br>
-<code>make</code><br>
-<code>make check</code><br>
-<code>sudo make install</code><br>
+```bash
+docker pull ghcr.io/fischertayna/lifting-framework:sblp25
+```
 
-Ainda na pasta cudd, copie alguns arquivos necessários foram copiados no processo:<br>
-<code>sudo cp config.h /usr/local/include/</code><br>
-<code>sudo cp util/util.h /usr/local/include/</code><br>
-<code>sudo cp mtr/mtr.h /usr/local/include/</code><br>
+2. **Start an interactive shell (optional)**
 
-Por algum motivo, o cabal não está reconhecendo os argumentos "--extra-include-dirs=" e "--extra-lib-dirs=", então é necessário passar informações adicionais para o cabal na instalação do CUDD e no primeiro build do projeto. Adicionalmente, precisamos passar o argumento --lib, para que o cabal disponibilize o cudd como uma biblioteca e não como executável:<br>
-<code>C_INCLUDE_PATH=/usr/local/include LIBRARY_PATH=/usr/local/lib/ cabal install --lib cudd</code>
+```bash
+docker run --rm -it ghcr.io/fischertayna/lifting-framework:sblp25 bash
+```
 
-Acesse novamente esse projeto, e execute o build:<br>
-<code>C_INCLUDE_PATH=/usr/local/include LIBRARY_PATH=/usr/local/lib/ cabal build</code>
-
-A partir de agora, pode executar o projeto normalmente*:<br>
-<code>cabal run < src/Language/Analysis/Concat.lng</code> 
-
-Verifique no arquivo app/Main.js qual programa será executado (Typecheck, Base, Var, etc.) e qual input está sendo enviado no Driver.hs correspondente.
+Note: No authentication is required as the image is public.

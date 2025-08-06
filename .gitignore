@@ -4,3 +4,5 @@
 build
 dist-newstyle
 .vscode
+.DS_Store
+.idea/
