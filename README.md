@@ -1,6 +1,6 @@
 # Lifting-Framework &nbsp;•&nbsp; Artifact for SBLP ’25
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16755087.svg)](https://doi.org/10.5281/zenodo.16755087)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16763257.svg)](https://doi.org/10.5281/zenodo.16763257)
 
 An **interpreter-based framework** that combines **variational lifting** and **memoization** to enable scalable, reusable static analyses of evolving software-product lines (SPLs).
 
