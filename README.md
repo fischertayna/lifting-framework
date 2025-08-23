@@ -86,12 +86,42 @@ If you prefer a local build (or wish to hack on the code), follow [INSTALL.md](I
 
 ## Basic Usage
 
-#### Run an analysis
+Analyses are implemented in src/Language/Analysis, with Data Flow Analyses located in src/Language/Analysis/DFA. All analyses must be written in PCF+, though you are free to define additional analyses in this language.
 
-The command below runs the Fibonacci example (src/Language/Analysis/Fibonacci.lng). In this analysis the variable is variational: it evaluates to **2** under presence condition **A** and to **3** under **¬A**, represented as `VarInteger (Var [(2, pcA), (3, notBDD pcA)])`.
+Programs to be analyzed should be expressed in the While Language, as described in Principles of Program Analysis. This language has been extended to support variability. For further details, see the paper “An Interpreter-based Framework for Static Analysis of Variability in Space and Time”.
+
+Examples of While programs can be found in:
+
+- src/WhileLang/WhileDFAExamples.hs
+
+- benchmarks/ComplexExamples.hs
+
+#### Interpreters
+
+The framework provides four execution modes, each with its own driver module:
+
+- Driver.Base – baseline interpreter
+
+- Driver.Memo – interpreter with memoization
+
+- Driver.Var – variability-aware interpreter
+
+- Driver.VMemo – variability + memoization (default)
+
+The active interpreter is selected in app/Main.hs by changing the imported driver. Each driver defines its own main function. To run a different program, adjust the input directly in the chosen driver module.
+
+#### Smoke test
+
+As a quick test, you can run the Fibonacci example (src/Language/Analysis/Fibonacci.lng):
 
 ```bash
 cabal run lifting-framework < src/Language/Analysis/Fibonacci.lng
+```
+
+This program defines a variational input: the variable evaluates to 2 under presence condition A and to 3 under ¬A, represented as:
+
+```
+VarInteger (Var [(2, pcA), (3, notBDD pcA)])
 ```
 
 Expected output:
@@ -104,16 +134,6 @@ The tuple contains:
 
 1. Result – the variational integer produced by the analysis.
 2. Final cache – key/value pairs stored by the interpreter’s memoization layer.
-
-The analysis is executed by whichever driver module is imported in app/Main.hs.
-To switch execution modes, open that file and replace the import with one of:
-
-- Driver.Base – baseline interpreter
-- Driver.Memo – memoized interpreter
-- Driver.Var – variability-aware interpreter
-- Driver.VMemo – variability + memoization (default)
-
-Each driver defines its own main function. Adjust the input for the analysis directly inside the selected driver module if you need to test a different program.
 
 #### Run the unit test suite
 
@@ -135,40 +155,37 @@ bnfc --haskell --name-space=Language.Frontend --output=src ./src/Language/Langua
 
 #### Quick run
 
-```bash
-docker run -it \
-  -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
-  ghcr.io/fischertayna/lifting-framework:sblp25 \
-  cabal run benchmark-suite -- --json /lifting-framework/benchmark_output/benchmark.json
-```
-
-You can also generate directly all the metrics:
+To reproduce the benchmarks and persist results to your host machine, run:
 
 ```bash
 docker run -it \
   -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
   ghcr.io/fischertayna/lifting-framework:sblp25 \
-  python3 benchmarks/scripts/generateCSV.py
+  bash -c "
+    cabal run benchmark-suite -- --json /lifting-framework/benchmark_output/benchmark.json &&
+    python3 benchmarks/scripts/generateCSV.py &&
+    cabal run cache-metrics-extractor
+  "
 ```
 
-and
+This single command will:
 
-```bash
-docker run -it \
-  -v "$(pwd)/benchmark_output:/lifting-framework/benchmark_output" \
-  ghcr.io/fischertayna/lifting-framework:sblp25 \
-  cabal run cache-metrics-extractor
-```
+1. **Run the Criterion benchmark suite** – produces benchmark.json.
 
-The benchmark writes a cache_metrics.csv and runtime_metrics.csv containing raw numbers that feed
-directly into the paper’s artefact evaluation package.
+2. **Generate runtime metrics (CSV)** – produces runtime_metrics.csv.
+
+3. **Extract cache metrics** – produces cache_metrics.csv.
+
+All results will appear in ./benchmark_output on your machine.
+
+⏱️ Note: Running the full benchmark takes about **25 minutes** on a standard laptop.
 
 #### Resulting files
 
 | File                          | Description                        |
 | ----------------------------- | ---------------------------------- |
-| `benchmark_output/runtime_performance/runtime_metrics.csv` | Wall-clock runtime per interpreter |
-| `benchmark_output/memoization/cache_metrics.csv`   | Cache hits, misses, and reuse      |
+| `benchmark_output/runtime_metrics.csv` | Wall-clock runtime per interpreter |
+| `benchmark_output/cache_metrics.csv`   | Cache hits, misses, and reuse      |
 
 Further details are in [benchmarks/README.md](benchmarks/README.md).
 
